@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".ui.main.OldHomeActivity">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Lock1 BroadcastId1"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/lockBroadcastId1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_black_rounded"
+        android:importantForAutofill="no"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="478312"
+        tools:ignore="HardcodedText,LabelFor,TextFields" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lock1 Password"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/lockPassword1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_black_rounded"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="337800489559774425"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/textViewStatusLock1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="RSSI"
+        android:textColor="@color/purple_700" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Lock2 BroadcastId" />
+
+    <EditText
+        android:id="@+id/lockBroadcastId2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_black_rounded"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lock2 Password" />
+
+    <EditText
+        android:id="@+id/lockPassword2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_black_rounded"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/textViewStatusLock2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/purple_700" />
+
+    <TextView
+        android:id="@+id/textViewRSSI"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="RSSI Threshold" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/seekBarRssi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:max="-15"
+        android:min="-95" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="-95dB"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textViewCurrentThreshold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textStyle="bold"
+            tools:text="Current:" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="-15dB"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Delay After Unlock"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="15"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="sec"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Version 1.0.0"
+        android:textSize="12sp"
+        tools:ignore="HardcodedText" />
+
+</LinearLayout>
+

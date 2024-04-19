@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.peripheral.bledevice">
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <application
+        android:name=".ui.common.LockApplication"
+        android:allowBackup="true"
+        android:icon="@android:drawable/ic_lock_lock"
+        android:label="@string/app_name"
+        android:roundIcon="@android:drawable/ic_lock_lock"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyLockBLE">
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyLockBLE">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!--
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MyLockBLE">
+        </activity>-->
+
+        <service
+            android:name="com.mnh.service.BluetoothScanService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+    </application>
+
+</manifest>
