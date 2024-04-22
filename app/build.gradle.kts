@@ -83,6 +83,7 @@ dependencies {
     implementation(project(":data:local"))
     implementation(project(":core:utils"))
     implementation(project(":ble"))
+    implementation(project(":service"))
 }
 
 kapt {

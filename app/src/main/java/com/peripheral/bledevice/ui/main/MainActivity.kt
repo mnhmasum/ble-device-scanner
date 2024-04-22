@@ -2,6 +2,7 @@ package com.peripheral.bledevice.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.content.ComponentName
 import android.content.Intent
@@ -30,15 +31,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lightnotebook.data.database.entity.DeviceEntity
-import com.mnh.service.model.LockRSSI
 import com.mnh.service.BluetoothScanService
+import com.mnh.service.model.LockRSSI
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private var bluetoothScanService: com.mnh.service.BluetoothScanService? = null
+    private var bluetoothScanService: BluetoothScanService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +93,7 @@ class MainActivity : ComponentActivity() {
     private fun startBluetoothScanForegroundService() {
         val bleScanServiceConnectionCallback = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as? com.mnh.service.BluetoothScanService.MyBinder
+                val binder = service as? BluetoothScanService.MyBinder
                 bluetoothScanService = binder?.getService()
 
                 setContent {
@@ -107,7 +108,7 @@ class MainActivity : ComponentActivity() {
         }
 
         fun startBleScanningService(bleScanServiceConnectionCallback: ServiceConnection) {
-            val serviceIntent = Intent(this, com.mnh.service.BluetoothScanService::class.java)
+            val serviceIntent = Intent(this, BluetoothScanService::class.java)
             startForegroundService(serviceIntent)
             bindService(serviceIntent, bleScanServiceConnectionCallback, BIND_AUTO_CREATE)
         }
@@ -141,8 +142,7 @@ fun MainContent(viewModel: MainActivityViewModel = viewModel()) {
 
 @Composable
 fun MainContentWithService(
-    service: com.mnh.service.BluetoothScanService,
-    viewModel: MainActivityViewModel = viewModel()
+    service: BluetoothScanService, viewModel: MainActivityViewModel = viewModel()
 ) {
     val locks by viewModel.locks.collectAsState(initial = emptyList())
     val lockInfo by service.lockRSSI.collectAsState(initial = com.mnh.service.model.LockRSSI(""))
@@ -166,7 +166,7 @@ fun MainContentBody1(
     onClick: () -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        UserList(users = list)
+        UserList(scanResults = list)
     }
 }
 
@@ -182,8 +182,7 @@ fun MainContentBody(
 
         Text(text = "Name")
 
-        TextField(
-            value = viewModel.deviceName,
+        TextField(value = viewModel.deviceName,
             onValueChange = { viewModel.updateLockBroadcastId(it) })
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -198,15 +197,15 @@ fun MainContentBody(
 }
 
 @Composable
-fun UserList(users: List<ScanResult>?) {
-    users?.let {
+fun UserList(scanResults: List<ScanResult>?) {
+    scanResults?.let {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            items(users) { user ->
-                UserItem(user = user)
+            items(scanResults) { scanResult ->
+                ListItem(device = scanResult.device)
             }
         }
     }
@@ -215,10 +214,9 @@ fun UserList(users: List<ScanResult>?) {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun UserItem(user: ScanResult) {
+fun ListItem(device: BluetoothDevice) {
     Text(
-        modifier = Modifier.padding(8.dp),
-        text = "${user.device?.name ?: "Unknown"} ${user.device.address}"
+        modifier = Modifier.padding(8.dp), text = "${device.name ?: "Unknown"} ${device.address}"
     )
 }
 
@@ -226,6 +224,6 @@ fun UserItem(user: ScanResult) {
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBody(list = emptyList(), com.mnh.service.model.LockRSSI(""), onClick = { })
+        MainContentBody(list = emptyList(), LockRSSI(""), onClick = { })
     }
 }
