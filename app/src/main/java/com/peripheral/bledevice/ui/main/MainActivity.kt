@@ -2,7 +2,6 @@ package com.peripheral.bledevice.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.content.ComponentName
 import android.content.Intent
@@ -205,7 +204,7 @@ fun UserList(scanResults: List<ScanResult>?) {
                 .padding(16.dp)
         ) {
             items(scanResults) { scanResult ->
-                ListItem(device = scanResult.device)
+                ListItem(scanResult = scanResult)
             }
         }
     }
@@ -214,10 +213,26 @@ fun UserList(scanResults: List<ScanResult>?) {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun ListItem(device: BluetoothDevice) {
-    Text(
-        modifier = Modifier.padding(8.dp), text = "${device.name ?: "Unknown"} ${device.address}"
-    )
+fun ListItem(scanResult: ScanResult) {
+    val device = scanResult.device
+    val rssi = scanResult.rssi
+
+    Column {
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = device.name ?: "Unknown"
+        )
+
+        Text(
+            modifier = Modifier.padding(vertical = 4.dp),
+            text = device.address
+        )
+
+        Text(
+            modifier = Modifier.padding(vertical = 4.dp),
+            text = "RSSI $rssi"
+        )
+    }
 }
 
 @Preview(showBackground = true)
