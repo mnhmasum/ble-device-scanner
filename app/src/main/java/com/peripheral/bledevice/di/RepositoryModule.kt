@@ -3,9 +3,9 @@ package com.peripheral.bledevice.di
 import com.lightnotebook.data.database.DeviceDao
 import com.lightnotebook.data.repository.DeviceRepository
 import com.lightnotebook.data.repository.DeviceRepositoryImp
-import com.mnh.ble.scanner.BleScanner
 import com.mnh.ble.repository.BleRepository
 import com.mnh.ble.repository.BleRepositoryImp
+import com.mnh.ble.scanner.BleScanner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +26,5 @@ class RepositoryModule {
     fun provideBleRepository(bleScanner: BleScanner): BleRepository {
         return BleRepositoryImp(bleScanner)
     }
+
 }

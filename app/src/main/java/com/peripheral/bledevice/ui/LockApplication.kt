@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.common;
+package com.peripheral.bledevice.ui;
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

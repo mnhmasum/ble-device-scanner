@@ -1,20 +1,14 @@
 package com.mnh.ble.di
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.mnh.ble.scanner.BleScanner
 import com.mnh.ble.scanner.BleScannerImp
-import com.mnh.service.BluetoothScanService
 import com.napco.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -82,40 +76,6 @@ class BleModule {
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply { description = "Channel for Bluetooth Scan Service" }
         return channel
-    }
-
-    @Provides
-    @Singleton
-    fun provideNotificationBuilder(@ApplicationContext appContext: Context): Notification {
-        val stopIntent = Intent(appContext, com.mnh.service.BluetoothScanService::class.java)
-            .apply { action = com.mnh.service.BluetoothScanService.ACTION_STOP_SERVICE }
-
-        val stopPendingIntent = PendingIntent.getService(
-            appContext,
-            0,
-            stopIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notificationBuilder = NotificationCompat.Builder(appContext, Constants.channelId)
-            .apply {
-                setContentTitle("Lock Background Scan Service")
-                setContentText("Scanning for BLE devices")
-                setSmallIcon(androidx.core.R.drawable.notification_bg)
-                setColor(
-                    ContextCompat.getColor(
-                        appContext,
-                        androidx.core.R.color.notification_icon_bg_color
-                    )
-                )
-                setOngoing(true)
-                addAction(
-                    com.google.android.material.R.drawable.notify_panel_notification_icon_bg,
-                    "Stop",
-                    stopPendingIntent
-                )
-            }.build()
-        return notificationBuilder
     }
 
 

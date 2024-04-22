@@ -33,6 +33,7 @@ import com.lightnotebook.data.database.entity.DeviceEntity
 import com.mnh.service.BluetoothScanService
 import com.mnh.service.model.LockRSSI
 import com.napco.utils.PermissionManager.Companion.permissionManager
+import com.peripheral.bledevice.ui.navigation.Navigation
 import com.peripheral.bledevice.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -58,9 +59,8 @@ class MainActivity : ComponentActivity() {
 
             onPermissionGranted {
                 setContent {
-                    MainContent()
+                    Navigation()
                 }
-                //startBluetoothScanForegroundService()
             }
 
             onPermissionDenied {
@@ -130,8 +130,7 @@ fun MainContent(viewModel: MainActivityViewModel = viewModel()) {
         println("++++++++++++")
     }*/
 
-    val lockInfo =
-        com.mnh.service.model.LockRSSI("${scannedResult?.device} RSSI ${scannedResult?.rssi}")
+    val lockInfo = LockRSSI("${scannedResult?.device} RSSI ${scannedResult?.rssi}")
     Log.d("MainActivity", "MainContent: " + scannedResult?.device)
 
     MainContentBody1(list = bleDeviceList, lockInfo, viewModel) {
@@ -219,7 +218,7 @@ fun ListItem(scanResult: ScanResult) {
 
     Column {
         Text(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             text = device.name ?: "Unknown"
         )
 
@@ -232,6 +231,8 @@ fun ListItem(scanResult: ScanResult) {
             modifier = Modifier.padding(vertical = 4.dp),
             text = "RSSI $rssi"
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 

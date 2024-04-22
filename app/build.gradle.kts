@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
 
