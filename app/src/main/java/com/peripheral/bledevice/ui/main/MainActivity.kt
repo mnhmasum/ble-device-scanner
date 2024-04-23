@@ -29,11 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.lightnotebook.data.database.entity.DeviceEntity
 import com.mnh.service.BluetoothScanService
 import com.mnh.service.model.LockRSSI
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.navigation.Navigation
+import com.peripheral.bledevice.ui.navigation.Screen
 import com.peripheral.bledevice.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -82,12 +84,15 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
     }
 
-//    @Composable
-//    private fun MainContent() {
-//        AppTheme {
-//            MainContent()
-//        }
-//    }
+    override fun onPause() {
+        Log.d("MainActivity", "OnPause")
+        super.onPause()
+    }
+
+    override fun onResume() {
+        Log.d("MainActivity", "OnPause")
+        super.onResume()
+    }
 
     private fun startBluetoothScanForegroundService() {
         val bleScanServiceConnectionCallback = object : ServiceConnection {
@@ -117,25 +122,12 @@ class MainActivity : ComponentActivity() {
 
 }
 
+
 @Composable
-fun MainContent(viewModel: MainActivityViewModel = viewModel()) {
-    val locks by viewModel.locks.collectAsState(initial = emptyList())
-    val scannedResult by viewModel.bleDevice.collectAsState(initial = null)
-    val bleDeviceList by viewModel.bleDeviceList.collectAsState(initial = null)
-
-    println(bleDeviceList?.size)
-
-    /*scannedResult1?.forEach {
-        println(it.device)
-        println("++++++++++++")
-    }*/
-
-    val lockInfo = LockRSSI("${scannedResult?.device} RSSI ${scannedResult?.rssi}")
-    Log.d("MainActivity", "MainContent: " + scannedResult?.device)
-
-    MainContentBody1(list = bleDeviceList, lockInfo, viewModel) {
-        viewModel.insert(viewModel.deviceName)
-    }
+fun MainContent(navController: NavController, bleDeviceList: List<ScanResult>?) {
+    MainContentBody(
+        deviceList = bleDeviceList,
+        onClick = { navController.navigate(Screen.Details.route) })
 }
 
 @Composable
@@ -143,35 +135,36 @@ fun MainContentWithService(
     service: BluetoothScanService, viewModel: MainActivityViewModel = viewModel()
 ) {
     val locks by viewModel.locks.collectAsState(initial = emptyList())
-    val lockInfo by service.lockRSSI.collectAsState(initial = com.mnh.service.model.LockRSSI(""))
+    val lockInfo by service.lockRSSI.collectAsState(initial = LockRSSI(""))
 
     val scannedResult by viewModel.bleDevice.collectAsState(initial = null)
     Log.d("MainActivity", "MainContent: " + scannedResult?.device)
 
     service.deviceName = viewModel.deviceName
 
-    MainContentBody(list = locks, lockInfo, viewModel) {
+    MainContentBodyWithService(list = locks, lockInfo, viewModel) {
         viewModel.insert(viewModel.deviceName)
     }
 }
 
 
 @Composable
-fun MainContentBody1(
-    list: List<ScanResult>?,
-    lockStatus: com.mnh.service.model.LockRSSI,
-    viewModel: MainActivityViewModel = viewModel(),
+fun MainContentBody(
+    deviceList: List<ScanResult>?,
     onClick: () -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        UserList(scanResults = list)
+        Button(onClick = onClick) {
+            Text("Save")
+        }
+        UserList(scanResults = deviceList)
     }
 }
 
 @Composable
-fun MainContentBody(
+fun MainContentBodyWithService(
     list: List<DeviceEntity>,
-    lockStatus: com.mnh.service.model.LockRSSI,
+    lockStatus: LockRSSI,
     viewModel: MainActivityViewModel = viewModel(),
     onClick: () -> Unit
 ) {
@@ -240,6 +233,6 @@ fun ListItem(scanResult: ScanResult) {
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBody(list = emptyList(), LockRSSI(""), onClick = { })
+        MainContentBodyWithService(list = emptyList(), LockRSSI(""), onClick = { })
     }
 }

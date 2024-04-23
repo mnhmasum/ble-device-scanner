@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_POWER
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.ParcelUuid
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.UnsupportedEncodingException
+
 
 @SuppressLint("MissingPermission")
 class BleScannerImp(
@@ -337,26 +339,39 @@ class BleScannerImp(
 
     override fun startScanningWithList(): Flow<List<ScanResult>> = callbackFlow {
         val listOfScanResult = HashMap<String, ScanResult>()
-        val scanCallback = object : ScanCallback() {
+
+        scanCallBack1 = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 listOfScanResult[result.device.address] = result
                 trySend(listOfScanResult.values.toList())
             }
 
             override fun onScanFailed(errorCode: Int) {
-                //close(IllegalStateException("BLE Scan failed with error code: $errorCode"))
+                close(IllegalStateException("BLE Scan failed with error code: $errorCode"))
+                Log.e(TAG, "onScanFailed: " + errorCode )
             }
         }
 
-        bluetoothLeScanner.startScan(scanCallback)
+
+        //global ScanSettings settings;
+        val settingBuilder = ScanSettings.Builder()
+        settingBuilder.setScanMode(SCAN_MODE_LOW_POWER)
+        val settings = settingBuilder.build()
+
+
+        bluetoothLeScanner.startScan(null, settings, scanCallBack1)
 
         awaitClose {
-            bluetoothLeScanner.stopScan(scanCallback)
+            bluetoothLeScanner.stopScan(scanCallBack1)
         }
     }
 
+    private var scanCallBack1: ScanCallback? = null
 
     override fun stopScanning() {
-        TODO("Not yet implemented")
+        scanCallBack1?.let {
+            bluetoothLeScanner.stopScan(it)
+            scanCallBack1 = null // Clear the reference to the callback
+        }
     }
 }
