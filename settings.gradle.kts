@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "BLEIoTDemo"
+rootProject.name = "ble-device-scanner"
 include(":app")
 include(":data:local")
 include(":core:utils")
