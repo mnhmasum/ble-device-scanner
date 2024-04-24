@@ -62,10 +62,6 @@ class BleModule {
         return BleScannerImp(bluetoothLeScanner, sharedPreferences, appContext)
     }
 
-   /* @Provides
-    fun provideBleRepository(bleDataSource: BleDataSource): BleRepository {
-        return BleRepositoryImp(bleDataSource)
-    }*/
 
     @Provides
     @Singleton

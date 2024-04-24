@@ -1,5 +1,6 @@
 package com.mnh.ble.usecase
 
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import com.mnh.ble.repository.BleRepository
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,14 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
             .map { bleDeviceList ->
                 bleDeviceList.sortedByDescending { it.device.address }
             }
+    }
+
+    fun connect(device: BluetoothDevice) {
+        return bleRepository.connect(device)
+    }
+
+    fun bleGattConnectionResult(): Flow<String?> {
+        return bleRepository.getGattConnectionResult()
     }
 
 }

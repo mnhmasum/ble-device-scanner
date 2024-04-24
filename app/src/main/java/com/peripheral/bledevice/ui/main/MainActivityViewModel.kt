@@ -1,5 +1,6 @@
 package com.peripheral.bledevice.ui.main
 
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,9 +26,14 @@ class MainActivityViewModel @Inject constructor(
     val locks: Flow<List<DeviceEntity>> = deviceLocalDataUseCase.getDeviceList()
     val bleDevice: Flow<ScanResult> = bleUseCase.getBleDevice()
     val bleDeviceList: Flow<List<ScanResult>> = bleUseCase.getBleDeviceList()
+    val bleGattState: Flow<String?> = bleUseCase.bleGattConnectionResult()
 
     var deviceName by mutableStateOf("C845FF")
         private set
+
+    fun connect(device: BluetoothDevice) {
+        bleUseCase.connect(device)
+    }
 
     fun updateLockBroadcastId(input: String) {
         deviceName = input

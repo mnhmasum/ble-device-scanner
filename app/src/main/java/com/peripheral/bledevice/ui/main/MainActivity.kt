@@ -225,6 +225,10 @@ fun ListItem(scanResult: ScanResult) {
             text = "RSSI $rssi"
         )
 
+        Button(onClick = {}) {
+            Text("Connect")
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
