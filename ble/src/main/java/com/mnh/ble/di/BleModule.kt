@@ -1,6 +1,5 @@
 package com.mnh.ble.di
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -9,7 +8,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.mnh.ble.scanner.BleScanner
 import com.mnh.ble.scanner.BleScannerImp
-import com.napco.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,18 +59,5 @@ class BleModule {
 
         return BleScannerImp(bluetoothLeScanner, sharedPreferences, appContext)
     }
-
-
-    @Provides
-    @Singleton
-    fun provideNotificationChannel(): NotificationChannel {
-        val channel = NotificationChannel(
-            Constants.channelId,
-            "Bluetooth Scan Service Channel",
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply { description = "Channel for Bluetooth Scan Service" }
-        return channel
-    }
-
 
 }

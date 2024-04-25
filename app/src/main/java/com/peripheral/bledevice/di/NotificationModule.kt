@@ -1,6 +1,8 @@
 package com.peripheral.bledevice.di
 
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -51,6 +53,17 @@ class NotificationModule {
                 )
             }.build()
         return notificationBuilder
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationChannel(): NotificationChannel {
+        val channel = NotificationChannel(
+            Constants.channelId,
+            "Bluetooth Scan Service Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply { description = "Channel for Bluetooth Scan Service" }
+        return channel
     }
 
 }
