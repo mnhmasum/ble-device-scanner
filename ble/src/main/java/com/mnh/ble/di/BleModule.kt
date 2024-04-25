@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
 import android.content.SharedPreferences
+import com.mnh.ble.connector.BleConnector
+import com.mnh.ble.connector.BleConnectorImp
 import com.mnh.ble.scanner.BleScanner
 import com.mnh.ble.scanner.BleScannerImp
 import dagger.Module
@@ -54,10 +56,15 @@ class BleModule {
     fun provideBleScannerDataSourceImp(
         bluetoothLeScanner: BluetoothLeScanner,
         sharedPreferences: SharedPreferences,
-        @ApplicationContext appContext: Context
     ): BleScanner {
 
-        return BleScannerImp(bluetoothLeScanner, sharedPreferences, appContext)
+        return BleScannerImp(bluetoothLeScanner)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBleConnector(@ApplicationContext appContext: Context): BleConnector {
+        return BleConnectorImp(appContext)
     }
 
 }
