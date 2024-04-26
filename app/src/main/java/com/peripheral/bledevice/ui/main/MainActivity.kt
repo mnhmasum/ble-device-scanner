@@ -124,10 +124,16 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainContent(navController: NavController, bleDeviceList: List<ScanResult>?) {
+fun MainContent(
+    navController: NavController,
+    bleDeviceList: List<ScanResult>?,
+    viewModel: MainActivityViewModel
+) {
     MainContentBody(
         deviceList = bleDeviceList,
-        onClick = { navController.navigate(Screen.Details.route) })
+        onClick = { navController.navigate(Screen.Details.route) },
+        viewModel
+    )
 }
 
 @Composable
@@ -136,9 +142,6 @@ fun MainContentWithService(
 ) {
     val locks by viewModel.locks.collectAsState(initial = emptyList())
     val lockInfo by service.lockRSSI.collectAsState(initial = LockRSSI(""))
-
-    val scannedResult by viewModel.bleDevice.collectAsState(initial = null)
-    Log.d("MainActivity", "MainContent: " + scannedResult?.device)
 
     service.deviceName = viewModel.deviceName
 
@@ -151,13 +154,14 @@ fun MainContentWithService(
 @Composable
 fun MainContentBody(
     deviceList: List<ScanResult>?,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    viewModel: MainActivityViewModel
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Button(onClick = onClick) {
             Text("Save")
         }
-        UserList(scanResults = deviceList)
+        UserList(scanResults = deviceList, viewModel)
     }
 }
 
@@ -188,7 +192,7 @@ fun MainContentBodyWithService(
 }
 
 @Composable
-fun UserList(scanResults: List<ScanResult>?) {
+fun UserList(scanResults: List<ScanResult>?, viewModel: MainActivityViewModel) {
     scanResults?.let {
         LazyColumn(
             modifier = Modifier
@@ -196,7 +200,7 @@ fun UserList(scanResults: List<ScanResult>?) {
                 .padding(16.dp)
         ) {
             items(scanResults) { scanResult ->
-                ListItem(scanResult = scanResult)
+                ListItem(scanResult = scanResult, viewModel)
             }
         }
     }
@@ -205,7 +209,7 @@ fun UserList(scanResults: List<ScanResult>?) {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun ListItem(scanResult: ScanResult) {
+fun ListItem(scanResult: ScanResult, viewModel: MainActivityViewModel) {
     val device = scanResult.device
     val rssi = scanResult.rssi
 
@@ -225,7 +229,7 @@ fun ListItem(scanResult: ScanResult) {
             text = "RSSI $rssi"
         )
 
-        Button(onClick = {}) {
+        Button(onClick = { viewModel.connect(device) }) {
             Text("Connect")
         }
 

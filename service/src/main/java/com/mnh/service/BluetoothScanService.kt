@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import com.mnh.ble.repository.BleRepository
 import com.mnh.service.model.LockRSSI
 import com.mnh.service.utils.Utility
@@ -71,10 +70,10 @@ class BluetoothScanService : Service() {
 
     private fun observeBluetoothScanningResult() {
         job = scope.launch {
-            bleScanServiceRepository.fetchBleDevice().collectLatest { scanResult ->
-                val device = scanResult.device
+            bleScanServiceRepository.fetchBleDeviceList().collectLatest { scanResult ->
+                /*val device = scanResult.device
                 updateLockRSSiInfo(scanResult)
-                Log.d(TAG, "In Service : Device: ${device.name} RSS: ${device.address}")
+                Log.d(TAG, "In Service : Device: ${device.name} RSS: ${device.address}")*/
             }
         }
 

@@ -2,7 +2,9 @@ package com.mnh.ble.usecase
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
+import com.mnh.ble.model.Gatt
 import com.mnh.ble.repository.BleRepository
+import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -10,10 +12,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
-    fun getBleDevice(): Flow<ScanResult> {
-        return bleRepository.fetchBleDevice()
-            .flowOn(Dispatchers.IO)
-    }
 
     fun getBleDeviceList(): Flow<List<ScanResult>> {
         return bleRepository.fetchBleDeviceList()
@@ -27,7 +25,11 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
         return bleRepository.connect(device)
     }
 
-    fun bleGattConnectionResult(): Flow<String?> {
+    fun disconnect() {
+        bleRepository.disconnect()
+    }
+
+    fun bleGattConnectionResult(): Flow<DataState<Gatt>> {
         return bleRepository.getGattConnectionResult()
     }
 

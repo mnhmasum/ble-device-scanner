@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mnh.ble.model.Gatt
 import com.peripheral.bledevice.ui.main.MainActivityViewModel
 import com.peripheral.bledevice.ui.main.MainContent
 
@@ -20,11 +21,11 @@ fun Navigation() {
     val navController = rememberNavController()
     val mainActivityViewModel: MainActivityViewModel = viewModel()
     val bleDeviceList by mainActivityViewModel.bleDeviceList.collectAsState(initial = null)
-    val gattState by mainActivityViewModel.bleGattState.collectAsState(initial = "")
+    val gattState by mainActivityViewModel.bleGattState.collectAsState(initial = Gatt(""))
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            MainContent(navController, bleDeviceList)
+            MainContent(navController, bleDeviceList, mainActivityViewModel)
         }
 
         composable(route = Screen.Details.route) {

@@ -10,36 +10,51 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
+import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.Device
+import com.mnh.ble.model.Gatt
+import com.mnh.ble.model.Service
 import com.mnh.ble.utils.Utility
 import com.napco.utils.Constants
+import com.napco.utils.DataState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import java.io.UnsupportedEncodingException
 
 @SuppressLint("MissingPermission")
 class BleConnectorImp(private val context: Context) : BleConnector {
     private var lockFullStatus: ByteArray = ByteArray(4)
     private var seqLB: Int = -1
-    private var descWriteCount = 0
     private var hasEncryptionKey = false
     private lateinit var encryptByte: ByteArray
 
     private val device1: Device = Device()
 
-
-    private val _bleGattConnectionResult = MutableStateFlow<String?>("")
+    private val job = Job()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
 
 
     companion object {
         val TAG: String = BleConnectorImp::class.java.simpleName
     }
 
+    private val _bleGattConnectionResult =
+        MutableSharedFlow<DataState<Gatt>>()
+
+    override fun bleGattConnectionResult(): Flow<DataState<Gatt>> = _bleGattConnectionResult
+
     override fun connect(device: BluetoothDevice) {
         device.connectGatt(context, false, gattCallback)
     }
 
-    override fun bleGattConnectionResult(): Flow<String?> = _bleGattConnectionResult
+    override fun disconnect() {
+        scope.cancel()
+    }
 
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -52,6 +67,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
+                    disconnect()
                     Log.d(TAG, "Device disconnected")
                 }
             }
@@ -67,10 +83,23 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
                 for (service in services) {
                     Log.d(TAG, "Service: ${service.uuid}")
+                    scope.launch {
+                        _bleGattConnectionResult.emit(DataState.service(Service(service.uuid.toString())))
+                    }
                     Log.d(TAG, "------------------------- ")
                     for (characteristic in service.characteristics) {
                         Log.d(TAG, "Characteristic: ${characteristic.uuid}")
+                        scope.launch {
+                            _bleGattConnectionResult.emit(
+                                DataState.characteristic(
+                                    Characteristic(
+                                        characteristic.uuid.toString()
+                                    )
+                                )
+                            )
+                        }
                     }
+
                     Log.d(TAG, "============================= ")
                 }
 
