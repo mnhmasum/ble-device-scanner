@@ -7,6 +7,7 @@ sealed class DataState<T> {
     data class Success<T>(var data: T) : DataState<T>()
     data class Service<T>(var data: T) : DataState<T>()
     data class Characteristic<T>(var data: T) : DataState<T>()
+    //data class Characteristic<T>(var data: T) : DataState<T>()
 
     companion object {
         fun <T> loading(): DataState<T> =

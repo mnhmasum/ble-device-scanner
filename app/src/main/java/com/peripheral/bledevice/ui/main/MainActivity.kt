@@ -2,13 +2,13 @@ package com.peripheral.bledevice.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -84,16 +84,6 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onPause() {
-        Log.d("MainActivity", "OnPause")
-        super.onPause()
-    }
-
-    override fun onResume() {
-        Log.d("MainActivity", "OnPause")
-        super.onResume()
-    }
-
     private fun startBluetoothScanForegroundService() {
         val bleScanServiceConnectionCallback = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -130,10 +120,81 @@ fun MainContent(
     viewModel: MainActivityViewModel
 ) {
     MainContentBody(
+        viewModel,
         deviceList = bleDeviceList,
-        onClick = { navController.navigate(Screen.Details.route) },
-        viewModel
+        onClick = {
+            viewModel.connect(it)
+            navController.navigate(Screen.Details.route)
+        },
     )
+}
+
+@Composable
+fun MainContentBody(
+    viewModel: MainActivityViewModel,
+    deviceList: List<ScanResult>?,
+    onClick: (device: BluetoothDevice) -> Unit
+) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        /*Button(onClick = { onClick(null) }) {
+            Text("Save")
+        }*/
+        ListView(viewModel, scanResults = deviceList, onClick)
+    }
+}
+
+@Composable
+fun ListView(
+    viewModel: MainActivityViewModel,
+    scanResults: List<ScanResult>?,
+    onClick: (device: BluetoothDevice) -> Unit
+) {
+    scanResults?.let {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            items(scanResults) { scanResult ->
+                ListItem(viewModel, scanResult = scanResult, onClick)
+            }
+        }
+    }
+
+}
+
+@SuppressLint("MissingPermission")
+@Composable
+fun ListItem(
+    viewModel: MainActivityViewModel,
+    scanResult: ScanResult,
+    onClick: (device: BluetoothDevice) -> Unit
+) {
+    val device = scanResult.device
+    val rssi = scanResult.rssi
+
+    Column {
+        Text(
+            modifier = Modifier.padding(vertical = 8.dp),
+            text = device.name ?: "Unknown"
+        )
+
+        Text(
+            modifier = Modifier.padding(vertical = 4.dp),
+            text = device.address
+        )
+
+        Text(
+            modifier = Modifier.padding(vertical = 4.dp),
+            text = "RSSI $rssi"
+        )
+
+        Button(onClick = { onClick(device) }) {
+            Text("Connect")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+    }
 }
 
 @Composable
@@ -150,20 +211,6 @@ fun MainContentWithService(
     }
 }
 
-
-@Composable
-fun MainContentBody(
-    deviceList: List<ScanResult>?,
-    onClick: () -> Unit,
-    viewModel: MainActivityViewModel
-) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Button(onClick = onClick) {
-            Text("Save")
-        }
-        UserList(scanResults = deviceList, viewModel)
-    }
-}
 
 @Composable
 fun MainContentBodyWithService(
@@ -188,52 +235,6 @@ fun MainContentBodyWithService(
 
         Text(text = lockStatus.lock1)
 
-    }
-}
-
-@Composable
-fun UserList(scanResults: List<ScanResult>?, viewModel: MainActivityViewModel) {
-    scanResults?.let {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            items(scanResults) { scanResult ->
-                ListItem(scanResult = scanResult, viewModel)
-            }
-        }
-    }
-
-}
-
-@SuppressLint("MissingPermission")
-@Composable
-fun ListItem(scanResult: ScanResult, viewModel: MainActivityViewModel) {
-    val device = scanResult.device
-    val rssi = scanResult.rssi
-
-    Column {
-        Text(
-            modifier = Modifier.padding(vertical = 8.dp),
-            text = device.name ?: "Unknown"
-        )
-
-        Text(
-            modifier = Modifier.padding(vertical = 4.dp),
-            text = device.address
-        )
-
-        Text(
-            modifier = Modifier.padding(vertical = 4.dp),
-            text = "RSSI $rssi"
-        )
-
-        Button(onClick = { viewModel.connect(device) }) {
-            Text("Connect")
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 

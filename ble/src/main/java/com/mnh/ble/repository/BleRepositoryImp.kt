@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import com.mnh.ble.connector.BleConnector
-import com.mnh.ble.model.Gatt
+import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.scanner.BleScanner
 import com.napco.utils.DataState
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ class BleRepositoryImp(private val bleSource: BleScanner, private val bleConnect
         bleConnector.disconnect()
     }
 
-    override fun getGattConnectionResult(): Flow<DataState<Gatt>> {
+    override fun getGattConnectionResult(): Flow<DataState<DeviceInfo>> {
         return bleConnector.bleGattConnectionResult()
     }
 

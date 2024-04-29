@@ -10,10 +10,8 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
-import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.Device
-import com.mnh.ble.model.Gatt
-import com.mnh.ble.model.Service
+import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.utils.Utility
 import com.napco.utils.Constants
 import com.napco.utils.DataState
@@ -44,9 +42,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     }
 
     private val _bleGattConnectionResult =
-        MutableSharedFlow<DataState<Gatt>>()
+        MutableSharedFlow<DataState<DeviceInfo>>()
 
-    override fun bleGattConnectionResult(): Flow<DataState<Gatt>> = _bleGattConnectionResult
+    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> = _bleGattConnectionResult
 
     override fun connect(device: BluetoothDevice) {
         device.connectGatt(context, false, gattCallback)
@@ -75,35 +73,39 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "onServicesDiscovered: Enable Notification")
+
                 //enableTxTypeNotification(gatt)
+
+                val map = HashMap<String, List<String>>()
 
                 val services = gatt.services
 
                 for (service in services) {
-                    Log.d(TAG, "Service: ${service.uuid}")
-                    scope.launch {
-                        _bleGattConnectionResult.emit(DataState.service(Service(service.uuid.toString())))
-                    }
-                    Log.d(TAG, "------------------------- ")
+                    val listOfCharacteristics = ArrayList<String>()
+
                     for (characteristic in service.characteristics) {
+                        listOfCharacteristics.add(characteristic.uuid.toString())
                         Log.d(TAG, "Characteristic: ${characteristic.uuid}")
-                        scope.launch {
-                            _bleGattConnectionResult.emit(
-                                DataState.characteristic(
-                                    Characteristic(
-                                        characteristic.uuid.toString()
-                                    )
-                                )
-                            )
-                        }
+
                     }
 
-                    Log.d(TAG, "============================= ")
+                    map[service.uuid.toString()] = listOfCharacteristics
+
+                }
+
+                val deviceInfo = DataState.success(DeviceInfo(map))
+
+                scope.launch {
+                    _bleGattConnectionResult.emit(deviceInfo)
+
                 }
 
             }
+
+
         }
 
         override fun onDescriptorWrite(
@@ -115,7 +117,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             Log.d(TAG, "onDescriptorWrite: Status $status")
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-
                 /*descWriteCount++
                 when (descWriteCount) {
                     1 -> enableTxBufferNotification(gatt)
@@ -160,6 +161,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             //processCharacteristicChangedData(gatt, characteristic)
 
         }
+
 
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,

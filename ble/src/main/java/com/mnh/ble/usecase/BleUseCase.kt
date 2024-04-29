@@ -2,7 +2,7 @@ package com.mnh.ble.usecase
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
-import com.mnh.ble.model.Gatt
+import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.repository.BleRepository
 import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
         bleRepository.disconnect()
     }
 
-    fun bleGattConnectionResult(): Flow<DataState<Gatt>> {
+    fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> {
         return bleRepository.getGattConnectionResult()
     }
 
