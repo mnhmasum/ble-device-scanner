@@ -136,9 +136,6 @@ fun MainContentBody(
     onClick: (device: BluetoothDevice) -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        /*Button(onClick = { onClick(null) }) {
-            Text("Save")
-        }*/
         ListView(viewModel, scanResults = deviceList, onClick)
     }
 }

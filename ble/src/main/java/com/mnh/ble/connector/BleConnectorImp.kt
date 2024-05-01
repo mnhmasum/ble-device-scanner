@@ -6,10 +6,12 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
+import com.mnh.ble.model.CharacteristicInfo
 import com.mnh.ble.model.Device
 import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.utils.Utility
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.io.UnsupportedEncodingException
+
 
 @SuppressLint("MissingPermission")
 class BleConnectorImp(private val context: Context) : BleConnector {
@@ -41,8 +44,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val TAG: String = BleConnectorImp::class.java.simpleName
     }
 
-    private val _bleGattConnectionResult =
-        MutableSharedFlow<DataState<DeviceInfo>>()
+    private val _bleGattConnectionResult = MutableSharedFlow<DataState<DeviceInfo>>()
 
     override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> = _bleGattConnectionResult
 
@@ -71,41 +73,86 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             }
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            super.onServicesDiscovered(gatt, status)
+        override fun onServicesDiscovered(peripheralGatt: BluetoothGatt, status: Int) {
+            super.onServicesDiscovered(peripheralGatt, status)
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
+
                 Log.d(TAG, "onServicesDiscovered: Enable Notification")
 
                 //enableTxTypeNotification(gatt)
 
-                val map = HashMap<String, List<String>>()
-
-                val services = gatt.services
-
-                for (service in services) {
-                    val listOfCharacteristics = ArrayList<String>()
-
-                    for (characteristic in service.characteristics) {
-                        listOfCharacteristics.add(characteristic.uuid.toString())
-                        Log.d(TAG, "Characteristic: ${characteristic.uuid}")
-
-                    }
-
-                    map[service.uuid.toString()] = listOfCharacteristics
-
-                }
-
-                val deviceInfo = DataState.success(DeviceInfo(map))
+                val peripheralDeviceInfo = getPeripheralInfo(peripheralGatt.services)
 
                 scope.launch {
-                    _bleGattConnectionResult.emit(deviceInfo)
+                    _bleGattConnectionResult.emit(DataState.success(peripheralDeviceInfo))
 
                 }
 
             }
 
 
+        }
+
+        fun getPeripheralInfo(services: List<BluetoothGattService>): DeviceInfo {
+            val peripheralServices = HashMap<String, List<CharacteristicInfo>>()
+
+            for (service in services) {
+
+                val characteristics = ArrayList<CharacteristicInfo>()
+
+                for (characteristic in service.characteristics) {
+                    Log.d(TAG, "getPeripheralInfo char : ${characteristic.uuid.toString()}")
+                    val characteristicInfo = getCharacteristicInfo(characteristic)
+                    characteristics.add(characteristicInfo)
+
+                }
+
+                peripheralServices[service.uuid.toString()] = characteristics
+
+            }
+
+            return DeviceInfo(peripheralServices)
+        }
+
+
+        fun getCharacteristicInfo(characteristic: BluetoothGattCharacteristic): CharacteristicInfo {
+            val types = ArrayList<Constants.CharType>()
+            val isReadable = isCharacteristicReadable(characteristic)
+            val isNotify = isCharacteristicNotify(characteristic)
+            val isWritable = isCharacteristicWritable(characteristic)
+            val isWriteNoResponse = isCharacteristicWritableNoResponse(characteristic)
+
+            if (isReadable) {
+                types.add(Constants.CharType.READABLE)
+            }
+            if (isNotify) {
+                types.add(Constants.CharType.NOTIFY)
+            }
+            if (isWritable) {
+                types.add(Constants.CharType.WRITABLE)
+            }
+            if (isWriteNoResponse) {
+                types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
+            }
+
+            return CharacteristicInfo(types, characteristic.uuid.toString())
+        }
+
+        fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0
+        }
+
+        fun isCharacteristicWritable(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
+        }
+
+        fun isCharacteristicNotify(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
+        }
+
+        fun isCharacteristicWritableNoResponse(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
         }
 
         override fun onDescriptorWrite(
@@ -132,13 +179,12 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 val service = gatt.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-                val charRxType =
-                    service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_TYPE)
+                val charRxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_TYPE)
 
                 if (characteristic == charRxType) {
                     val charRxBuffer =
                         service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_BUFFER)
-                    //writePassword(charRxBuffer, gatt)
+                    writePassword(charRxBuffer, gatt)
                 }
             }
         }
@@ -158,7 +204,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             Log.d(TAG, "Characteristics Read value2: ${characteristicsValue?.contentToString()}")
             Log.d(TAG, "Characteristics Read value2: ${characteristic?.uuid.toString()}")
 
-            //processCharacteristicChangedData(gatt, characteristic)
+            processCharacteristicChangedData(gatt, characteristic)
 
         }
 
@@ -169,8 +215,24 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             value: ByteArray
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            //processCharacteristicChangedData(gatt, characteristic)
+            processCharacteristicChangedData(gatt, characteristic)
         }
+
+
+        /* override fun onCharacteristicRead(
+             gatt: BluetoothGatt,
+             characteristic: BluetoothGattCharacteristic,
+             value: ByteArray,
+             status: Int
+         ) {
+             super.onCharacteristicRead(gatt, characteristic, value, status)
+             //processCharacteristicChangedData(null, null)
+             if (status == BluetoothGatt.GATT_SUCCESS) {
+                 Log.d(TAG, "Characteristics Read NEW: ${characteristic?.uuid.toString()}")
+                 Log.d(TAG, "Characteristics Read Value: $value")
+                 Log.d(TAG, "Characteristics Read Status: $status")
+             }
+         }*/
 
     }
 
@@ -198,9 +260,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val charTxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_TX_TYPE)
         gatt.setCharacteristicNotification(charTxType, true)
 
-        val bt2TxTypeDesc = charTxType.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
+        /*val bt2TxTypeDesc = charTxType.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
         bt2TxTypeDesc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        gatt.writeDescriptor(bt2TxTypeDesc)
+        gatt.writeDescriptor(bt2TxTypeDesc)*/
     }
 
     fun processCharacteristicChangedData(

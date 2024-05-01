@@ -3,6 +3,14 @@ package com.napco.utils
 import java.util.UUID
 
 class Constants {
+
+    enum class CharType {
+        READABLE,
+        WRITABLE,
+        NOTIFY,
+        WRITABLE_NO_RESPONSE
+    }
+
     companion object {
         val LOCK_READY = 0x30.toByte()
         val LOCKED = 0x33.toByte()
@@ -21,7 +29,8 @@ class Constants {
             UUID.fromString("A8C993EB-1322-4A8E-9CB1-4501B9AE539B")
         val CHARACTERISTIC_DATA_TX_CTRL: UUID =
             UUID.fromString("BCD6678B-55D0-47BC-AD27-EDB6EC455255")
-        val DESCRIPTOR_PRE_CLIENT_CONFIG: UUID = UUID.fromString("00002902-0000-1000-8000-00805F9B34FB")
+        val DESCRIPTOR_PRE_CLIENT_CONFIG: UUID =
+            UUID.fromString("00002902-0000-1000-8000-00805F9B34FB")
 
         val channelId = "BluetoothScanServiceChannel"
     }
