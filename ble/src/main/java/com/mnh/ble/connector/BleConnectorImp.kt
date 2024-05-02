@@ -22,7 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.UnsupportedEncodingException
 
@@ -39,14 +40,13 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-
     companion object {
         val TAG: String = BleConnectorImp::class.java.simpleName
     }
 
-    private val _bleGattConnectionResult = MutableSharedFlow<DataState<DeviceInfo>>()
+    private val _bleGattConnectionResult = MutableStateFlow<DataState<DeviceInfo>>(DataState.loading())
 
-    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> = _bleGattConnectionResult
+    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> = _bleGattConnectionResult.asStateFlow()
 
     override fun connect(device: BluetoothDevice) {
         device.connectGatt(context, false, gattCallback)
