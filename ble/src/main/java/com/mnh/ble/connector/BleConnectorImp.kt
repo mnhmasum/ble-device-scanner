@@ -20,7 +20,6 @@ import com.napco.utils.DataState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +35,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     private lateinit var encryptByte: ByteArray
 
     private val device1: Device = Device()
+    private var device: BluetoothDevice? = null
 
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
@@ -44,16 +44,22 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val TAG: String = BleConnectorImp::class.java.simpleName
     }
 
-    private val _bleGattConnectionResult = MutableStateFlow<DataState<DeviceInfo>>(DataState.loading())
+    private val _bleGattConnectionResult =
+        MutableStateFlow<DataState<DeviceInfo>>(DataState.loading())
 
-    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> = _bleGattConnectionResult.asStateFlow()
+    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> =
+        _bleGattConnectionResult.asStateFlow()
 
     override fun connect(device: BluetoothDevice) {
+        this.device = device
         device.connectGatt(context, false, gattCallback)
     }
 
     override fun disconnect() {
-        scope.cancel()
+        scope.launch {
+            _bleGattConnectionResult.emit(DataState.loading())
+        }
+        //scope.can  cel()
     }
 
 

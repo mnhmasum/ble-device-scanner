@@ -2,7 +2,6 @@ package com.peripheral.bledevice.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.content.ComponentName
 import android.content.Intent
@@ -18,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -123,8 +122,7 @@ fun MainContent(
         viewModel,
         deviceList = bleDeviceList,
         onClick = {
-            viewModel.connect(it)
-            navController.navigate(Screen.Details.route)
+            navController.navigate("${Screen.Details.route}/$it")
         },
     )
 }
@@ -133,18 +131,17 @@ fun MainContent(
 fun MainContentBody(
     viewModel: MainActivityViewModel,
     deviceList: List<ScanResult>?,
-    onClick: (device: BluetoothDevice) -> Unit
+    onClick: (index: Int) -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        ListView(viewModel, scanResults = deviceList, onClick)
+        ListView(scanResults = deviceList, onClick)
     }
 }
 
 @Composable
 fun ListView(
-    viewModel: MainActivityViewModel,
     scanResults: List<ScanResult>?,
-    onClick: (device: BluetoothDevice) -> Unit
+    onClick: (device: Int) -> Unit
 ) {
     scanResults?.let {
         LazyColumn(
@@ -152,8 +149,8 @@ fun ListView(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            items(scanResults) { scanResult ->
-                ListItem(viewModel, scanResult = scanResult, onClick)
+            itemsIndexed(scanResults) { index, scanResult ->
+                ListItem(index, scanResult = scanResult, onClick)
             }
         }
     }
@@ -163,9 +160,9 @@ fun ListView(
 @SuppressLint("MissingPermission")
 @Composable
 fun ListItem(
-    viewModel: MainActivityViewModel,
+    index: Int,
     scanResult: ScanResult,
-    onClick: (device: BluetoothDevice) -> Unit
+    onClick: (index: Int) -> Unit
 ) {
     val device = scanResult.device
     val rssi = scanResult.rssi
@@ -186,7 +183,7 @@ fun ListItem(
             text = "RSSI $rssi"
         )
 
-        Button(onClick = { onClick(device) }) {
+        Button(onClick = { onClick(index) }) {
             Text("Connect")
         }
 

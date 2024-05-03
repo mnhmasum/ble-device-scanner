@@ -1,5 +1,6 @@
 package com.mnh.features.details
 
+import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,22 +22,36 @@ import com.napco.utils.DataState
 
 
 @Composable
-fun Details(result: DataState<DeviceInfo>?) {
+fun Details(
+    viewModel: DetailsViewModel,
+    gattResult: DataState<DeviceInfo>,
+    device: BluetoothDevice
+) {
 
-    when (result) {
-        is DataState.Error -> TODO()
+    LaunchedEffect(Unit) {
+        viewModel.connect(device)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.disconnect(device)
+        }
+    }
+
+    when (gattResult) {
         is DataState.Loading -> {
             Loader()
         }
 
         is DataState.Success -> {
-            DeviceInfoScreen(result.data.deviceInfo)
+            DeviceInfoScreen(gattResult.data.deviceInfo)
         }
 
-        null -> {}
-        is DataState.Characteristic -> TODO()
-        is DataState.Service -> TODO()
+        is DataState.Error -> {}
+
+        else -> {}
     }
+
 }
 
 @Composable
@@ -49,7 +66,6 @@ fun DeviceInfoScreen(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
         horizontalAlignment = Alignment.Start
     ) {
         deviceInfo.forEach { (service, characteristics) ->
-
             Text(text = service)
             Spacer(modifier = Modifier.height(8.dp))
 
