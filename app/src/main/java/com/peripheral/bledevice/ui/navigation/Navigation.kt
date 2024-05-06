@@ -12,7 +12,7 @@ import androidx.navigation.navArgument
 import com.mnh.features.details.Details
 import com.mnh.features.details.DetailsViewModel
 import com.peripheral.bledevice.ui.main.MainActivityViewModel
-import com.peripheral.bledevice.ui.main.MainContent
+import com.peripheral.bledevice.ui.mainwithservice.MainContent
 
 @Composable
 fun Navigation() {

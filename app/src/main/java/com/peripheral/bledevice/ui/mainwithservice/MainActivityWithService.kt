@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.main
+package com.peripheral.bledevice.ui.mainwithservice
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -33,13 +33,14 @@ import com.lightnotebook.data.database.entity.DeviceEntity
 import com.mnh.service.BluetoothScanService
 import com.mnh.service.model.LockRSSI
 import com.napco.utils.PermissionManager.Companion.permissionManager
+import com.peripheral.bledevice.ui.main.MainActivityViewModel
 import com.peripheral.bledevice.ui.navigation.Navigation
 import com.peripheral.bledevice.ui.navigation.Screen
 import com.peripheral.bledevice.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivityWithService : ComponentActivity() {
     private var bluetoothScanService: BluetoothScanService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
     private fun setupPermissions() {
         permissionManager {
-            context = this@MainActivity
+            context = this@MainActivityWithService
             permissionsToRequest = arrayOf(
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_SCAN,
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
 
 
     private fun showToast(message: String) {
-        Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivityWithService, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun startBluetoothScanForegroundService() {
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
                 bluetoothScanService = binder?.getService()
 
                 setContent {
-                    com.peripheral.bledevice.ui.mainwithservice.MainContentWithService(service = bluetoothScanService!!)
+                    MainContentWithService(service = bluetoothScanService!!)
                 }
 
             }
@@ -118,7 +119,7 @@ fun MainContent(
     bleDeviceList: List<ScanResult>?,
     viewModel: MainActivityViewModel
 ) {
-    com.peripheral.bledevice.ui.mainwithservice.MainContentBody(
+    MainContentBody(
         viewModel,
         deviceList = bleDeviceList,
         onClick = {
@@ -134,7 +135,7 @@ fun MainContentBody(
     onClick: (index: Int) -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        com.peripheral.bledevice.ui.mainwithservice.ListView(scanResults = deviceList, onClick)
+        ListView(scanResults = deviceList, onClick)
     }
 }
 
@@ -150,11 +151,7 @@ fun ListView(
                 .padding(16.dp)
         ) {
             itemsIndexed(scanResults) { index, scanResult ->
-                com.peripheral.bledevice.ui.mainwithservice.ListItem(
-                    index,
-                    scanResult = scanResult,
-                    onClick
-                )
+                ListItem(index, scanResult = scanResult, onClick)
             }
         }
     }
@@ -204,11 +201,7 @@ fun MainContentWithService(
 
     service.deviceName = viewModel.deviceName
 
-    com.peripheral.bledevice.ui.mainwithservice.MainContentBodyWithService(
-        list = locks,
-        lockInfo,
-        viewModel
-    ) {
+    MainContentBodyWithService(list = locks, lockInfo, viewModel) {
         viewModel.insert(viewModel.deviceName)
     }
 }
@@ -244,9 +237,6 @@ fun MainContentBodyWithService(
 @Composable
 fun MainPreview() {
     AppTheme {
-        com.peripheral.bledevice.ui.mainwithservice.MainContentBodyWithService(
-            list = emptyList(),
-            LockRSSI(""),
-            onClick = { })
+        MainContentBodyWithService(list = emptyList(), LockRSSI(""), onClick = { })
     }
 }
