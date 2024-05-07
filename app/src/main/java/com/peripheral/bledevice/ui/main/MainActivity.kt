@@ -83,10 +83,9 @@ class MainActivity : ComponentActivity() {
 fun MainContent(
     navController: NavController,
     bleDeviceList: List<ScanResult>?,
-    viewModel: MainActivityViewModel
+    viewModel: MainActivityViewModel,
 ) {
     MainContentBody(
-        viewModel,
         deviceList = bleDeviceList,
         onClick = {
             navController.navigate("${Screen.Details.route}/$it")
@@ -96,9 +95,8 @@ fun MainContent(
 
 @Composable
 fun MainContentBody(
-    viewModel: MainActivityViewModel,
     deviceList: List<ScanResult>?,
-    onClick: (index: Int) -> Unit
+    onClick: (index: Int) -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         ListView(scanResults = deviceList, onClick)
@@ -108,17 +106,18 @@ fun MainContentBody(
 @Composable
 fun ListView(
     scanResults: List<ScanResult>?,
-    onClick: (device: Int) -> Unit
+    onClick: (device: Int) -> Unit,
 ) {
-    scanResults?.let {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            itemsIndexed(scanResults) { index, scanResult ->
-                ListItem(index, scanResult = scanResult, onClick)
-            }
+
+    val bleDeviceList = scanResults ?: emptyList()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        itemsIndexed(bleDeviceList) { index, scanResult ->
+            ListItem(index, scanResult = scanResult, onClick)
         }
     }
 
@@ -129,7 +128,7 @@ fun ListView(
 fun ListItem(
     index: Int,
     scanResult: ScanResult,
-    onClick: (index: Int) -> Unit
+    onClick: (index: Int) -> Unit,
 ) {
     val device = scanResult.device
     val rssi = scanResult.rssi
@@ -163,7 +162,7 @@ fun MainContentBodyWithService(
     list: List<DeviceEntity>,
     lockStatus: LockRSSI,
     viewModel: MainActivityViewModel = viewModel(),
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(modifier = Modifier.height(20.dp))
