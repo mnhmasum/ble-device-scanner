@@ -16,15 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lightnotebook.data.database.entity.DeviceEntity
-import com.mnh.service.model.LockRSSI
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.navigation.Navigation
 import com.peripheral.bledevice.ui.navigation.Screen
@@ -70,20 +66,16 @@ class MainActivity : ComponentActivity() {
         showToast("Some permissions are denied")
     }
 
-
-    private fun showToast(message: String) {
-        Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+    private fun showToast(text: String) {
+        Toast.makeText(this@MainActivity, text, Toast.LENGTH_SHORT).show()
     }
 
-
 }
-
 
 @Composable
 fun MainContent(
     navController: NavController,
     bleDeviceList: List<ScanResult>?,
-    viewModel: MainActivityViewModel,
 ) {
     MainContentBody(
         deviceList = bleDeviceList,
@@ -155,38 +147,13 @@ fun ListItem(
 
         Spacer(modifier = Modifier.height(20.dp))
     }
-}
 
-@Composable
-fun MainContentBodyWithService(
-    list: List<DeviceEntity>,
-    lockStatus: LockRSSI,
-    viewModel: MainActivityViewModel = viewModel(),
-    onClick: () -> Unit,
-) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(text = "Name")
-
-        TextField(value = viewModel.deviceName,
-            onValueChange = { viewModel.updateLockBroadcastId(it) })
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Button(onClick = onClick) {
-            Text("Save")
-        }
-
-        Text(text = lockStatus.lock1)
-
-    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBodyWithService(list = emptyList(), LockRSSI(""), onClick = { })
+        MainContentBody(deviceList = emptyList(), onClick = { })
     }
 }
