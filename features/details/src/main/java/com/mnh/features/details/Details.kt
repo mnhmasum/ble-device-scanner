@@ -1,13 +1,16 @@
 package com.mnh.features.details
 
 import android.bluetooth.BluetoothDevice
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +28,7 @@ import com.napco.utils.DataState
 fun Details(
     viewModel: DetailsViewModel,
     gattResult: DataState<DeviceInfo>,
-    device: BluetoothDevice
+    device: BluetoothDevice,
 ) {
 
     LaunchedEffect(Unit) {
@@ -44,7 +47,7 @@ fun Details(
         }
 
         is DataState.Success -> {
-            DeviceInfoScreen(gattResult.data.deviceInfo)
+            ListView(gattResult.data.deviceInfo)
         }
 
         is DataState.Error -> {}
@@ -55,7 +58,7 @@ fun Details(
 }
 
 @Composable
-fun DeviceInfoScreen(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
+fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -70,7 +73,25 @@ fun DeviceInfoScreen(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
             Spacer(modifier = Modifier.height(8.dp))
 
             characteristics.forEach { characteristic ->
-                Text(text = "${characteristic.types.toList()}")
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    val characteristicTypes = characteristic.types.toList()
+                    val formattedString = characteristicTypes.joinToString(", ") { it.toString() }
+
+                    Text(text = formattedString)
+
+                    if (characteristic.types.isNotEmpty()) {
+                        Button(onClick = { }) {
+                            Text(">")
+                        }
+                    }
+
+                }
+
                 Text(text = characteristic.uuid)
                 Spacer(modifier = Modifier.height(4.dp))
             }

@@ -25,12 +25,8 @@ fun Navigation() {
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            MainContent(navController, bleDeviceList, mainActivityViewModel)
+            MainContent(navController, bleDeviceList)
         }
-
-        /*composable(route = Screen.Details.route) {
-            Details(detailsViewModel)
-        }*/
 
         composable(
             route = "${Screen.Details.route}/{index}",
