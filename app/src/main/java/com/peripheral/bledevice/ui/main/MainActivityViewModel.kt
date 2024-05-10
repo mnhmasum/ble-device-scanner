@@ -1,6 +1,5 @@
 package com.peripheral.bledevice.ui.main
 
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,9 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lightnotebook.data.database.entity.DeviceEntity
 import com.lightnotebook.data.usecase.DeviceLocalDataUseCase
-import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.usecase.BleUseCase
-import com.napco.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,13 +24,13 @@ class MainActivityViewModel @Inject constructor(
 
     val locks: Flow<List<DeviceEntity>> = deviceLocalDataUseCase.getDeviceList()
     val bleDeviceList: Flow<List<ScanResult>> = bleUseCase.getBleDeviceList()
-    val bleGattState: Flow<DataState<DeviceInfo>> = bleUseCase.bleGattConnectionResult()
+    //val bleGattState: Flow<DataState<DeviceInfo>> = bleUseCase.bleGattConnectionResult()
 
-    var deviceName by mutableStateOf("C845FF")
+    private var deviceName by mutableStateOf("C845FF")
         private set
 
-    fun connect(device: BluetoothDevice) {
-        bleUseCase.connect(device)
+    fun stopScanning() {
+        bleUseCase.stopScanning()
     }
 
     fun updateLockBroadcastId(input: String) {

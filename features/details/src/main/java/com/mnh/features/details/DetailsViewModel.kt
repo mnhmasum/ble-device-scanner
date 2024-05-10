@@ -1,6 +1,5 @@
 package com.mnh.features.details
 
-import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.ViewModel
 import com.mnh.ble.model.DeviceInfo
 import com.mnh.features.details.usecase.PeripheralDetailsUseCase
@@ -14,11 +13,12 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: Periphera
     ViewModel() {
     val bleGattState: Flow<DataState<DeviceInfo>> = detailsUseCase.bleGattConnectionResult()
 
-    fun connect(device: BluetoothDevice) {
-        detailsUseCase.connect(device)
+    fun connect(address: String):Flow<DataState<DeviceInfo>> {
+        detailsUseCase.connect(address)
+        return detailsUseCase.bleGattConnectionResult()
     }
 
-    fun disconnect(device: BluetoothDevice) {
+    fun disconnect(address: String) {
         detailsUseCase.disconnect()
     }
 

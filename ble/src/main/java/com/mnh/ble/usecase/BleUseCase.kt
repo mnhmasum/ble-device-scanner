@@ -1,10 +1,8 @@
 package com.mnh.ble.usecase
 
-import android.bluetooth.BluetoothDevice
+import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
-import com.mnh.ble.model.DeviceInfo
 import com.mnh.ble.repository.BleRepository
-import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -13,24 +11,29 @@ import javax.inject.Inject
 
 class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
 
+    @SuppressLint("MissingPermission")
     fun getBleDeviceList(): Flow<List<ScanResult>> {
-        return bleRepository.fetchBleDeviceList()
+        return bleRepository.getScannedDeviceList()
             .flowOn(Dispatchers.IO)
             .map { bleDeviceList ->
-                bleDeviceList.sortedByDescending { it.device.address }
+                bleDeviceList.filterNot { it.device.name == null }
             }
     }
 
-    fun connect(device: BluetoothDevice) {
-        return bleRepository.connect(device)
+    fun stopScanning() {
+        bleRepository.stopScanning()
     }
 
-    fun disconnect() {
-        bleRepository.disconnect()
-    }
+    /* fun connect(device: BluetoothDevice) {
+         return bleRepository.connect(device)
+     }
 
-    fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> {
-        return bleRepository.getGattConnectionResult()
-    }
+     fun disconnect() {
+         bleRepository.disconnect()
+     }
+
+     fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> {
+         return bleRepository.getGattConnectionResult()
+     }*/
 
 }

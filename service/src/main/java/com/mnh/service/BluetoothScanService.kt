@@ -70,7 +70,7 @@ class BluetoothScanService : Service() {
 
     private fun observeBluetoothScanningResult() {
         job = scope.launch {
-            bleScanServiceRepository.fetchBleDeviceList().collectLatest { scanResult ->
+            bleScanServiceRepository.getScannedDeviceList().collectLatest { scanResult ->
                 /*val device = scanResult.device
                 updateLockRSSiInfo(scanResult)
                 Log.d(TAG, "In Service : Device: ${device.name} RSS: ${device.address}")*/

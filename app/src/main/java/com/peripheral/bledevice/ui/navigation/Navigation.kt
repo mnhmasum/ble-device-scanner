@@ -30,12 +30,17 @@ fun Navigation() {
 
         composable(
             route = "${Screen.Details.route}/{index}",
-            arguments = listOf(navArgument("index") { type = NavType.IntType })
+            arguments = listOf(navArgument("index") { type = NavType.StringType })
         ) {
-            val index = it.arguments?.getInt("index") ?: 0
-            val device = bleDeviceList?.get(index)?.device
-            if (device != null) {
-                gattResult?.let { gattState -> Details(detailsViewModel, gattState, device) }
+            val address = it.arguments?.getString("index") ?: ""
+            //val device = Gson().fromJson(index, BluetoothDevice::class.java) ?: return@composable
+
+            gattResult?.let { gattState ->
+                Details(
+                    viewModel = detailsViewModel,
+                    connectionResult = gattState,
+                    deviceAddress = address
+                )
             }
         }
     }

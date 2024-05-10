@@ -1,14 +1,11 @@
 package com.mnh.ble.repository
 
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
-import com.mnh.ble.model.DeviceInfo
-import com.napco.utils.DataState
 import kotlinx.coroutines.flow.Flow
 
 interface BleRepository {
-    fun fetchBleDeviceList(): Flow<List<ScanResult>>
-    fun connect(device: BluetoothDevice)
-    fun disconnect()
-    fun getGattConnectionResult(): Flow<DataState<DeviceInfo>>
+    fun getScannedDeviceList(): Flow<List<ScanResult>>
+
+    fun stopScanning()
+
 }

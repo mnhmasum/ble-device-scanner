@@ -89,6 +89,8 @@ dependencies {
     implementation(project(":ble"))
     implementation(project(":service"))
     implementation(project(":features:details"))
+
+    implementation ("com.google.code.gson:gson:2.10.1")
 }
 
 kapt {

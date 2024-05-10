@@ -1,6 +1,5 @@
 package com.mnh.features.details
 
-import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,30 +26,32 @@ import com.napco.utils.DataState
 @Composable
 fun Details(
     viewModel: DetailsViewModel,
-    gattResult: DataState<DeviceInfo>,
-    device: BluetoothDevice,
+    connectionResult: DataState<DeviceInfo>,
+    deviceAddress: String,
 ) {
 
     LaunchedEffect(Unit) {
-        viewModel.connect(device)
+        viewModel.connect(deviceAddress)
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.disconnect(device)
+            viewModel.disconnect(deviceAddress)
         }
     }
 
-    when (gattResult) {
+    when (connectionResult) {
         is DataState.Loading -> {
             Loader()
         }
 
         is DataState.Success -> {
-            ListView(gattResult.data.deviceInfo)
+            ListView(connectionResult.data.deviceInfo)
         }
 
-        is DataState.Error -> {}
+        is DataState.Error -> {
+
+        }
 
         else -> {}
     }
@@ -69,7 +70,8 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
         horizontalAlignment = Alignment.Start
     ) {
         deviceInfo.forEach { (service, characteristics) ->
-            Text(text = service)
+
+            Text(text = "Service: $service")
             Spacer(modifier = Modifier.height(8.dp))
 
             characteristics.forEach { characteristic ->
@@ -81,8 +83,10 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
 
                     val characteristicTypes = characteristic.types.toList()
                     val formattedString = characteristicTypes.joinToString(", ") { it.toString() }
-
-                    Text(text = formattedString)
+                    Column {
+                        Text(text = characteristic.uuid)
+                        Text(text = formattedString)
+                    }
 
                     if (characteristic.types.isNotEmpty()) {
                         Button(onClick = { }) {
@@ -92,8 +96,6 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
 
                 }
 
-                Text(text = characteristic.uuid)
-                Spacer(modifier = Modifier.height(4.dp))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -106,8 +108,7 @@ fun Loader() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(16.dp), horizontalAlignment = Alignment.Start
     ) {
         CircularProgressIndicator()
     }

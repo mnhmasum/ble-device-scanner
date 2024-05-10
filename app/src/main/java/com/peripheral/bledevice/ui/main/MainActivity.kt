@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -63,11 +64,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showMessage() {
-        showToast("Some permissions are denied")
+        toast()
     }
 
-    private fun showToast(text: String) {
-        Toast.makeText(this@MainActivity, text, Toast.LENGTH_SHORT).show()
+    private fun toast() {
+        Toast.makeText(
+            this@MainActivity,
+            "Some required permissions are denied",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 }
@@ -80,7 +85,9 @@ fun MainContent(
     MainContentBody(
         deviceList = bleDeviceList,
         onClick = {
-            navController.navigate("${Screen.Details.route}/$it")
+            val d: String = bleDeviceList?.get(it)?.device?.address ?: ""
+            Log.d("main", "MainContent: Device Address $d")
+            navController.navigate("${Screen.Details.route}/$d")
         },
     )
 }

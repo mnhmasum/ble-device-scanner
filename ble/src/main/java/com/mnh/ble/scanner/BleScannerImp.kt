@@ -28,7 +28,7 @@ class BleScannerImp(private val bluetoothLeScanner: BluetoothLeScanner) : BleSca
             }
         }
 
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
+        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED).build()
 
         bluetoothLeScanner.startScan(null, settings, scanCallBack)
 

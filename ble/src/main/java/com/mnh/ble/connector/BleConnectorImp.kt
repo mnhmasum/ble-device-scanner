@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanResult
 import android.content.Context
@@ -35,7 +36,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     private lateinit var encryptByte: ByteArray
 
     private val device1: Device = Device()
-    private var device: BluetoothDevice? = null
 
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
@@ -50,16 +50,25 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> =
         _bleGattConnectionResult.asStateFlow()
 
-    override fun connect(device: BluetoothDevice) {
-        this.device = device
-        device.connectGatt(context, false, gattCallback)
+    override fun connect(address: String) {
+        val device = getDevice(address)
+        device?.connectGatt(context, false, gattCallback)
     }
 
     override fun disconnect() {
-        scope.launch {
-            _bleGattConnectionResult.emit(DataState.loading())
-        }
-        //scope.can  cel()
+        _bleGattConnectionResult.value = DataState.error("Disconnected", Throwable("Error: Disconnected "))
+        /*scope.launch {
+            _bleGattConnectionResult.emit(DataState.
+        }*/
+    }
+
+    private fun provideBluetoothManager(): BluetoothManager {
+        return context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    }
+
+    private fun getDevice(address: String): BluetoothDevice? {
+        val adapter = provideBluetoothManager().adapter
+        return adapter.getRemoteDevice(address)
     }
 
 
@@ -162,7 +171,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
         override fun onDescriptorWrite(
-            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor?, status: Int
+            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor?, status: Int,
         ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             val string = Utility.bytesToHexString(descriptor?.value!!)
@@ -180,7 +189,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
         override fun onCharacteristicWrite(
-            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
+            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int,
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -202,7 +211,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         )
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?
+            characteristic: BluetoothGattCharacteristic?,
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
             val characteristicsValue: ByteArray? = characteristic?.value
@@ -218,7 +227,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
-            value: ByteArray
+            value: ByteArray,
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
             processCharacteristicChangedData(gatt, characteristic)
@@ -272,7 +281,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     }
 
     fun processCharacteristicChangedData(
-        gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?
+        gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?,
     ) {
         val characteristicBytes = characteristic?.value ?: byteArrayOf()
 
