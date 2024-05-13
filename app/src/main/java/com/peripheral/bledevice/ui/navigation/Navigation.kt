@@ -21,7 +21,7 @@ fun Navigation() {
     val bleDeviceList by mainActivityViewModel.bleDeviceList.collectAsState(initial = null)
 
     val detailsViewModel: DetailsViewModel = viewModel()
-    val gattResult by detailsViewModel.bleGattState.collectAsState(initial = null)
+    val connectionResult by detailsViewModel.bleGattState.collectAsState(initial = null)
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -32,14 +32,13 @@ fun Navigation() {
             route = "${Screen.Details.route}/{index}",
             arguments = listOf(navArgument("index") { type = NavType.StringType })
         ) {
-            val address = it.arguments?.getString("index") ?: ""
-            //val device = Gson().fromJson(index, BluetoothDevice::class.java) ?: return@composable
+            val deviceAddress = it.arguments?.getString("index") ?: ""
 
-            gattResult?.let { gattState ->
+            connectionResult?.let { result ->
                 Details(
                     viewModel = detailsViewModel,
-                    connectionResult = gattState,
-                    deviceAddress = address
+                    connectionResult = result,
+                    deviceAddress = deviceAddress
                 )
             }
         }
