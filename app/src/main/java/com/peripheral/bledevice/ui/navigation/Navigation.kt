@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mnh.features.details.Details
 import com.mnh.features.details.DetailsViewModel
+import com.napco.utils.DataState
 import com.peripheral.bledevice.ui.main.MainActivityViewModel
 import com.peripheral.bledevice.ui.main.MainContent
 
@@ -21,7 +22,7 @@ fun Navigation() {
     val bleDeviceList by mainActivityViewModel.bleDeviceList.collectAsState(initial = null)
 
     val detailsViewModel: DetailsViewModel = viewModel()
-    val connectionResult by detailsViewModel.bleGattState.collectAsState(initial = null)
+    val connectionResult by detailsViewModel.bleGattState.collectAsState(initial = DataState.loading())
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -34,13 +35,11 @@ fun Navigation() {
         ) {
             val deviceAddress = it.arguments?.getString("index") ?: ""
 
-            connectionResult?.let { result ->
-                Details(
-                    viewModel = detailsViewModel,
-                    connectionResult = result,
-                    deviceAddress = deviceAddress
-                )
-            }
+            Details(
+                viewModel = detailsViewModel,
+                connectionResult = connectionResult,
+                deviceAddress = deviceAddress
+            )
         }
     }
 }

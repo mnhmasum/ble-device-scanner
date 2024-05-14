@@ -51,15 +51,26 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         _bleGattConnectionResult.asStateFlow()
 
     override fun connect(address: String) {
+        //showLoading()
         val device = getDevice(address)
         device?.connectGatt(context, false, gattCallback)
     }
 
+    private fun showLoading() {
+        scope.launch {
+            _bleGattConnectionResult.emit(DataState.loading())
+        }
+    }
+
     override fun disconnect() {
-        _bleGattConnectionResult.value = DataState.error("Disconnected", Throwable("Error: Disconnected "))
-        /*scope.launch {
-            _bleGattConnectionResult.emit(DataState.
-        }*/
+        scope.launch {
+            _bleGattConnectionResult.emit(
+                DataState.error(
+                    "Disconnected",
+                    Throwable("Error: Disconnected ")
+                )
+            )
+        }
     }
 
     private fun provideBluetoothManager(): BluetoothManager {
@@ -70,7 +81,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val adapter = provideBluetoothManager().adapter
         return adapter.getRemoteDevice(address)
     }
-
 
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
@@ -171,7 +181,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
         override fun onDescriptorWrite(
-            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor?, status: Int,
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int,
         ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             val string = Utility.bytesToHexString(descriptor?.value!!)

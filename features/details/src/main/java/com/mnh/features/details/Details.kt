@@ -1,5 +1,6 @@
 package com.mnh.features.details
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,8 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.mnh.ble.model.CharacteristicInfo
 import com.mnh.ble.model.DeviceInfo
@@ -29,6 +35,8 @@ fun Details(
     connectionResult: DataState<DeviceInfo>,
     deviceAddress: String,
 ) {
+
+    var deviceInfo: DeviceInfo? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.connect(deviceAddress)
@@ -46,20 +54,21 @@ fun Details(
         }
 
         is DataState.Success -> {
-            ListView(connectionResult.data.deviceInfo)
+            deviceInfo = connectionResult.data
+            ListView(deviceInfo?.deviceInfo)
         }
 
         is DataState.Error -> {
-
+            Toast.makeText(LocalContext.current, "Disconnected", Toast.LENGTH_SHORT).show()
+            ListView(deviceInfo?.deviceInfo)
         }
 
-        else -> {}
     }
 
 }
 
 @Composable
-fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
+fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>?) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -69,7 +78,7 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.Start
     ) {
-        deviceInfo.forEach { (service, characteristics) ->
+        deviceInfo?.forEach { (service, characteristics) ->
 
             Text(text = "Service: $service")
             Spacer(modifier = Modifier.height(8.dp))
@@ -81,11 +90,11 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    val characteristicTypes = characteristic.types.toList()
-                    val formattedString = characteristicTypes.joinToString(", ") { it.toString() }
+                    val typeList = characteristic.types.toList()
+                    val types = typeList.joinToString(", ") { it.toString() }
                     Column {
                         Text(text = characteristic.uuid)
-                        Text(text = formattedString)
+                        Text(text = types)
                     }
 
                     if (characteristic.types.isNotEmpty()) {
