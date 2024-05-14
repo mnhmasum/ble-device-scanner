@@ -18,18 +18,4 @@ class BleRepositoryImp(private val bleSource: BleScanner, private val bleConnect
         bleSource.stopScanning()
     }
 
-
-    /* override fun connect(device: BluetoothDevice) {
-         bleConnector.connect(device)
-     }
-
-     override fun disconnect() {
-         bleConnector.disconnect()
-     }
-
-     override fun getGattConnectionResult(): Flow<DataState<DeviceInfo>> {
-         return bleConnector.bleGattConnectionResult()
-     }*/
-
-
 }

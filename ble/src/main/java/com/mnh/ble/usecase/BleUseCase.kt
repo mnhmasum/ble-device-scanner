@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
-
     @SuppressLint("MissingPermission")
     fun getBleDeviceList(): Flow<List<ScanResult>> {
         return bleRepository.getScannedDeviceList()
@@ -23,17 +22,5 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
     fun stopScanning() {
         bleRepository.stopScanning()
     }
-
-    /* fun connect(device: BluetoothDevice) {
-         return bleRepository.connect(device)
-     }
-
-     fun disconnect() {
-         bleRepository.disconnect()
-     }
-
-     fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> {
-         return bleRepository.getGattConnectionResult()
-     }*/
 
 }
