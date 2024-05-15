@@ -110,10 +110,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
                 //enableTxTypeNotification(gatt)
 
-                val peripheralDeviceInfo = getPeripheralInfo(peripheralGatt.services)
+                val serviceDetails = parseServiceDetails(peripheralGatt.services)
 
                 scope.launch {
-                    _bleGattConnectionResult.emit(DataState.success(peripheralDeviceInfo))
+                    _bleGattConnectionResult.emit(DataState.success(serviceDetails))
 
                 }
 
@@ -122,27 +122,29 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
         }
 
-        fun getPeripheralInfo(services: List<BluetoothGattService>): ServiceInfo {
-            val peripheralServices = HashMap<Service, List<Characteristic>>()
+        fun parseServiceDetails(serviceList: List<BluetoothGattService>): ServiceInfo {
+            val services = HashMap<Service, List<Characteristic>>()
 
-            for (service in services) {
-
-                val newService = Service(name = "", uuid = service.getUUID())
+            for (service in serviceList) {
 
                 val characteristics = ArrayList<Characteristic>()
 
-                for (characteristic in service.characteristics) {
-                    Log.d(TAG, "getPeripheralInfo char : ${characteristic.uuid}")
-                    val characteristicInfo = getCharacteristicInfo(characteristic)
-                    characteristics.add(characteristicInfo)
+                for (bleCharacteristic in service.characteristics) {
+                    Log.d(TAG, "getPeripheralInfo char : ${bleCharacteristic.uuid}")
+                    val characteristic = extractCharacteristicInfo(bleCharacteristic)
+                    characteristics.add(characteristic)
 
                 }
 
-                peripheralServices[newService] = characteristics
+
+                val serviceName = ""
+                val newService = Service(name = serviceName, uuid = service.getUUID())
+
+                services[newService] = characteristics
 
             }
 
-            return ServiceInfo(peripheralServices)
+            return ServiceInfo(services)
         }
 
         private fun BluetoothGattService.getUUID(): String {
@@ -150,7 +152,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
 
-        fun getCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
+        fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
             val types = ArrayList<Constants.CharType>()
             val isReadable = isCharacteristicReadable(characteristic)
             val isNotify = isCharacteristicNotify(characteristic)
@@ -170,7 +172,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
             }
 
-            return Characteristic(types, characteristic.uuid.toString())
+            val characteristicName = Utility.getCharacteristicPurpose(characteristic.uuid)
+
+            return Characteristic(types, characteristicName)
         }
 
         fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {

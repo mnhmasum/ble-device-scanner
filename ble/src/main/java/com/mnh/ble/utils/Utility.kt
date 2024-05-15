@@ -3,18 +3,15 @@ package com.mnh.ble.utils
 import android.content.Context
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
 import java.io.File
 import java.io.FileOutputStream
-import java.io.FileWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Formatter
 import java.util.Locale
+import java.util.UUID
 
 
 class Utility {
@@ -52,28 +49,6 @@ class Utility {
             return passData
         }
 
-        fun getCurrentTime(): String {
-            val currentTime = LocalTime.now()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
-            return currentTime.format(formatter)
-        }
-
-        fun generateNoteOnSD(context: Context?, sFileName: String?, sBody: String?) {
-            try {
-                val root = File(Environment.getExternalStorageDirectory(), "log")
-                if (!root.exists()) {
-                    root.mkdirs()
-                }
-                val gpxfile = File(root, sFileName)
-                val writer = FileWriter(gpxfile)
-                writer.append(sBody)
-                writer.flush()
-                writer.close()
-                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
 
         private const val LOG_TAG = "MyLogger"
         private const val LOG_FILE_NAME = "my_log.txt"
@@ -128,6 +103,24 @@ class Utility {
             val formatter = Formatter(sb)
             for (b in bytes) formatter.format("%02x ", b)
             return sb.toString()
+        }
+
+        fun getCharacteristicPurpose(characteristicUuid: UUID): String {
+            return when (characteristicUuid) {
+                // Device Information Service
+                UUID.fromString("00002A24-0000-1000-8000-00805F9B34FB") -> "Model Number String"
+                UUID.fromString("00002A25-0000-1000-8000-00805F9B34FB") -> "Serial Number String"
+                UUID.fromString("00002A26-0000-1000-8000-00805F9B34FB") -> "Firmware Revision String"
+                UUID.fromString("00002A27-0000-1000-8000-00805F9B34FB") -> "Hardware Revision String"
+                UUID.fromString("00002A28-0000-1000-8000-00805F9B34FB") -> "Software Revision String"
+                UUID.fromString("00002A29-0000-1000-8000-00805F9B34FB") -> "Manufacturer Name String"
+
+                //Generic Access
+                UUID.fromString("00002A00-0000-1000-8000-00805F9B34FB") -> "Device Name"
+                UUID.fromString("00002A01-0000-1000-8000-00805F9B34FB") -> "Appearance"
+                UUID.fromString("00002A04-0000-1000-8000-00805F9B34FB") -> "Peripheral Preferred Connection Parameters"
+                else -> characteristicUuid.toString()
+            }
         }
 
     }
