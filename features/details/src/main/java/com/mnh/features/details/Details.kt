@@ -1,6 +1,6 @@
 package com.mnh.features.details
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,21 +22,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.mnh.ble.model.CharacteristicInfo
-import com.mnh.ble.model.DeviceInfo
+import com.mnh.ble.model.Characteristic
+import com.mnh.ble.model.Service
+import com.mnh.ble.model.ServiceInfo
 import com.napco.utils.DataState
 
 
 @Composable
 fun Details(
     viewModel: DetailsViewModel,
-    connectionResult: DataState<DeviceInfo>,
+    connectionResult: DataState<ServiceInfo>,
     deviceAddress: String,
 ) {
 
-    var deviceInfo: DeviceInfo? by remember { mutableStateOf(null) }
+    var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.connect(deviceAddress)
@@ -44,7 +44,8 @@ fun Details(
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.disconnect(deviceAddress)
+            Log.d("Details", "Disposed !! ")
+            viewModel.disconnect()
         }
     }
 
@@ -54,13 +55,14 @@ fun Details(
         }
 
         is DataState.Success -> {
-            deviceInfo = connectionResult.data
-            ListView(deviceInfo?.deviceInfo)
+            serviceInfo = connectionResult.data
+            ListView(serviceInfo?.serviceInfo)
         }
 
         is DataState.Error -> {
-            Toast.makeText(LocalContext.current, "Disconnected", Toast.LENGTH_SHORT).show()
-            ListView(deviceInfo?.deviceInfo)
+            Log.d("Details", "Error and Disconnected !! ")
+            ListView(serviceInfo?.serviceInfo)
+            Text(text = "Disconnected")
         }
 
     }
@@ -68,7 +70,7 @@ fun Details(
 }
 
 @Composable
-fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>?) {
+fun ListView(deviceInfo: HashMap<Service, List<Characteristic>>?) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -80,31 +82,11 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>?) {
     ) {
         deviceInfo?.forEach { (service, characteristics) ->
 
-            Text(text = "Service: $service")
+            Text(text = "Service: ${service.uuid}")
             Spacer(modifier = Modifier.height(8.dp))
 
             characteristics.forEach { characteristic ->
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    val typeList = characteristic.types.toList()
-                    val types = typeList.joinToString(", ") { it.toString() }
-                    Column {
-                        Text(text = characteristic.uuid)
-                        Text(text = types)
-                    }
-
-                    if (characteristic.types.isNotEmpty()) {
-                        Button(onClick = { }) {
-                            Text(">")
-                        }
-                    }
-
-                }
-
+                CharacteristicComponent(characteristic)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -113,7 +95,31 @@ fun ListView(deviceInfo: HashMap<String, List<CharacteristicInfo>>?) {
 }
 
 @Composable
-fun Loader() {
+private fun CharacteristicComponent(characteristic: Characteristic) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        val typeList = characteristic.types.toList()
+        val types = typeList.joinToString(", ") { it.toString() }
+        Column {
+            Text(text = characteristic.uuid)
+            Text(text = types)
+        }
+
+        if (characteristic.types.isNotEmpty()) {
+            Button(onClick = { }) {
+                Text(">")
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun Loader() {
     Column(
         modifier = Modifier
             .fillMaxSize()

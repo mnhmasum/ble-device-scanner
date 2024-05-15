@@ -12,9 +12,10 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
-import com.mnh.ble.model.CharacteristicInfo
+import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.Device
-import com.mnh.ble.model.DeviceInfo
+import com.mnh.ble.model.Service
+import com.mnh.ble.model.ServiceInfo
 import com.mnh.ble.utils.Utility
 import com.napco.utils.Constants
 import com.napco.utils.DataState
@@ -22,8 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.UnsupportedEncodingException
 
@@ -45,13 +46,14 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     }
 
     private val _bleGattConnectionResult =
-        MutableStateFlow<DataState<DeviceInfo>>(DataState.loading())
+        MutableSharedFlow<DataState<ServiceInfo>>()
 
-    override fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> =
-        _bleGattConnectionResult.asStateFlow()
+    override fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> =
+        _bleGattConnectionResult.asSharedFlow()
 
     override fun connect(address: String) {
-        //showLoading()
+        showLoading()
+
         val device = getDevice(address)
         device?.connectGatt(context, false, gattCallback)
     }
@@ -71,6 +73,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 )
             )
         }
+
     }
 
     private fun provideBluetoothManager(): BluetoothManager {
@@ -119,29 +122,35 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
         }
 
-        fun getPeripheralInfo(services: List<BluetoothGattService>): DeviceInfo {
-            val peripheralServices = HashMap<String, List<CharacteristicInfo>>()
+        fun getPeripheralInfo(services: List<BluetoothGattService>): ServiceInfo {
+            val peripheralServices = HashMap<Service, List<Characteristic>>()
 
             for (service in services) {
 
-                val characteristics = ArrayList<CharacteristicInfo>()
+                val newService = Service(name = "", uuid = service.getUUID())
+
+                val characteristics = ArrayList<Characteristic>()
 
                 for (characteristic in service.characteristics) {
-                    Log.d(TAG, "getPeripheralInfo char : ${characteristic.uuid.toString()}")
+                    Log.d(TAG, "getPeripheralInfo char : ${characteristic.uuid}")
                     val characteristicInfo = getCharacteristicInfo(characteristic)
                     characteristics.add(characteristicInfo)
 
                 }
 
-                peripheralServices[service.uuid.toString()] = characteristics
+                peripheralServices[newService] = characteristics
 
             }
 
-            return DeviceInfo(peripheralServices)
+            return ServiceInfo(peripheralServices)
+        }
+
+        private fun BluetoothGattService.getUUID(): String {
+            return this.uuid.toString()
         }
 
 
-        fun getCharacteristicInfo(characteristic: BluetoothGattCharacteristic): CharacteristicInfo {
+        fun getCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
             val types = ArrayList<Constants.CharType>()
             val isReadable = isCharacteristicReadable(characteristic)
             val isNotify = isCharacteristicNotify(characteristic)
@@ -161,7 +170,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
             }
 
-            return CharacteristicInfo(types, characteristic.uuid.toString())
+            return Characteristic(types, characteristic.uuid.toString())
         }
 
         fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {

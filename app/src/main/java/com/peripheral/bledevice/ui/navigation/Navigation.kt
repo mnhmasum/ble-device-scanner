@@ -19,10 +19,10 @@ import com.peripheral.bledevice.ui.main.MainContent
 fun Navigation() {
     val navController = rememberNavController()
     val mainActivityViewModel: MainActivityViewModel = viewModel()
-    val bleDeviceList by mainActivityViewModel.bleDeviceList.collectAsState(initial = null)
+    val bleDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = null)
 
     val detailsViewModel: DetailsViewModel = viewModel()
-    val connectionResult by detailsViewModel.bleGattState.collectAsState(initial = DataState.loading())
+    val connectionResult by detailsViewModel.bleConnectionResult.collectAsState(initial = DataState.loading())
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -32,8 +32,8 @@ fun Navigation() {
         composable(
             route = "${Screen.Details.route}/{index}",
             arguments = listOf(navArgument("index") { type = NavType.StringType })
-        ) {
-            val deviceAddress = it.arguments?.getString("index") ?: ""
+        ) { backStackEntry ->
+            val deviceAddress = backStackEntry.arguments?.getString("index") ?: ""
 
             Details(
                 viewModel = detailsViewModel,

@@ -1,6 +1,6 @@
 package com.mnh.features.details.usecase
 
-import com.mnh.ble.model.DeviceInfo
+import com.mnh.ble.model.ServiceInfo
 import com.mnh.features.details.repository.PeripheralDetailsRepository
 import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetails
         peripheralDetailsRepository.disconnect()
     }
 
-    fun bleGattConnectionResult(): Flow<DataState<DeviceInfo>> {
+    fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> {
         peripheralDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
             .map { dataState ->

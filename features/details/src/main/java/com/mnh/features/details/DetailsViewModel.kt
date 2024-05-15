@@ -1,7 +1,7 @@
 package com.mnh.features.details
 
 import androidx.lifecycle.ViewModel
-import com.mnh.ble.model.DeviceInfo
+import com.mnh.ble.model.ServiceInfo
 import com.mnh.features.details.usecase.PeripheralDetailsUseCase
 import com.napco.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,14 +11,13 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(private val detailsUseCase: PeripheralDetailsUseCase) :
     ViewModel() {
-    val bleGattState: Flow<DataState<DeviceInfo>> = detailsUseCase.bleGattConnectionResult()
+    val bleConnectionResult: Flow<DataState<ServiceInfo>> = detailsUseCase.bleGattConnectionResult()
 
-    fun connect(address: String):Flow<DataState<DeviceInfo>> {
+    fun connect(address: String) {
         detailsUseCase.connect(address)
-        return detailsUseCase.bleGattConnectionResult()
     }
 
-    fun disconnect(address: String) {
+    fun disconnect() {
         detailsUseCase.disconnect()
     }
 
