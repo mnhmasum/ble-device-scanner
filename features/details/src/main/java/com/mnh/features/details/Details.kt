@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.Service
@@ -82,9 +84,12 @@ fun ListView(deviceInfo: HashMap<Service, List<Characteristic>>?) {
     ) {
         deviceInfo?.forEach { (service, characteristics) ->
 
-            Text(text = "Service: ${service.uuid}")
+            Text(text = service.name)
+            Divider(thickness = 1.dp, color = Color.Black)
             Spacer(modifier = Modifier.height(8.dp))
-
+            if (characteristics.isEmpty()) {
+                Text(text = "No characteristic available")
+            }
             characteristics.forEach { characteristic ->
                 CharacteristicComponent(characteristic)
             }

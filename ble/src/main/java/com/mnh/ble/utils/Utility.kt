@@ -105,6 +105,15 @@ class Utility {
             return sb.toString()
         }
 
+        fun getServiceName(characteristicUuid: UUID): String {
+            return when (characteristicUuid) {
+                UUID.fromString("00001800-0000-1000-8000-00805F9B34FB") -> "GENERIC ACCESS"
+                UUID.fromString("00001801-0000-1000-8000-00805F9B34FB") -> "GENERIC ATTRIBUTE"
+                UUID.fromString("0000180A-0000-1000-8000-00805F9B34FB") -> "DEVICE INFORMATION"
+                else -> characteristicUuid.toString()
+            }
+        }
+
         fun getCharacteristicPurpose(characteristicUuid: UUID): String {
             return when (characteristicUuid) {
                 // Device Information Service

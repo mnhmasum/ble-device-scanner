@@ -137,7 +137,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 }
 
 
-                val serviceName = ""
+                val serviceName = Utility.getServiceName(service.uuid)
                 val newService = Service(name = serviceName, uuid = service.getUUID())
 
                 services[newService] = characteristics
