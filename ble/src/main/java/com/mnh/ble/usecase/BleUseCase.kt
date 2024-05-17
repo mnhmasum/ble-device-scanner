@@ -16,7 +16,7 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
             .flowOn(Dispatchers.IO)
             .map { bleDeviceList ->
                 bleDeviceList.filterNot { it.device.name == null }
-            }
+            }.flowOn(Dispatchers.Main)
     }
 
     fun stopScanning() {

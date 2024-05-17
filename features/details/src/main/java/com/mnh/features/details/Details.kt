@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,21 +34,23 @@ import com.napco.utils.DataState
 
 @Composable
 fun Details(
-    viewModel: DetailsViewModel,
-    connectionResult: DataState<ServiceInfo>,
+    detailsViewModel: DetailsViewModel,
     deviceAddress: String,
 ) {
-
+    val connectionResult by detailsViewModel.bleConnectionResult.collectAsState(initial = DataState.loading())
     var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 
+    Log.d("Navigation", "Navigation: 1")
+
     LaunchedEffect(Unit) {
-        viewModel.connect(deviceAddress)
+        detailsViewModel.connect(deviceAddress)
+        Log.d("Navigation", "Navigation: 2")
     }
 
     DisposableEffect(Unit) {
         onDispose {
             Log.d("Details", "Disposed !! ")
-            viewModel.disconnect()
+            detailsViewModel.disconnect()
         }
     }
 
@@ -57,7 +60,7 @@ fun Details(
         }
 
         is DataState.Success -> {
-            serviceInfo = connectionResult.data
+            serviceInfo = (connectionResult as DataState.Success<ServiceInfo>).data
             ListView(serviceInfo?.serviceInfo)
         }
 

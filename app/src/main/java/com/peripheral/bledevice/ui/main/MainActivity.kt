@@ -18,9 +18,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.navigation.Navigation
@@ -79,9 +82,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent(
-    navController: NavController,
-    bleDeviceList: List<ScanResult>?,
+    navController: NavController, mainActivityViewModel: MainActivityViewModel = viewModel()
 ) {
+
+    //val mainActivityViewModel: MainActivityViewModel = viewModel()
+    val bleDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = emptyList())
+
     MainContentBody(
         deviceList = bleDeviceList,
         onClick = {

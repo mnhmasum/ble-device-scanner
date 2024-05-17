@@ -18,18 +18,10 @@ class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetails
         peripheralDetailsRepository.disconnect()
     }
 
-    fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> {
+    fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> =
         peripheralDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
-            .map { dataState ->
-                when (dataState) {
-                    is DataState.Success -> dataState
-                    is DataState.Error -> dataState
-                    is DataState.Loading -> dataState
-                }
-
-            }
-        return peripheralDetailsRepository.getGattConnectionResult()
-    }
+            .map { it }
+            .flowOn(Dispatchers.Main)
 
 }
