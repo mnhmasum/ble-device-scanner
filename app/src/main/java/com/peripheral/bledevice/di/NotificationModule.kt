@@ -34,7 +34,7 @@ class NotificationModule {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notificationBuilder = NotificationCompat.Builder(appContext, Constants.channelId)
+        val notificationBuilder = NotificationCompat.Builder(appContext, Constants.NOTIFICATION_CHANNEL_ID)
             .apply {
                 setContentTitle("Lock Background Scan Service")
                 setContentText("Scanning for BLE devices")
@@ -59,7 +59,7 @@ class NotificationModule {
     @Singleton
     fun provideNotificationChannel(): NotificationChannel {
         val channel = NotificationChannel(
-            Constants.channelId,
+            Constants.NOTIFICATION_CHANNEL_ID,
             "Bluetooth Scan Service Channel",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply { description = "Channel for Bluetooth Scan Service" }
