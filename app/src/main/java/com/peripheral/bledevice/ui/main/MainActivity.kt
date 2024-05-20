@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -82,18 +81,15 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent(
-    navController: NavController, mainActivityViewModel: MainActivityViewModel = viewModel()
+    navController: NavController, mainActivityViewModel: MainActivityViewModel = viewModel(),
 ) {
-
-    //val mainActivityViewModel: MainActivityViewModel = viewModel()
-    val bleDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = emptyList())
+    val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = emptyList())
 
     MainContentBody(
-        deviceList = bleDeviceList,
+        deviceList = bleScannedDeviceList,
         onClick = {
-            val d: String = bleDeviceList?.get(it)?.device?.address ?: ""
-            Log.d("main", "MainContent: Device Address $d")
-            navController.navigate("${Screen.Details.route}/$d")
+            val deviceAddress: String = bleScannedDeviceList[it].device?.address ?: ""
+            navController.navigate("${Screen.Details.route}/$deviceAddress")
         },
     )
 }
@@ -125,7 +121,6 @@ fun ListView(
             ListItem(index, scanResult = scanResult, onClick)
         }
     }
-
 }
 
 @SuppressLint("MissingPermission")
@@ -160,7 +155,6 @@ fun ListItem(
 
         Spacer(modifier = Modifier.height(20.dp))
     }
-
 }
 
 @Preview(showBackground = true)

@@ -1,6 +1,5 @@
 package com.mnh.features.details
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mnh.ble.model.Characteristic
-import com.mnh.ble.model.Service
 import com.mnh.ble.model.ServiceInfo
 import com.napco.utils.DataState
 
@@ -40,16 +38,12 @@ fun Details(
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsState(initial = DataState.loading())
     var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 
-    Log.d("Navigation", "Navigation: 1")
-
     LaunchedEffect(Unit) {
         detailsViewModel.connect(deviceAddress)
-        Log.d("Navigation", "Navigation: 2")
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            Log.d("Details", "Disposed !! ")
             detailsViewModel.disconnect()
         }
     }
@@ -61,21 +55,19 @@ fun Details(
 
         is DataState.Success -> {
             serviceInfo = (connectionResult as DataState.Success<ServiceInfo>).data
-            ListView(serviceInfo?.serviceInfo)
+            DeviceInfo(detailsViewModel, serviceInfo)
         }
 
         is DataState.Error -> {
-            Log.d("Details", "Error and Disconnected !! ")
-            ListView(serviceInfo?.serviceInfo)
+            DeviceInfo(detailsViewModel, serviceInfo)
             Text(text = "Disconnected")
         }
-
     }
-
 }
 
 @Composable
-fun ListView(deviceInfo: HashMap<Service, List<Characteristic>>?) {
+fun DeviceInfo(detailsViewModel: DetailsViewModel, serviceInfo: ServiceInfo?) {
+    val deviceInfo = serviceInfo?.serviceInfo
     val scrollState = rememberScrollState()
 
     Column(
@@ -90,11 +82,16 @@ fun ListView(deviceInfo: HashMap<Service, List<Characteristic>>?) {
             Text(text = service.name)
             Divider(thickness = 1.dp, color = Color.Black)
             Spacer(modifier = Modifier.height(8.dp))
+
             if (characteristics.isEmpty()) {
                 Text(text = "No characteristic available")
             }
-            characteristics.forEach { characteristic ->
-                CharacteristicComponent(characteristic)
+
+            for (characteristic in characteristics) {
+                CharacteristicInfo(characteristic, onClickArrow = { characteristicUUIDString ->
+                    //detailsViewModel.enableNotification(service.uuid, characteristicUUIDString)
+                    //detailsViewModel.readCharacteristic(service.uuid, characteristicUUIDString)
+                })
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -103,22 +100,25 @@ fun ListView(deviceInfo: HashMap<Service, List<Characteristic>>?) {
 }
 
 @Composable
-private fun CharacteristicComponent(characteristic: Characteristic) {
+private fun CharacteristicInfo(
+    characteristic: Characteristic,
+    onClickArrow: (uuid: String) -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        val typeList = characteristic.types.toList()
-        val types = typeList.joinToString(", ") { it.toString() }
+        val types = characteristic.types.joinToString(", ")
+
         Column {
-            Text(text = characteristic.uuid)
+            Text(text = characteristic.name)
             Text(text = types)
         }
 
         if (characteristic.types.isNotEmpty()) {
-            Button(onClick = { }) {
+            Button(onClick = { onClickArrow(characteristic.uuid) }) {
                 Text(">")
             }
         }
