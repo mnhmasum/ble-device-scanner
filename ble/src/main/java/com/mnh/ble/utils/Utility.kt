@@ -1,8 +1,11 @@
 package com.mnh.ble.utils
 
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Environment
 import android.util.Log
+import com.mnh.ble.model.Characteristic
+import com.napco.utils.Constants
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -217,6 +220,45 @@ class Utility {
 
                 else -> characteristicUuid.toString()
             }
+        }
+
+        fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
+            val types = ArrayList<Constants.CharType>()
+            val isReadable = isCharacteristicReadable(characteristic)
+            val isNotify = isCharacteristicNotify(characteristic)
+            val isWritable = isCharacteristicWritable(characteristic)
+            val isWriteNoResponse = isCharacteristicWritableNoResponse(characteristic)
+
+            if (isReadable) {
+                types.add(Constants.CharType.READABLE)
+            }
+            if (isNotify) {
+                types.add(Constants.CharType.NOTIFY)
+            }
+            if (isWritable) {
+                types.add(Constants.CharType.WRITABLE)
+            }
+            if (isWriteNoResponse) {
+                types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
+            }
+
+            return Characteristic(types, characteristic.uuid.toString())
+        }
+
+        private fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0
+        }
+
+        private fun isCharacteristicWritable(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
+        }
+
+        private fun isCharacteristicNotify(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
+        }
+
+        private fun isCharacteristicWritableNoResponse(pChar: BluetoothGattCharacteristic): Boolean {
+            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
         }
 
     }

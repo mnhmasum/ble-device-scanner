@@ -17,6 +17,7 @@ import com.mnh.ble.model.Device
 import com.mnh.ble.model.Service
 import com.mnh.ble.model.ServiceInfo
 import com.mnh.ble.utils.Utility
+import com.mnh.ble.utils.Utility.Companion.extractCharacteristicInfo
 import com.napco.utils.Constants
 import com.napco.utils.DataState
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.UnsupportedEncodingException
+import java.util.UUID
 
 
 @SuppressLint("MissingPermission")
@@ -40,6 +42,8 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
+
+    private var bluetoothGatt: BluetoothGatt? = null
 
     companion object {
         val TAG: String = BleConnectorImp::class.java.simpleName
@@ -91,7 +95,8 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
-                    gatt.discoverServices()
+                    bluetoothGatt = gatt
+                    bluetoothGatt?.discoverServices()
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
@@ -110,16 +115,11 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
                 //enableTxTypeNotification(gatt)
 
-                val serviceDetails = parseServiceDetails(peripheralGatt.services)
-
                 scope.launch {
+                    val serviceDetails = parseServiceDetails(peripheralGatt.services)
                     _bleGattConnectionResult.emit(DataState.success(serviceDetails))
-
                 }
-
             }
-
-
         }
 
         fun parseServiceDetails(serviceList: List<BluetoothGattService>): ServiceInfo {
@@ -133,15 +133,12 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                     Log.d(TAG, "getPeripheralInfo char : ${bleCharacteristic.uuid}")
                     val characteristic = extractCharacteristicInfo(bleCharacteristic)
                     characteristics.add(characteristic)
-
                 }
-
 
                 val serviceName = Utility.getServiceName(service.uuid)
                 val newService = Service(name = serviceName, uuid = service.getUUID())
 
                 services[newService] = characteristics
-
             }
 
             return ServiceInfo(services)
@@ -149,48 +146,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
         private fun BluetoothGattService.getUUID(): String {
             return this.uuid.toString()
-        }
-
-
-        fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
-            val types = ArrayList<Constants.CharType>()
-            val isReadable = isCharacteristicReadable(characteristic)
-            val isNotify = isCharacteristicNotify(characteristic)
-            val isWritable = isCharacteristicWritable(characteristic)
-            val isWriteNoResponse = isCharacteristicWritableNoResponse(characteristic)
-
-            if (isReadable) {
-                types.add(Constants.CharType.READABLE)
-            }
-            if (isNotify) {
-                types.add(Constants.CharType.NOTIFY)
-            }
-            if (isWritable) {
-                types.add(Constants.CharType.WRITABLE)
-            }
-            if (isWriteNoResponse) {
-                types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
-            }
-
-            val characteristicName = Utility.getCharacteristicPurpose(characteristic.uuid)
-
-            return Characteristic(types, characteristicName)
-        }
-
-        fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0
-        }
-
-        fun isCharacteristicWritable(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
-        }
-
-        fun isCharacteristicNotify(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
-        }
-
-        fun isCharacteristicWritableNoResponse(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
         }
 
         override fun onDescriptorWrite(
@@ -222,8 +177,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 val charRxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_TYPE)
 
                 if (characteristic == charRxType) {
-                    val charRxBuffer =
-                        service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_BUFFER)
+                    val charRxBuffer = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_BUFFER)
                     writePassword(charRxBuffer, gatt)
                 }
             }
@@ -243,11 +197,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
             Log.d(TAG, "Characteristics Read value2: ${characteristicsValue?.contentToString()}")
             Log.d(TAG, "Characteristics Read value2: ${characteristic?.uuid.toString()}")
+            Log.d(TAG, "Characteristics Read value2: ${Utility.bytesToHexString(characteristic?.value!!)}")
 
             processCharacteristicChangedData(gatt, characteristic)
-
         }
-
 
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
@@ -255,11 +208,11 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             value: ByteArray,
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            processCharacteristicChangedData(gatt, characteristic)
+            Log.d(TAG, "Characteristics Read value new: ${characteristic.uuid}")
         }
 
 
-        /* override fun onCharacteristicRead(
+         override fun onCharacteristicRead(
              gatt: BluetoothGatt,
              characteristic: BluetoothGattCharacteristic,
              value: ByteArray,
@@ -269,10 +222,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
              //processCharacteristicChangedData(null, null)
              if (status == BluetoothGatt.GATT_SUCCESS) {
                  Log.d(TAG, "Characteristics Read NEW: ${characteristic?.uuid.toString()}")
-                 Log.d(TAG, "Characteristics Read Value: $value")
+                 Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(value)}")
                  Log.d(TAG, "Characteristics Read Status: $status")
              }
-         }*/
+         }
 
     }
 
@@ -300,9 +253,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val charTxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_TX_TYPE)
         gatt.setCharacteristicNotification(charTxType, true)
 
-        /*val bt2TxTypeDesc = charTxType.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
+        val bt2TxTypeDesc = charTxType.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
         bt2TxTypeDesc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        gatt.writeDescriptor(bt2TxTypeDesc)*/
+        gatt.writeDescriptor(bt2TxTypeDesc)
     }
 
     fun processCharacteristicChangedData(
@@ -391,6 +344,22 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     private fun showLogCat(device: BluetoothDevice, result: ScanResult) {
         Log.d(TAG, "Device found: ${device.name}, Address: ${device.address}")
         Log.d(TAG, "Device RSS: ${result.rssi}")
+    }
+
+    override fun enableNotification(service: UUID, characteristic: UUID) {
+        val service1 = bluetoothGatt?.getService(service)
+        val gattCharacteristic = service1?.getCharacteristic(characteristic)
+        bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
+
+        val descriptor = gattCharacteristic?.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
+        descriptor?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+        bluetoothGatt?.writeDescriptor(descriptor)
+    }
+
+    override fun readCharacteristic(service: UUID, characteristic: UUID) {
+        val service1 = bluetoothGatt?.getService(service)
+        val gattCharacteristic = service1?.getCharacteristic(characteristic)
+        bluetoothGatt?.readCharacteristic(gattCharacteristic)
     }
 
 }
