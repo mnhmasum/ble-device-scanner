@@ -4,7 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class LockApplication : Application() {
+class BLEDeviceScannerApplication : Application() {
 
     companion object {
         //val channelId = "BluetoothScanServiceChannel"

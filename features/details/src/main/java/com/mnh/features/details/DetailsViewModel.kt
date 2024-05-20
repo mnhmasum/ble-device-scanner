@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +24,18 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: Periphera
 
     fun disconnect() {
         detailsUseCase.disconnect()
+    }
+
+    fun enableNotification(service: String, characteristic: String) {
+        val serviceUUID = UUID.fromString(service)
+        val characteristicUUID = UUID.fromString(characteristic)
+        detailsUseCase.enableNotification(serviceUUID, characteristicUUID)
+    }
+
+    fun readCharacteristic(service: String, characteristic: String) {
+        val serviceUUID = UUID.fromString(service)
+        val characteristicUUID = UUID.fromString(characteristic)
+        detailsUseCase.readCharacteristic(serviceUUID, characteristicUUID)
     }
 
 }
