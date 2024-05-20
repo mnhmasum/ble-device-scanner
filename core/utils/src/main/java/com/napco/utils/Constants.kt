@@ -8,7 +8,8 @@ class Constants {
         READABLE,
         WRITABLE,
         NOTIFY,
-        WRITABLE_NO_RESPONSE
+        WRITABLE_NO_RESPONSE,
+        INDICATION
     }
 
     companion object {

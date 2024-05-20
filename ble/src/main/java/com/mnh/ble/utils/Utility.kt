@@ -223,43 +223,29 @@ class Utility {
         }
 
         fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
-            val types = ArrayList<Constants.CharType>()
-            val isReadable = isCharacteristicReadable(characteristic)
-            val isNotify = isCharacteristicNotify(characteristic)
-            val isWritable = isCharacteristicWritable(characteristic)
-            val isWriteNoResponse = isCharacteristicWritableNoResponse(characteristic)
+            val types = mutableListOf<Constants.CharType>()
 
-            if (isReadable) {
+            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_READ)) {
                 types.add(Constants.CharType.READABLE)
             }
-            if (isNotify) {
+            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_NOTIFY)) {
                 types.add(Constants.CharType.NOTIFY)
             }
-            if (isWritable) {
+            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_WRITE)) {
                 types.add(Constants.CharType.WRITABLE)
             }
-            if (isWriteNoResponse) {
+            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) {
                 types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
+            }
+            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_INDICATE)) {
+                types.add(Constants.CharType.INDICATION)
             }
 
             return Characteristic(types, characteristic.uuid.toString())
         }
 
-        private fun isCharacteristicReadable(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0
+        private fun isCharacteristicPropertyPresent(characteristic: BluetoothGattCharacteristic, property: Int): Boolean {
+            return (characteristic.properties and property) != 0
         }
-
-        private fun isCharacteristicWritable(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
-        }
-
-        private fun isCharacteristicNotify(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
-        }
-
-        private fun isCharacteristicWritableNoResponse(pChar: BluetoothGattCharacteristic): Boolean {
-            return (pChar.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
-        }
-
     }
 }
