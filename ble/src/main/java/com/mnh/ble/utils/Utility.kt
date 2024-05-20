@@ -225,27 +225,31 @@ class Utility {
         fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
             val types = mutableListOf<Constants.CharType>()
 
-            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_READ)) {
+            if (BluetoothGattCharacteristic.PROPERTY_READ.isPresent(characteristic)) {
                 types.add(Constants.CharType.READABLE)
             }
-            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_NOTIFY)) {
+
+            if (BluetoothGattCharacteristic.PROPERTY_NOTIFY.isPresent(characteristic)) {
                 types.add(Constants.CharType.NOTIFY)
             }
-            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_WRITE)) {
+
+            if (BluetoothGattCharacteristic.PROPERTY_WRITE.isPresent(characteristic)) {
                 types.add(Constants.CharType.WRITABLE)
             }
-            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) {
+
+            if (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.isPresent(characteristic)) {
                 types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
             }
-            if (isCharacteristicPropertyPresent(characteristic, BluetoothGattCharacteristic.PROPERTY_INDICATE)) {
+
+            if (BluetoothGattCharacteristic.PROPERTY_INDICATE.isPresent(characteristic)) {
                 types.add(Constants.CharType.INDICATION)
             }
 
             return Characteristic(types, characteristic.uuid.toString())
         }
 
-        private fun isCharacteristicPropertyPresent(characteristic: BluetoothGattCharacteristic, property: Int): Boolean {
-            return (characteristic.properties and property) != 0
+        private fun Int.isPresent(characteristic: BluetoothGattCharacteristic): Boolean {
+            return (characteristic.properties and this) != 0
         }
     }
 }
