@@ -1,5 +1,6 @@
 package com.mnh.features.details
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ fun Details(
     detailsViewModel: DetailsViewModel,
     deviceAddress: String,
 ) {
+    Log.d("MyCompose", "Details ")
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsState(initial = DataState.loading())
     var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 

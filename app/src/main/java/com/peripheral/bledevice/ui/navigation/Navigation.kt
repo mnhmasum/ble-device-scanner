@@ -1,6 +1,5 @@
 package com.peripheral.bledevice.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -21,7 +20,6 @@ fun Navigation() {
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            Log.d("Navigation", "Navigation: 0")
             MainContent(navController, mainActivityViewModel)
         }
 
@@ -29,9 +27,7 @@ fun Navigation() {
             route = "${Screen.Details.route}/{index}",
             arguments = listOf(navArgument("index") { type = NavType.StringType })
         ) { backStackEntry ->
-            Log.d("Navigation", "Navigation: ")
             val deviceAddress = backStackEntry.arguments?.getString("index") ?: ""
-
             Details(
                 detailsViewModel = detailsViewModel,
                 deviceAddress = deviceAddress

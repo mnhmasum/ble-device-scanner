@@ -39,7 +39,5 @@ class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetails
         peripheralDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
             .map { it }
-            .flowOn(Dispatchers.Main)
-
 
 }

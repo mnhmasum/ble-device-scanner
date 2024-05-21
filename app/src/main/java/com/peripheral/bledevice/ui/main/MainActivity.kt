@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,16 +14,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.navigation.Navigation
@@ -81,16 +81,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent(
-    navController: NavController, mainActivityViewModel: MainActivityViewModel = viewModel(),
+    navController: NavController,
+    mainActivityViewModel: MainActivityViewModel,
 ) {
+    Log.d("MyComposable", "Main ")
+    //val mainActivityViewModel: MainActivityViewModel = hiltViewModel()
     val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = emptyList())
+
+    val onClick: (Int) -> Unit = remember(bleScannedDeviceList) {
+        { index ->
+            val deviceAddress: String = bleScannedDeviceList[index].device?.address ?: ""
+            navController.navigate("${Screen.Details.route}/$deviceAddress")
+        }
+    }
 
     MainContentBody(
         deviceList = bleScannedDeviceList,
         onClick = {
-            val deviceAddress: String = bleScannedDeviceList[it].device?.address ?: ""
-            navController.navigate("${Screen.Details.route}/$deviceAddress")
-        },
+            onClick(it)
+            /*val deviceAddress: String = bleScannedDeviceList[it].device?.address ?: ""
+            navController.navigate("${Screen.Details.route}/$deviceAddress")*/
+        }
     )
 }
 
@@ -100,12 +111,12 @@ fun MainContentBody(
     onClick: (index: Int) -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        ListView(scanResults = deviceList, onClick)
+        DeviceList(scanResults = deviceList, onClick)
     }
 }
 
 @Composable
-fun ListView(
+fun DeviceList(
     scanResults: List<ScanResult>?,
     onClick: (device: Int) -> Unit,
 ) {
@@ -117,15 +128,17 @@ fun ListView(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        itemsIndexed(bleDeviceList) { index, scanResult ->
-            ListItem(index, scanResult = scanResult, onClick)
+        items(
+            bleDeviceList.size,
+            key = { index -> bleDeviceList[index].device?.address ?: index }) { index ->
+            DeviceItem(index, bleDeviceList[index], onClick = { onClick(index) })
         }
     }
 }
 
 @SuppressLint("MissingPermission")
 @Composable
-fun ListItem(
+fun DeviceItem(
     index: Int,
     scanResult: ScanResult,
     onClick: (index: Int) -> Unit,
