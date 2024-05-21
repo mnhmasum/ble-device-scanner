@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
-import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import com.mnh.ble.model.Characteristic
@@ -70,14 +69,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
     override fun disconnect() {
         scope.launch {
-            _bleGattConnectionResult.emit(
-                DataState.error(
-                    "Disconnected",
-                    Throwable("Error: Disconnected ")
-                )
-            )
+            val throwable = Throwable("Error: Disconnected ")
+            _bleGattConnectionResult.emit(DataState.error("Disconnected", throwable))
         }
-
     }
 
     private fun provideBluetoothManager(): BluetoothManager {
@@ -154,17 +148,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             status: Int,
         ) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            val string = Utility.bytesToHexString(descriptor?.value!!)
-            Log.d(TAG, "onDescriptorWrite: $string")
-            Log.d(TAG, "onDescriptorWrite: Status $status")
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                /*descWriteCount++
-                when (descWriteCount) {
-                    1 -> enableTxBufferNotification(gatt)
-                    2 -> enableRxCtrlNotification(gatt)
-                }*/
-
+                //When descriptor is written successfully
             }
         }
 
@@ -197,7 +183,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
 
             Log.d(TAG, "Characteristics Read value2: ${characteristicsValue?.contentToString()}")
             Log.d(TAG, "Characteristics Read value2: ${characteristic?.uuid.toString()}")
-            Log.d(TAG, "Characteristics Read value2: ${Utility.bytesToHexString(characteristic?.value!!)}")
+            Log.d(
+                TAG,
+                "Characteristics Read value2: ${Utility.bytesToHexString(characteristic?.value!!)}"
+            )
 
             processCharacteristicChangedData(gatt, characteristic)
         }
@@ -212,50 +201,21 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
 
-         override fun onCharacteristicRead(
-             gatt: BluetoothGatt,
-             characteristic: BluetoothGattCharacteristic,
-             value: ByteArray,
-             status: Int
-         ) {
-             super.onCharacteristicRead(gatt, characteristic, value, status)
-             //processCharacteristicChangedData(null, null)
-             if (status == BluetoothGatt.GATT_SUCCESS) {
-                 Log.d(TAG, "Characteristics Read NEW: ${characteristic?.uuid.toString()}")
-                 Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(value)}")
-                 Log.d(TAG, "Characteristics Read Status: $status")
-             }
-         }
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
+            status: Int,
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, value, status)
+            //processCharacteristicChangedData(null, null)
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d(TAG, "Characteristics Read NEW: ${characteristic?.uuid.toString()}")
+                Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(value)}")
+                Log.d(TAG, "Characteristics Read Status: $status")
+            }
+        }
 
-    }
-
-    private fun enableRxCtrlNotification(gatt: BluetoothGatt) {
-        val service = gatt.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-        val charRxCtrl = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_CTRL)
-        gatt.setCharacteristicNotification(charRxCtrl, true)
-        val bt2RxCtrlDesc = charRxCtrl.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
-        bt2RxCtrlDesc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        gatt.writeDescriptor(bt2RxCtrlDesc)
-    }
-
-    private fun enableTxBufferNotification(gatt: BluetoothGatt) {
-        val service = gatt.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-        val charTxBuffer = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_TX_BUFFER)
-        gatt.setCharacteristicNotification(charTxBuffer, true)
-
-        val bt2TxBufferDesc = charTxBuffer.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG);
-        bt2TxBufferDesc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        gatt.writeDescriptor(bt2TxBufferDesc)
-    }
-
-    private fun enableTxTypeNotification(gatt: BluetoothGatt) {
-        val service = gatt.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-        val charTxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_TX_TYPE)
-        gatt.setCharacteristicNotification(charTxType, true)
-
-        val bt2TxTypeDesc = charTxType.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
-        bt2TxTypeDesc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        gatt.writeDescriptor(bt2TxTypeDesc)
     }
 
     fun processCharacteristicChangedData(
@@ -264,23 +224,17 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         val characteristicBytes = characteristic?.value ?: byteArrayOf()
 
         when (characteristic?.uuid) {
-            Constants.CHARACTERISTIC_DATA_RX_CTRL -> { /*Handle CHARACTERISTIC_DATA_RX_CTRL*/
-            }
-
             Constants.CHARACTERISTIC_DATA_TX_TYPE -> handleTxType(characteristicBytes)
             Constants.CHARACTERISTIC_DATA_TX_BUFFER -> handleTxBuffer(characteristicBytes, gatt)
         }
     }
 
-
     private fun handleTxType(characteristicBytes: ByteArray) {
-        writeLog("TxType:", characteristicBytes)
         lockFullStatus[0] = characteristicBytes.getOrNull(0) ?: 0
         seqLB = characteristicBytes.getOrNull(1)?.toInt() ?: 0
     }
 
     private fun handleTxBuffer(characteristicBytes: ByteArray, gatt: BluetoothGatt?) {
-        writeLog("TxBuffer:", characteristicBytes)
         lockFullStatus[1] = characteristicBytes.getOrNull(0) ?: 0
         lockFullStatus[2] = characteristicBytes.getOrNull(1) ?: 0
 
@@ -311,19 +265,11 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 gatt.writeCharacteristic(charRxBuffer)
             }
 
-            writeLog("Password", password)
-
         } catch (e: NullPointerException) {
             e.printStackTrace()
         } catch (e: UnsupportedEncodingException) {
             e.printStackTrace()
         }
-    }
-
-    private fun writeLog(message: String, characteristicBytes: ByteArray) {
-        val logMessage = "$message: ${Utility.bytesToHexString(characteristicBytes)}"
-        Log.d(TAG, logMessage)
-        Utility.logToFile(context, logMessage)
     }
 
     private fun writeRxType(gatt: BluetoothGatt?) {
@@ -339,11 +285,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             charRxType?.value = writeRxType
             gatt?.writeCharacteristic(charRxType)
         }
-    }
-
-    private fun showLogCat(device: BluetoothDevice, result: ScanResult) {
-        Log.d(TAG, "Device found: ${device.name}, Address: ${device.address}")
-        Log.d(TAG, "Device RSS: ${result.rssi}")
     }
 
     override fun enableNotification(service: UUID, characteristic: UUID) {

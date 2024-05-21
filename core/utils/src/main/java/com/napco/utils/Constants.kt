@@ -18,7 +18,7 @@ class Constants {
         val PASSWORD = 0x16.toByte()
         val LOCK_STATUS = 0x12.toByte()
 
-        val SERVICE_ALARM_LOCK_DATA = UUID.fromString("")
+        val SERVICE_ALARM_LOCK_DATA:UUID = UUID.fromString("")
         val CHARACTERISTIC_DATA_RX_TYPE: UUID = UUID.fromString("")
         val CHARACTERISTIC_DATA_RX_BUFFER: UUID = UUID.fromString("")
         val CHARACTERISTIC_DATA_RX_CTRL: UUID = UUID.fromString("")

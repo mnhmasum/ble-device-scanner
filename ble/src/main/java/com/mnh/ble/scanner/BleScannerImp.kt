@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.callbackFlow
 @SuppressLint("MissingPermission")
 class BleScannerImp(private val bluetoothLeScanner: BluetoothLeScanner) : BleScanner {
     private var scanCallBack: ScanCallback? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     override fun startScanningWithList(): Flow<List<ScanResult>> = callbackFlow {
         val listOfScanResult = HashMap<String, ScanResult>()
