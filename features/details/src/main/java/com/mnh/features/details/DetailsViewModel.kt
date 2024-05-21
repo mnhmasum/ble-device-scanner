@@ -26,16 +26,37 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: Periphera
         detailsUseCase.disconnect()
     }
 
-    fun enableNotification(service: String, characteristic: String) {
-        val serviceUUID = UUID.fromString(service)
-        val characteristicUUID = UUID.fromString(characteristic)
+    fun enableNotification(serviceUUIDString: String, characteristicUUIDString: String) {
+        val serviceUUID = UUID.fromString(serviceUUIDString)
+        val characteristicUUID = UUID.fromString(characteristicUUIDString)
         detailsUseCase.enableNotification(serviceUUID, characteristicUUID)
     }
 
-    fun readCharacteristic(service: String, characteristic: String) {
-        val serviceUUID = UUID.fromString(service)
-        val characteristicUUID = UUID.fromString(characteristic)
+    fun enableIndication(serviceUUIDString: String, characteristicUUIDString: String) {
+        val serviceUUID = UUID.fromString(serviceUUIDString)
+        val characteristicUUID = UUID.fromString(characteristicUUIDString)
+        detailsUseCase.enableNotification(serviceUUID, characteristicUUID)
+    }
+
+    fun readCharacteristic(serviceUUIDString: String, characteristicUUIDString: String) {
+        val serviceUUID = UUID.fromString(serviceUUIDString)
+        val characteristicUUID = UUID.fromString(characteristicUUIDString)
         detailsUseCase.readCharacteristic(serviceUUID, characteristicUUID)
+    }
+
+    fun writeCharacteristic(serviceUUIDString: String, characteristicUUIDString: String) {
+        val serviceUUID = UUID.fromString(serviceUUIDString)
+        val characteristicUUID = UUID.fromString(characteristicUUIDString)
+        detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID)
+    }
+
+    fun writeCharacteristicWithNoResponse(
+        serviceUUIDString: String,
+        characteristicUUIDString: String,
+    ) {
+        val serviceUUID = UUID.fromString(serviceUUIDString)
+        val characteristicUUID = UUID.fromString(characteristicUUIDString)
+        detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID)
     }
 
 }

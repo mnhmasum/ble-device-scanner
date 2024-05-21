@@ -23,6 +23,14 @@ class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetails
         peripheralDetailsRepository.readCharacteristic(service, chara)
     }
 
+    fun writeCharacteristic(service: UUID, chara: UUID) {
+        peripheralDetailsRepository.readCharacteristic(service, chara)
+    }
+
+    fun writeCharacteristicWithNoResponse(service: UUID, chara: UUID) {
+        peripheralDetailsRepository.readCharacteristic(service, chara)
+    }
+
     fun disconnect() {
         peripheralDetailsRepository.disconnect()
     }
