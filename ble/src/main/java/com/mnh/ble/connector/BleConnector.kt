@@ -7,8 +7,15 @@ import java.util.UUID
 
 interface BleConnector {
     fun connect(address: String)
-    fun enableNotification(service: UUID, characteristic: UUID)
-    fun readCharacteristic(service: UUID, characteristic: UUID)
-    fun disconnect()
     fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>>
+    fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
+    fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
+    fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID)
+    fun writeCharacteristic(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray)
+    fun writeCharacteristicWithNoResponse(
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+        bytes: ByteArray,
+    )
+    fun disconnect()
 }

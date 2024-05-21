@@ -9,7 +9,14 @@ interface PeripheralDetailsRepository {
     fun connect(address: String)
     fun disconnect()
     fun getGattConnectionResult(): Flow<DataState<ServiceInfo>>
-    fun enableNotification(service: UUID, characteristic: UUID)
+    fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
+    fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(service: UUID, characteristic: UUID)
+    fun writeCharacteristic(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray)
+    fun writeCharacteristicWithNoResponse(
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+        bytes: ByteArray,
+    )
 
 }
