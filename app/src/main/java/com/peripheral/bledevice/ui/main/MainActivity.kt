@@ -17,12 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.napco.utils.PermissionManager.Companion.permissionManager
 import com.peripheral.bledevice.ui.navigation.Navigation
@@ -85,8 +85,8 @@ fun MainContent(
     mainActivityViewModel: MainActivityViewModel,
 ) {
     Log.d("MyComposable", "Main ")
-    //val mainActivityViewModel: MainActivityViewModel = hiltViewModel()
-    val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsState(initial = emptyList())
+
+    val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsStateWithLifecycle(emptyList())
 
     val onClick: (Int) -> Unit = remember(bleScannedDeviceList) {
         { index ->

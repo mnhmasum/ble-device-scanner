@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.ServiceInfo
 import com.napco.utils.DataState
@@ -37,7 +37,9 @@ fun Details(
     deviceAddress: String,
 ) {
     Log.d("MyCompose", "Details ")
-    val connectionResult by detailsViewModel.bleConnectionResult.collectAsState(initial = DataState.loading())
+    val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
+        DataState.loading()
+    )
     var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {

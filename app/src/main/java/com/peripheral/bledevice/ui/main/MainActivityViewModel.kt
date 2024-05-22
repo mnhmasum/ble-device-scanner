@@ -14,5 +14,6 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(bleUseCase: BleUseCase) :
     ViewModel() {
     val scannedDeviceList: Flow<List<ScanResult>> =
-        bleUseCase.getBleDeviceList().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        bleUseCase.getBleDeviceList()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 }

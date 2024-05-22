@@ -21,6 +21,7 @@ class BleScannerImp(private val bluetoothLeScanner: BluetoothLeScanner) : BleSca
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 listOfScanResult[result.device.address] = result
                 trySend(listOfScanResult.values.toList())
+                //Log.d("BLE_Connector", "onScanResult: ${listOfScanResult.values.toList().toString()}" )
             }
 
             override fun onScanFailed(errorCode: Int) {
@@ -28,7 +29,7 @@ class BleScannerImp(private val bluetoothLeScanner: BluetoothLeScanner) : BleSca
             }
         }
 
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
+        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED).build()
         bluetoothLeScanner.startScan(null, settings, scanCallBack)
 
         awaitClose {

@@ -19,6 +19,10 @@ class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetails
         peripheralDetailsRepository.enableNotification(service, chara)
     }
 
+    fun enableIndication(service: UUID, chara: UUID) {
+        peripheralDetailsRepository.enableIndication(service, chara)
+    }
+
     fun readCharacteristic(service: UUID, chara: UUID) {
         peripheralDetailsRepository.readCharacteristic(service, chara)
     }
