@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peripheral.bledevice">
+    package="com.mnh.bledevicescanner">
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
     <application
-        android:name=".ui.BLEDeviceScannerApplication"
+        android:name=".BLEDeviceScannerApplication"
         android:allowBackup="true"
         android:icon="@android:drawable/ic_lock_lock"
         android:label="@string/app_name"

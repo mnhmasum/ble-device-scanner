@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.di
+package com.mnh.bledevicescanner.di
 
 import com.lightnotebook.data.database.DeviceDao
 import com.lightnotebook.data.repository.DeviceRepository

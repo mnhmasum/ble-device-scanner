@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.data.model
+package com.mnh.bledevicescanner.data.model
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic

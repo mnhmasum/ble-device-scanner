@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.navigation
+package com.mnh.bledevicescanner.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -9,8 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mnh.features.details.Details
 import com.mnh.features.details.DetailsViewModel
-import com.peripheral.bledevice.ui.main.MainActivityViewModel
-import com.peripheral.bledevice.ui.main.MainContent
+import com.mnh.bledevicescanner.ui.main.MainActivityViewModel
+import com.mnh.bledevicescanner.ui.main.MainContent
 
 @Composable
 fun Navigation() {

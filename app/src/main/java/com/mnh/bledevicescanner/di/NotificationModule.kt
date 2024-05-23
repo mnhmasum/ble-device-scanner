@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.di
+package com.mnh.bledevicescanner.di
 
 import android.app.Notification
 import android.app.NotificationChannel

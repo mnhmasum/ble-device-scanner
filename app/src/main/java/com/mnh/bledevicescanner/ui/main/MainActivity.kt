@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.main
+package com.mnh.bledevicescanner.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -26,10 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mnh.bledevicescanner.ui.navigation.Navigation
+import com.mnh.bledevicescanner.ui.navigation.Screen
+import com.mnh.bledevicescanner.ui.theme.AppTheme
 import com.napco.utils.PermissionManager.Companion.permissionManager
-import com.peripheral.bledevice.ui.navigation.Navigation
-import com.peripheral.bledevice.ui.navigation.Screen
-import com.peripheral.bledevice.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.navigation
+package com.mnh.bledevicescanner.ui.navigation
 
 sealed class Screen(val route: String) {
     object Home : Screen("Main")

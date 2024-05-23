@@ -1,4 +1,4 @@
-package com.peripheral.bledevice.ui.main
+package com.mnh.bledevicescanner.ui.main
 
 import android.bluetooth.le.ScanResult
 import androidx.lifecycle.ViewModel

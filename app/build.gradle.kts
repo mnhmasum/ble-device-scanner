@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.peripheral.bledevice"
+    namespace = "com.mnh.bledevicescanner"
     compileSdk = 34
 
     defaultConfig {

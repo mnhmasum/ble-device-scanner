@@ -1,6 +1,6 @@
-package com.peripheral.bledevice.data.repository
+package com.mnh.bledevicescanner.data.repository
 
-import com.peripheral.bledevice.data.model.MyData
+import com.mnh.bledevicescanner.data.model.MyData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
