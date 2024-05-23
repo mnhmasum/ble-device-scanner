@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -51,7 +53,9 @@ class MainActivity : ComponentActivity() {
 
             onPermissionGranted {
                 setContent {
-                    Navigation()
+                    AppTheme {
+                        Navigation()
+                    }
                 }
             }
 
@@ -86,7 +90,9 @@ fun MainContent(
 ) {
     Log.d("MyComposable", "Main ")
 
-    val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsStateWithLifecycle(emptyList())
+    val bleScannedDeviceList by mainActivityViewModel.scannedDeviceList.collectAsStateWithLifecycle(
+        emptyList()
+    )
 
     val onClick: (Int) -> Unit = remember(bleScannedDeviceList) {
         { index ->
@@ -94,6 +100,17 @@ fun MainContent(
             navController.navigate("${Screen.Details.route}/$deviceAddress")
         }
     }
+
+    LaunchedEffect(Unit) {
+        mainActivityViewModel.startScanning()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mainActivityViewModel.stopScanning()
+        }
+    }
+
 
     MainContentBody(
         deviceList = bleScannedDeviceList,

@@ -6,43 +6,47 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.util.Log
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 
 @SuppressLint("MissingPermission")
-class BleScannerImp(private val bluetoothLeScanner: BluetoothLeScanner) : BleScanner {
-    private var scanCallBack: ScanCallback? = null
+class BleScannerImp(
+    private val bluetoothLeScanner: BluetoothLeScanner,
+    private val deviceList: MutableMap<String, ScanResult> = mutableMapOf(),
+    private val channel: Channel<List<ScanResult>> = Channel(Channel.BUFFERED),
+    private val logger: (String) -> Unit = { message -> Log.d("BLE_Connector", message) },
+    private val close: (Throwable) -> Unit = { throwable -> channel.close(throwable) },
+) : BleScanner,
+    ScanCallback() {
 
-    override fun startScanningWithList(): Flow<List<ScanResult>> = callbackFlow {
-        val listOfScanResult = HashMap<String, ScanResult>()
+    override val scanResults: Flow<List<ScanResult>> = channel.receiveAsFlow()
 
-        scanCallBack = object : ScanCallback() {
-            override fun onScanResult(callbackType: Int, result: ScanResult) {
-                listOfScanResult[result.device.address] = result
-                trySend(listOfScanResult.values.toList())
-                Log.d("BLE_Connector", "onScanResult: ${listOfScanResult.values.toList().toString()}" )
-            }
-
-            override fun onScanFailed(errorCode: Int) {
-                close(IllegalStateException("BLE Scan failed with error code: $errorCode"))
-            }
-        }
-
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
-        bluetoothLeScanner.startScan(null, settings, scanCallBack)
-
-        awaitClose {
-            bluetoothLeScanner.stopScan(scanCallBack)
+    override fun onScanResult(callbackType: Int, result: ScanResult?) {
+        if (result != null) {
+            deviceList[result.device.address] = result
+            trySend(deviceList.values.toList())
+            logger("onScanResult: ${deviceList.values.toList()}")
         }
     }
 
+    override fun onScanFailed(errorCode: Int) {
+        //close(IllegalStateException("BLE Scan failed with error code: $errorCode"))
+    }
+
+    private fun trySend(results: List<ScanResult>) {
+        channel.trySend(results).isSuccess
+    }
+
+    override fun startScanning() {
+        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+            .build()
+        bluetoothLeScanner.startScan(null, settings, this)
+    }
+
     override fun stopScanning() {
-        if (scanCallBack != null) {
-            bluetoothLeScanner.stopScan(scanCallBack)
-            scanCallBack = null
-        }
+        bluetoothLeScanner.stopScan(this)
     }
 
 }

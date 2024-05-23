@@ -11,7 +11,11 @@ class BleRepositoryImp(private val bleSource: BleScanner, private val bleConnect
     BleRepository {
 
     override fun getScannedDeviceList(): Flow<List<ScanResult>> {
-        return bleSource.startScanningWithList()
+        return bleSource.scanResults
+    }
+
+    override fun startScanning() {
+        bleSource.startScanning()
     }
 
     override fun stopScanning() {

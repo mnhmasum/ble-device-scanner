@@ -11,9 +11,18 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(bleUseCase: BleUseCase) :
+class MainActivityViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
     ViewModel() {
     val scannedDeviceList: Flow<List<ScanResult>> =
         bleUseCase.getBleDeviceList()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    fun startScanning() {
+        bleUseCase.startScanning()
+    }
+
+    fun stopScanning() {
+        bleUseCase.stopScanning()
+    }
+
 }

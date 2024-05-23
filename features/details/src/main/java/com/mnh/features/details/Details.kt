@@ -81,8 +81,10 @@ fun DeviceInfo(detailsViewModel: DetailsViewModel, serviceInfo: ServiceInfo?) {
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.Start
     ) {
-        deviceInfo?.forEach { (service, characteristics) ->
 
+        if (deviceInfo == null) return
+
+        for ((service, characteristics) in deviceInfo) {
             Text(text = service.name)
             Divider(thickness = 1.dp, color = Color.Black)
             Spacer(modifier = Modifier.height(8.dp))

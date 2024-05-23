@@ -4,7 +4,8 @@ import android.bluetooth.le.ScanResult
 import kotlinx.coroutines.flow.Flow
 
 interface BleScanner {
-    fun startScanningWithList(): Flow<List<ScanResult>>
+    val scanResults: Flow<List<ScanResult>>
+    fun startScanning()
     fun stopScanning()
 
 }
