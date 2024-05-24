@@ -6,8 +6,9 @@ import java.util.UUID
 
 
 data class Characteristic(
-    val types: List<Constants.CharType>,
+    val properties: List<Constants.CharType>,
     val uuid: String = "",
+    val joinProperties: String = properties.joinToString(", "),
 ) {
     val name: String
         get() = Utility.getCharacteristicPurpose(UUID.fromString(uuid))

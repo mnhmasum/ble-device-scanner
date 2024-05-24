@@ -14,7 +14,6 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
     @SuppressLint("MissingPermission")
     fun getBleDeviceList(): Flow<List<ScanResult>> {
         return bleRepository.getScannedDeviceList()
-            .flowOn(Dispatchers.IO)
             .distinctUntilChanged { oldItem, newItem ->
                 oldItem == newItem
             }
@@ -23,14 +22,14 @@ class BleUseCase @Inject constructor(private val bleRepository: BleRepository) {
                     scanResult.device.name == null
                 }
             }
-            .flowOn(Dispatchers.Main)
+            .flowOn(Dispatchers.IO)
     }
 
-    fun startScanning() {
+    suspend fun startScanning() {
         bleRepository.startScanning()
     }
 
-    fun stopScanning() {
+    suspend fun stopScanning() {
         bleRepository.stopScanning()
     }
 
