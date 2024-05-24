@@ -1,4 +1,4 @@
-package com.mnh.bledevicescanner.ui.theme
+package com.mnh.bledevicescanner.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

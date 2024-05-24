@@ -1,4 +1,4 @@
-package com.mnh.bledevicescanner.ui.main
+package com.mnh.features.home
 
 import android.bluetooth.le.ScanResult
 import androidx.lifecycle.ViewModel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
+class HomeViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
     ViewModel() {
     val scannedDeviceList: Flow<List<ScanResult>> =
         bleUseCase.getBleDeviceList()

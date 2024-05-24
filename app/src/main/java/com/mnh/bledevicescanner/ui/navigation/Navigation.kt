@@ -7,20 +7,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.mnh.bledevicescanner.core.Screen
 import com.mnh.features.details.Details
 import com.mnh.features.details.DetailsViewModel
-import com.mnh.bledevicescanner.ui.main.MainActivityViewModel
-import com.mnh.bledevicescanner.ui.main.MainContent
+import com.mnh.features.home.HomeViewModel
+import com.mnh.features.home.MainContent
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-    val mainActivityViewModel: MainActivityViewModel = viewModel()
+    val homeViewModel: HomeViewModel = viewModel()
     val detailsViewModel: DetailsViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            MainContent(navController, mainActivityViewModel)
+            MainContent(navController, homeViewModel)
         }
 
         composable(

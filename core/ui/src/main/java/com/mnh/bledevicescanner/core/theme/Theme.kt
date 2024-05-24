@@ -1,4 +1,4 @@
-package com.mnh.bledevicescanner.ui.theme
+package com.mnh.bledevicescanner.core.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

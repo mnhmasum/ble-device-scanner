@@ -54,7 +54,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    //implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -88,9 +87,11 @@ dependencies {
 
     implementation(project(":data:local"))
     implementation(project(":core:utils"))
+    implementation(project(":core:ui"))
     implementation(project(":ble"))
     implementation(project(":service"))
     implementation(project(":features:details"))
+    implementation(project(":features:home"))
 
 }
 
