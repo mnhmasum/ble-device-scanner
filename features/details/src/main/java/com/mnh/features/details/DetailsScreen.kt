@@ -2,11 +2,9 @@ package com.mnh.features.details
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -98,18 +96,8 @@ fun ServiceItem(
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         BasicText(text = characteristics.first.uuid)
         Spacer(modifier = Modifier.height(20.dp))
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((characteristics.second.size * 120).dp)// Set an intrinsic height constraint
-        ) {
-            LazyColumn() {
-                items(
-                    characteristics.second,
-                    key = { it.uuid }) { characteristic ->
-                    CharacteristicItem(characteristic = characteristic)
-                }
-            }
+        characteristics.second.forEach {
+            CharacteristicItem(characteristic = it)
         }
     }
 }
