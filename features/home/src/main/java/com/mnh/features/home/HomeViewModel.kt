@@ -29,8 +29,6 @@ class HomeViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
         viewModelScope.launch(Dispatchers.IO) {
             bleUseCase.stopScanning()
         }
-
-        //bleUseCase.stopScanning()
     }
 
 }

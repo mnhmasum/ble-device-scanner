@@ -71,6 +71,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
     }
 
     override fun disconnect() {
+        bluetoothGatt?.disconnect()
+    }
+
+    private fun updateConnectionstatus() {
         scope.launch {
             val throwable = Throwable("Error: Disconnected ")
             _bleGattConnectionResult.emit(DataState.error("Disconnected", throwable))
@@ -99,7 +103,11 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         bluetoothGatt?.readCharacteristic(gattCharacteristic)
     }
 
-    override fun writeCharacteristic(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
+    override fun writeCharacteristic(
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+        bytes: ByteArray,
+    ) {
         val bluetoothGattService = bluetoothGatt?.getService(serviceUUID)
         val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
         writeCharacteristic(gattCharacteristic, bytes, WRITE_TYPE_DEFAULT)
@@ -149,7 +157,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    disconnect()
+                    updateConnectionstatus()
                     Log.d(TAG, "Device disconnected")
                 }
             }
@@ -165,7 +173,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 //enableTxTypeNotification(gatt)
 
                 scope.launch {
-                    val serviceDetails = parseServiceDetails(peripheralGatt.services)
+                    val serviceDetails: ServiceInfo = parseServiceDetails(peripheralGatt.services)
                     _bleGattConnectionResult.emit(DataState.success(serviceDetails))
                 }
             }

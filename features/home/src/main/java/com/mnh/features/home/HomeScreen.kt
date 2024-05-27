@@ -19,18 +19,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mnh.bledevicescanner.core.Screen
 import com.mnh.bledevicescanner.core.theme.AppTheme
 
 @Composable
-fun MainContent(
-    navController: NavController,
-    homeViewModel: HomeViewModel,
-) {
+fun MainContent(navController: NavController) {
     Log.d("MyComposable", "Main ")
-
+    val homeViewModel: HomeViewModel = hiltViewModel()
     val bleScannedDeviceList by homeViewModel.scannedDeviceList.collectAsStateWithLifecycle(
         emptyList()
     )
@@ -57,8 +55,6 @@ fun MainContent(
         deviceList = bleScannedDeviceList,
         onClick = {
             onClick(it)
-            /*val deviceAddress: String = bleScannedDeviceList[it].device?.address ?: ""
-            navController.navigate("${Screen.Details.route}/$deviceAddress")*/
         }
     )
 }

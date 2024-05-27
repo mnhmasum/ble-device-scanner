@@ -27,7 +27,7 @@ class BleScannerImp(
         if (result != null) {
             deviceList[result.device.address] = result
             trySend(deviceList.values.toList())
-            logger("onScanResult: ${deviceList.values.toList()}")
+            //logger("onScanResult: ${deviceList.values.toList()}")
         }
     }
 

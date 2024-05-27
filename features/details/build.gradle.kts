@@ -63,6 +63,7 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation (libs.androidx.lifecycle.runtime.compose)
+    implementation (libs.androidx.hilt.navigation.compose)
 
     implementation(project(":core:utils"))
     implementation(project(":ble"))
