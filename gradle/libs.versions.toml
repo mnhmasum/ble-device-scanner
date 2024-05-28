@@ -1,5 +1,6 @@
 [versions]
 agp = "8.4.0-alpha03"
+hiltAndroidGradlePlugin = "2.50"
 kotlin = "1.9.0"
 coreKtx = "1.12.0"
 junit = "4.13.2"
@@ -21,10 +22,12 @@ navigationFragmentKtx = "2.7.6"
 navigationUiKtx = "2.7.6"
 nav_version = "2.7.7"
 hiltNavigationCompose= "1.2.0"
+daggerHiltAndroid = "2.50"
 
 [libraries]
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-viewmodel-compose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
+hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -57,4 +60,5 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "daggerHiltAndroid" }
 

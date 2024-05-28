@@ -2,7 +2,7 @@
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
-    id("com.google.dagger.hilt.android") version "2.50" apply false
+    alias (libs.plugins.daggerHiltAndroid) apply false
     alias(libs.plugins.androidLibrary) apply false
 }
 
@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         //classpath(libs.hilt.android.gradle.plugin)
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.50")
+        classpath(libs.hilt.android.gradle.plugin)
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
