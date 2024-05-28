@@ -1,14 +1,13 @@
 package com.mnh.ble.model
 
 import com.mnh.ble.utils.Utility
-import com.napco.utils.Constants
 import java.util.UUID
 
 
 data class Characteristic(
-    val properties: List<Constants.CharType>,
     val uuid: String = "",
-    val joinProperties: String = properties.joinToString(", "),
+    val properties: List<String>,
+    val acceptedPropertyList: String = properties.joinToString(", "),
 ) {
     val name: String
         get() = Utility.getCharacteristicPurpose(UUID.fromString(uuid))

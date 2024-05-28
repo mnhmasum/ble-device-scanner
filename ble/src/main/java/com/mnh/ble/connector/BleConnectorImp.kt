@@ -74,7 +74,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         bluetoothGatt?.disconnect()
     }
 
-    private fun updateConnectionstatus() {
+    private fun updateConnectionStatus() {
         scope.launch {
             val throwable = Throwable("Error: Disconnected ")
             _bleGattConnectionResult.emit(DataState.error("Disconnected", throwable))
@@ -157,7 +157,7 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    updateConnectionstatus()
+                    updateConnectionStatus()
                     Log.d(TAG, "Device disconnected")
                 }
             }
@@ -187,9 +187,9 @@ class BleConnectorImp(private val context: Context) : BleConnector {
                 val characteristics = ArrayList<Characteristic>()
 
                 for (bleCharacteristic in service.characteristics) {
-                    Log.d(TAG, "getPeripheralInfo char : ${bleCharacteristic.uuid}")
                     val characteristic = extractCharacteristicInfo(bleCharacteristic)
                     characteristics.add(characteristic)
+                    Log.d(TAG, "getPeripheralInfo char : ${bleCharacteristic.uuid}")
                 }
 
                 val serviceName = Utility.getServiceName(service.uuid)
@@ -274,9 +274,8 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             super.onCharacteristicRead(gatt, characteristic, value, status)
             //processCharacteristicChangedData(null, null)
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "Characteristics Read NEW: ${characteristic?.uuid.toString()}")
+                Log.d(TAG, "Characteristics Read NEW: ${characteristic.uuid.toString()}")
                 Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(value)}")
-                Log.d(TAG, "Characteristics Read Status: $status")
             }
         }
 
