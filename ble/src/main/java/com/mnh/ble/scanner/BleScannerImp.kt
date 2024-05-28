@@ -27,7 +27,7 @@ class BleScannerImp(
         if (result != null) {
             deviceList[result.device.address] = result
             trySend(deviceList.values.toList())
-            //logger("onScanResult: ${deviceList.values.toList()}")
+            logger("onScanResult: ${deviceList.values.toList()}")
         }
     }
 
@@ -40,7 +40,7 @@ class BleScannerImp(
     }
 
     override fun startScanning() {
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
             .build()
         bluetoothLeScanner.startScan(null, settings, this)
     }
