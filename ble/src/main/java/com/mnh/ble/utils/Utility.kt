@@ -1,19 +1,9 @@
 package com.mnh.ble.utils
 
 import android.bluetooth.BluetoothGattCharacteristic
-import android.content.Context
-import android.os.Environment
-import android.util.Log
 import com.mnh.ble.model.Characteristic
 import com.napco.utils.Constants
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStreamWriter
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Formatter
-import java.util.Locale
 import java.util.UUID
 
 
@@ -41,7 +31,7 @@ class Utility {
         }
 
         fun passData(password: String): ByteArray {
-            val badgeNo = "337800489559774425".toLong()
+            val badgeNo = "".toLong()
             val pktLen = 15
             val passData = ByteArray(pktLen)
 
@@ -50,55 +40,6 @@ class Utility {
             }
 
             return passData
-        }
-
-
-        private const val LOG_TAG = "MyLogger"
-        private const val LOG_FILE_NAME = "my_log.txt"
-
-        fun logToFile(context: Context, message: String) {
-            try {
-                // Check if external storage is available
-                if (isExternalStorageAvailable()) {
-                    // Get the external storage directory
-                    //val externalStorageDir = context.getExternalFilesDir(null)
-
-                    val downloadDir =
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    // Create a subdirectory if it doesn't exist
-                    val logDir = File(downloadDir, "Logs")
-                    if (!logDir.exists()) {
-                        logDir.mkdir()
-                    }
-
-                    // Create a file for the log
-                    val logFile = File(logDir, LOG_FILE_NAME)
-
-                    // Get the current timestamp
-                    val timeStamp: String =
-                        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-
-                    // Append the timestamp to the log message
-                    val logMessage = "$timeStamp: $message\n"
-
-                    // Write the log message to the file
-                    val outputStream = FileOutputStream(logFile, true)
-                    val outputStreamWriter = OutputStreamWriter(outputStream)
-                    outputStreamWriter.append(logMessage)
-                    outputStreamWriter.close()
-
-                    Log.d(LOG_TAG, "Log written to file: " + logFile.absolutePath)
-                } else {
-                    Log.e(LOG_TAG, "External storage not available.")
-                }
-            } catch (e: IOException) {
-                Log.e(LOG_TAG, "Error writing log to file: " + e.message)
-            }
-        }
-
-        private fun isExternalStorageAvailable(): Boolean {
-            val state = Environment.getExternalStorageState()
-            return Environment.MEDIA_MOUNTED == state
         }
 
         fun bytesToHexString(bytes: ByteArray): String {
@@ -157,95 +98,94 @@ class Utility {
         fun getCharacteristicPurpose(characteristicUuid: UUID): String {
             return when (characteristicUuid) {
                 // Device Information Service
-                UUID.fromString("00002A00-0000-1000-8000-00805F9B34FB") -> "DEVICE NAME"
-                UUID.fromString("00002A01-0000-1000-8000-00805F9B34FB") -> "APPEARANCE"
-                UUID.fromString("00002A02-0000-1000-8000-00805F9B34FB") -> "PERIPHERAL PRIVACY FLAG"
-                UUID.fromString("00002A03-0000-1000-8000-00805F9B34FB") -> "RECONNECTION ADDRESS"
-                UUID.fromString("00002A04-0000-1000-8000-00805F9B34FB") -> "PERIPHERAL PREFERRED CONNECTION PARAMETERS"
-                UUID.fromString("00002A05-0000-1000-8000-00805F9B34FB") -> "SERVICE CHANGED"
-                UUID.fromString("00002A06-0000-1000-8000-00805F9B34FB") -> "ALERT LEVEL"
-                UUID.fromString("00002A07-0000-1000-8000-00805F9B34FB") -> "TX POWER LEVEL"
-                UUID.fromString("00002A08-0000-1000-8000-00805F9B34FB") -> "DATE TIME"
-                UUID.fromString("00002A09-0000-1000-8000-00805F9B34FB") -> "DAY OF WEEK"
-                UUID.fromString("00002A0A-0000-1000-8000-00805F9B34FB") -> "DAY DATE TIME"
-                UUID.fromString("00002A0C-0000-1000-8000-00805F9B34FB") -> "EXACT TIME 256"
-                UUID.fromString("00002A0D-0000-1000-8000-00805F9B34FB") -> "DST OFFSET"
-                UUID.fromString("00002A0E-0000-1000-8000-00805F9B34FB") -> "TIME ZONE"
-                UUID.fromString("00002A0F-0000-1000-8000-00805F9B34FB") -> "LOCAL TIME INFORMATION"
-                UUID.fromString("00002A11-0000-1000-8000-00805F9B34FB") -> "TIME WITH DST"
-                UUID.fromString("00002A12-0000-1000-8000-00805F9B34FB") -> "TIME ACCURACY"
-                UUID.fromString("00002A13-0000-1000-8000-00805F9B34FB") -> "TIME SOURCE"
-                UUID.fromString("00002A14-0000-1000-8000-00805F9B34FB") -> "REFERENCE TIME INFORMATION"
-                UUID.fromString("00002A16-0000-1000-8000-00805F9B34FB") -> "TIME UPDATE CONTROL POINT"
-                UUID.fromString("00002A17-0000-1000-8000-00805F9B34FB") -> "TIME UPDATE STATE"
-                UUID.fromString("00002A18-0000-1000-8000-00805F9B34FB") -> "GLUCOSE MEASUREMENT"
-                UUID.fromString("00002A19-0000-1000-8000-00805F9B34FB") -> "BATTERY LEVEL"
-                UUID.fromString("00002A1C-0000-1000-8000-00805F9B34FB") -> "TEMPERATURE MEASUREMENT"
-                UUID.fromString("00002A1D-0000-1000-8000-00805F9B34FB") -> "TEMPERATURE TYPE"
-                UUID.fromString("00002A1E-0000-1000-8000-00805F9B34FB") -> "INTERMEDIATE TEMPERATURE"
-                UUID.fromString("00002A21-0000-1000-8000-00805F9B34FB") -> "MEASUREMENT INTERVAL"
-                UUID.fromString("00002A22-0000-1000-8000-00805F9B34FB") -> "BOOT KEYBOARD INPUT REPORT"
-                UUID.fromString("00002A23-0000-1000-8000-00805F9B34FB") -> "SYSTEM ID"
-                UUID.fromString("00002A24-0000-1000-8000-00805F9B34FB") -> "MODEL NUMBER STRING"
-                UUID.fromString("00002A25-0000-1000-8000-00805F9B34FB") -> "SERIAL NUMBER STRING"
-                UUID.fromString("00002A26-0000-1000-8000-00805F9B34FB") -> "FIRMWARE REVISION STRING"
-                UUID.fromString("00002A27-0000-1000-8000-00805F9B34FB") -> "HARDWARE REVISION STRING"
-                UUID.fromString("00002A28-0000-1000-8000-00805F9B34FB") -> "SOFTWARE REVISION STRING"
-                UUID.fromString("00002A29-0000-1000-8000-00805F9B34FB") -> "MANUFACTURER NAME STRING"
-                UUID.fromString("00002A2A-0000-1000-8000-00805F9B34FB") -> "IEEE 11073-20601 REGULATORY CERTIFICATION DATA LIST"
-                UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB") -> "CURRENT TIME"
-                UUID.fromString("00002A2C-0000-1000-8000-00805F9B34FB") -> "MAGNETIC DECLINATION"
-                UUID.fromString("00002A31-0000-1000-8000-00805F9B34FB") -> "SCAN REFRESH"
-                UUID.fromString("00002A32-0000-1000-8000-00805F9B34FB") -> "BOOT KEYBOARD OUTPUT REPORT"
-                UUID.fromString("00002A33-0000-1000-8000-00805F9B34FB") -> "BOOT MOUSE INPUT REPORT"
-                UUID.fromString("00002A34-0000-1000-8000-00805F9B34FB") -> "GLUCOSE MEASUREMENT CONTEXT"
-                UUID.fromString("00002A35-0000-1000-8000-00805F9B34FB") -> "BLOOD PRESSURE MEASUREMENT"
-                UUID.fromString("00002A36-0000-1000-8000-00805F9B34FB") -> "INTERMEDIATE CUFF PRESSURE"
-                UUID.fromString("00002A37-0000-1000-8000-00805F9B34FB") -> "HEART RATE MEASUREMENT"
-                UUID.fromString("00002A38-0000-1000-8000-00805F9B34FB") -> "BODY SENSOR LOCATION"
-                UUID.fromString("00002A39-0000-1000-8000-00805F9B34FB") -> "HEART RATE CONTROL POINT"
-                UUID.fromString("00002A3F-0000-1000-8000-00805F9B34FB") -> "ALERT STATUS"
-                UUID.fromString("00002A40-0000-1000-8000-00805F9B34FB") -> "RINGER CONTROL POINT"
-                UUID.fromString("00002A41-0000-1000-8000-00805F9B34FB") -> "RINGER SETTING"
-                UUID.fromString("00002A42-0000-1000-8000-00805F9B34FB") -> "ALERT CATEGORY ID BIT MASK"
-                UUID.fromString("00002A43-0000-1000-8000-00805F9B34FB") -> "ALERT CATEGORY ID"
-                UUID.fromString("00002A44-0000-1000-8000-00805F9B34FB") -> "ALERT NOTIFICATION CONTROL POINT"
-                UUID.fromString("00002A45-0000-1000-8000-00805F9B34FB") -> "UNREAD ALERT STATUS"
-                UUID.fromString("00002A46-0000-1000-8000-00805F9B34FB") -> "NEW ALERT"
-                UUID.fromString("00002A47-0000-1000-8000-00805F9B34FB") -> "SUPPORTED NEW ALERT CATEGORY"
-                UUID.fromString("00002A48-0000-1000-8000-00805F9B34FB") -> "SUPPORTED UNREAD ALERT CATEGORY"
-                UUID.fromString("00002A49-0000-1000-8000-00805F9B34FB") -> "BLOOD PRESSURE FEATURE"
-                UUID.fromString("00002A4A-0000-1000-8000-00805F9B34FB") -> "HID INFORMATION"
-                UUID.fromString("00002A4B-0000-1000-8000-00805F9B34FB") -> "REPORT MAP"
-
+                UUID.fromString("00002A00-0000-1000-8000-00805F9B34FB") -> "Device Name"
+                UUID.fromString("00002A01-0000-1000-8000-00805F9B34FB") -> "Appearance"
+                UUID.fromString("00002A02-0000-1000-8000-00805F9B34FB") -> "Peripheral Privacy Flag"
+                UUID.fromString("00002A03-0000-1000-8000-00805F9B34FB") -> "Reconnection Address"
+                UUID.fromString("00002A04-0000-1000-8000-00805F9B34FB") -> "Peripheral Preferred Connection Parameters"
+                UUID.fromString("00002A05-0000-1000-8000-00805F9B34FB") -> "Service Changed"
+                UUID.fromString("00002A06-0000-1000-8000-00805F9B34FB") -> "Alert Level"
+                UUID.fromString("00002A07-0000-1000-8000-00805F9B34FB") -> "Tx Power Level"
+                UUID.fromString("00002A08-0000-1000-8000-00805F9B34FB") -> "Date Time"
+                UUID.fromString("00002A09-0000-1000-8000-00805F9B34FB") -> "Day Of Week"
+                UUID.fromString("00002A0A-0000-1000-8000-00805F9B34FB") -> "Day Date Time"
+                UUID.fromString("00002A0C-0000-1000-8000-00805F9B34FB") -> "Exact Time 256"
+                UUID.fromString("00002A0D-0000-1000-8000-00805F9B34FB") -> "Dst Offset"
+                UUID.fromString("00002A0E-0000-1000-8000-00805F9B34FB") -> "Time Zone"
+                UUID.fromString("00002A0F-0000-1000-8000-00805F9B34FB") -> "Local Time Information"
+                UUID.fromString("00002A11-0000-1000-8000-00805F9B34FB") -> "Time With Dst"
+                UUID.fromString("00002A12-0000-1000-8000-00805F9B34FB") -> "Time Accuracy"
+                UUID.fromString("00002A13-0000-1000-8000-00805F9B34FB") -> "Time Source"
+                UUID.fromString("00002A14-0000-1000-8000-00805F9B34FB") -> "Reference Time Information"
+                UUID.fromString("00002A16-0000-1000-8000-00805F9B34FB") -> "Time Update Control Point"
+                UUID.fromString("00002A17-0000-1000-8000-00805F9B34FB") -> "Time Update State"
+                UUID.fromString("00002A18-0000-1000-8000-00805F9B34FB") -> "Glucose Measurement"
+                UUID.fromString("00002A19-0000-1000-8000-00805F9B34FB") -> "Battery Level"
+                UUID.fromString("00002A1C-0000-1000-8000-00805F9B34FB") -> "Temperature Measurement"
+                UUID.fromString("00002A1D-0000-1000-8000-00805F9B34FB") -> "Temperature Type"
+                UUID.fromString("00002A1E-0000-1000-8000-00805F9B34FB") -> "Intermediate Temperature"
+                UUID.fromString("00002A21-0000-1000-8000-00805F9B34FB") -> "Measurement Interval"
+                UUID.fromString("00002A22-0000-1000-8000-00805F9B34FB") -> "Boot Keyboard Input Report"
+                UUID.fromString("00002A23-0000-1000-8000-00805F9B34FB") -> "System Id"
+                UUID.fromString("00002A24-0000-1000-8000-00805F9B34FB") -> "Model Number String"
+                UUID.fromString("00002A25-0000-1000-8000-00805F9B34FB") -> "Serial Number String"
+                UUID.fromString("00002A26-0000-1000-8000-00805F9B34FB") -> "Firmware Revision String"
+                UUID.fromString("00002A27-0000-1000-8000-00805F9B34FB") -> "Hardware Revision String"
+                UUID.fromString("00002A28-0000-1000-8000-00805F9B34FB") -> "Software Revision String"
+                UUID.fromString("00002A29-0000-1000-8000-00805F9B34FB") -> "Manufacturer Name String"
+                UUID.fromString("00002A2A-0000-1000-8000-00805F9B34FB") -> "Ieee 11073-20601 Regulatory Certification Data List"
+                UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB") -> "Current Time"
+                UUID.fromString("00002A2C-0000-1000-8000-00805F9B34FB") -> "Magnetic Declination"
+                UUID.fromString("00002A31-0000-1000-8000-00805F9B34FB") -> "Scan Refresh"
+                UUID.fromString("00002A32-0000-1000-8000-00805F9B34FB") -> "Boot Keyboard Output Report"
+                UUID.fromString("00002A33-0000-1000-8000-00805F9B34FB") -> "Boot Mouse Input Report"
+                UUID.fromString("00002A34-0000-1000-8000-00805F9B34FB") -> "Glucose Measurement Context"
+                UUID.fromString("00002A35-0000-1000-8000-00805F9B34FB") -> "Blood Pressure Measurement"
+                UUID.fromString("00002A36-0000-1000-8000-00805F9B34FB") -> "Intermediate Cuff Pressure"
+                UUID.fromString("00002A37-0000-1000-8000-00805F9B34FB") -> "Heart Rate Measurement"
+                UUID.fromString("00002A38-0000-1000-8000-00805F9B34FB") -> "Body Sensor Location"
+                UUID.fromString("00002A39-0000-1000-8000-00805F9B34FB") -> "Heart Rate Control Point"
+                UUID.fromString("00002A3F-0000-1000-8000-00805F9B34FB") -> "Alert Status"
+                UUID.fromString("00002A40-0000-1000-8000-00805F9B34FB") -> "Ringer Control Point"
+                UUID.fromString("00002A41-0000-1000-8000-00805F9B34FB") -> "Ringer Setting"
+                UUID.fromString("00002A42-0000-1000-8000-00805F9B34FB") -> "Alert Category Id Bit Mask"
+                UUID.fromString("00002A43-0000-1000-8000-00805F9B34FB") -> "Alert Category Id"
+                UUID.fromString("00002A44-0000-1000-8000-00805F9B34FB") -> "Alert Notification Control Point"
+                UUID.fromString("00002A45-0000-1000-8000-00805F9B34FB") -> "Unread Alert Status"
+                UUID.fromString("00002A46-0000-1000-8000-00805F9B34FB") -> "New Alert"
+                UUID.fromString("00002A47-0000-1000-8000-00805F9B34FB") -> "Supported New Alert Category"
+                UUID.fromString("00002A48-0000-1000-8000-00805F9B34FB") -> "Supported Unread Alert Category"
+                UUID.fromString("00002A49-0000-1000-8000-00805F9B34FB") -> "Blood Pressure Feature"
+                UUID.fromString("00002A4A-0000-1000-8000-00805F9B34FB") -> "Hid Information"
+                UUID.fromString("00002A4B-0000-1000-8000-00805F9B34FB") -> "Report Map"
                 else -> characteristicUuid.toString()
             }
         }
 
         fun extractCharacteristicInfo(characteristic: BluetoothGattCharacteristic): Characteristic {
-            val types = mutableListOf<Constants.CharType>()
+            val properties = mutableListOf<String>()
 
             if (BluetoothGattCharacteristic.PROPERTY_READ.isPresent(characteristic)) {
-                types.add(Constants.CharType.READABLE)
+                properties.add(Constants.CharType.READABLE.type)
             }
 
             if (BluetoothGattCharacteristic.PROPERTY_NOTIFY.isPresent(characteristic)) {
-                types.add(Constants.CharType.NOTIFY)
+                properties.add(Constants.CharType.NOTIFY.type)
             }
 
             if (BluetoothGattCharacteristic.PROPERTY_WRITE.isPresent(characteristic)) {
-                types.add(Constants.CharType.WRITABLE)
+                properties.add(Constants.CharType.WRITABLE.type)
             }
 
             if (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.isPresent(characteristic)) {
-                types.add(Constants.CharType.WRITABLE_NO_RESPONSE)
+                properties.add(Constants.CharType.WRITABLE_NO_RESPONSE.type)
             }
 
             if (BluetoothGattCharacteristic.PROPERTY_INDICATE.isPresent(characteristic)) {
-                types.add(Constants.CharType.INDICATION)
+                properties.add(Constants.CharType.INDICATION.type)
             }
 
-            return Characteristic(types, characteristic.uuid.toString())
+            return Characteristic(characteristic.uuid.toString(), properties)
         }
 
         private fun Int.isPresent(characteristic: BluetoothGattCharacteristic): Boolean {
