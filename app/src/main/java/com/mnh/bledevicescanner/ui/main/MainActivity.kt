@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
             onPermissionGranted {
                 setContent {
-                    AppTheme {
+                    AppTheme() {
                         Navigation()
                     }
                 }

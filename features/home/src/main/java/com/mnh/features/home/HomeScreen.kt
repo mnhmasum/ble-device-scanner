@@ -3,13 +3,15 @@ package com.mnh.features.home
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -51,12 +53,9 @@ fun MainContent(navController: NavController) {
     }
 
 
-    MainContentBody(
-        deviceList = bleScannedDeviceList,
-        onClick = {
-            onClick(it)
-        }
-    )
+    MainContentBody(deviceList = bleScannedDeviceList, onClick = {
+        onClick(it)
+    })
 }
 
 @Composable
@@ -80,10 +79,8 @@ fun DeviceList(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
     ) {
-        items(
-            bleDeviceList.size,
+        items(bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { index ->
             DeviceItem(index, bleDeviceList[index], onClick = { onClick(index) })
         }
@@ -100,28 +97,34 @@ fun DeviceItem(
     val device = scanResult.device
     val rssi = scanResult.rssi
 
-    Column {
-        Text(
-            modifier = Modifier.padding(vertical = 8.dp),
-            text = device.name ?: "Unknown"
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.secondary,
+                shape = RoundedCornerShape(8.dp)
+            )
+    ) {
+        Column(modifier = Modifier.padding(all = 16.dp)) {
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp), text = device.name ?: "Unknown"
+            )
 
-        Text(
-            modifier = Modifier.padding(vertical = 4.dp),
-            text = device.address
-        )
+            Text(
+                modifier = Modifier.padding(vertical = 4.dp), text = device.address
+            )
 
-        Text(
-            modifier = Modifier.padding(vertical = 4.dp),
-            text = "RSSI $rssi"
-        )
+            Text(
+                modifier = Modifier.padding(vertical = 4.dp), text = "RSSI $rssi"
+            )
 
-        Button(onClick = { onClick(index) }) {
-            Text("Connect")
+            Button(onClick = { onClick(index) }) {
+                Text("Connect")
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
     }
+
 }
 
 @Preview(showBackground = true)
