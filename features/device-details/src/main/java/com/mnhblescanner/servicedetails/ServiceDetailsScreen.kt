@@ -1,4 +1,4 @@
-package com.mnh.features.details
+package com.mnhblescanner.servicedetails
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
@@ -40,7 +40,7 @@ import com.mnh.ble.model.ServiceInfo
 import com.napco.utils.DataState
 
 @Composable
-fun Details(navController: NavController, deviceAddress: String) {
+fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     Log.d("Details", "Details")
 
     val detailsViewModel: DetailsViewModel = hiltViewModel()

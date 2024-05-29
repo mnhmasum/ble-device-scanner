@@ -1,4 +1,4 @@
-package com.mnh.features.home
+package com.mnhblescanner.devicelist
 
 import android.bluetooth.le.ScanResult
 import androidx.lifecycle.ViewModel

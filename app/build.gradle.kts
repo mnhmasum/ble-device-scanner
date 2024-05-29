@@ -90,8 +90,8 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":ble"))
     implementation(project(":service"))
-    implementation(project(":features:details"))
-    implementation(project(":features:home"))
+    implementation(project(":features:device-details"))
+    implementation(project(":features:device-list"))
 
 }
 

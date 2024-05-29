@@ -1,7 +1,7 @@
-package com.mnh.features.details.usecase
+package com.mnhblescanner.servicedetails.usecase
 
 import com.mnh.ble.model.ServiceInfo
-import com.mnh.features.details.repository.PeripheralDetailsRepository
+import com.mnhblescanner.servicedetails.repository.PeripheralDetailsRepository
 import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

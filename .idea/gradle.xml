@@ -17,8 +17,8 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/data/local" />
             <option value="$PROJECT_DIR$/features" />
-            <option value="$PROJECT_DIR$/features/details" />
-            <option value="$PROJECT_DIR$/features/home" />
+            <option value="$PROJECT_DIR$/features/device-details" />
+            <option value="$PROJECT_DIR$/features/device-list" />
             <option value="$PROJECT_DIR$/service" />
           </set>
         </option>

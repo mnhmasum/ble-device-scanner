@@ -1,4 +1,4 @@
-package com.mnh.features.home
+package com.mnhblescanner.devicelist
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
@@ -28,7 +28,7 @@ import com.mnh.bledevicescanner.core.Screen
 import com.mnh.bledevicescanner.core.theme.AppTheme
 
 @Composable
-fun MainContent(navController: NavController) {
+fun DeviceListScreen(navController: NavController) {
     Log.d("MyComposable", "Main ")
     val homeViewModel: HomeViewModel = hiltViewModel()
     val bleScannedDeviceList by homeViewModel.scannedDeviceList.collectAsStateWithLifecycle(
@@ -76,10 +76,7 @@ fun DeviceList(
 
     val bleDeviceList = scanResults ?: emptyList()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { index ->
             DeviceItem(index, bleDeviceList[index], onClick = { onClick(index) })

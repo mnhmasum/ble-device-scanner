@@ -1,4 +1,4 @@
-package com.mnh.features.details.repository
+package com.mnhblescanner.servicedetails.repository
 
 import com.mnh.ble.model.ServiceInfo
 import com.napco.utils.DataState
