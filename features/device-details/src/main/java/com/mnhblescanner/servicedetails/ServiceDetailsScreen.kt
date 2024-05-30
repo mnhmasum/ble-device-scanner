@@ -1,6 +1,7 @@
 package com.mnhblescanner.servicedetails
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.navigation.NavController
 import com.mnh.ble.model.Characteristic
 import com.mnh.ble.model.Service
 import com.mnh.ble.model.ServiceInfo
+import com.mnh.bledevicescanner.core.Screen
 import com.napco.utils.DataState
 
 @Composable
@@ -44,6 +47,7 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     Log.d("Details", "Details")
 
     val detailsViewModel: DetailsViewModel = hiltViewModel()
+    val effectTriggered = rememberSaveable { mutableStateOf(false) }
 
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
         DataState.Loading()
@@ -52,8 +56,10 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
 
     LaunchedEffect(deviceAddress) {
-        Log.d("Details", "Launched ")
-        detailsViewModel.connect(deviceAddress)
+        if (!effectTriggered.value) {
+            detailsViewModel.connect(deviceAddress)
+            effectTriggered.value = true
+        }
     }
 
     DisposableEffect(Unit) {
@@ -77,12 +83,17 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
         }
     }
 
-    serviceInfo?.let { DeviceInfo(serviceInfo = it) }
+    serviceInfo?.let { DeviceInfo(navController, serviceInfo = it) }
+
+    BackHandler {
+        navController.navigateUp()
+    }
+
 
 }
 
 @Composable
-fun DeviceInfo(serviceInfo: ServiceInfo) {
+fun DeviceInfo(navController: NavController, serviceInfo: ServiceInfo) {
     Log.d("Details", "DeviceInfo: ")
 
     LazyColumn(
@@ -93,7 +104,7 @@ fun DeviceInfo(serviceInfo: ServiceInfo) {
         items(
             serviceInfo.serviceInfo.toList(),
             key = { it.first.uuid }) { service ->
-            ServiceItem(service)
+            ServiceItem(service, navController)
         }
     }
 }
@@ -101,6 +112,7 @@ fun DeviceInfo(serviceInfo: ServiceInfo) {
 @Composable
 fun ServiceItem(
     service: Pair<Service, List<Characteristic>>,
+    navController: NavController,
 ) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         BasicText(
@@ -110,13 +122,15 @@ fun ServiceItem(
         Divider(color = Color.Gray, thickness = 0.5.dp)
         Spacer(modifier = Modifier.height(16.dp))
         service.second.forEach {
-            CharacteristicItem(characteristic = it)
+            CharacteristicItem(characteristic = it) {
+                navController.navigate("${Screen.DeviceOperation.route}/12")
+            }
         }
     }
 }
 
 @Composable
-private fun CharacteristicItem(characteristic: Characteristic) {
+private fun CharacteristicItem(characteristic: Characteristic, onClickNavigation: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,7 +147,7 @@ private fun CharacteristicItem(characteristic: Characteristic) {
         }
         if (characteristic.properties.isNotEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {}) {
+            Button(onClick = onClickNavigation) {
                 Text("►")
             }
         }

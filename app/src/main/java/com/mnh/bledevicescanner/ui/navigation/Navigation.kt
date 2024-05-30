@@ -32,12 +32,12 @@ fun Navigation() {
         }
 
         composable(
-            route = "${Screen.DetailsAction.route}/{index}",
+            route = "${Screen.DeviceOperation.route}/{index}",
             arguments = listOf(navArgument("index") { type = NavType.StringType })
         ) { backStackEntry ->
             Log.d("Navigation", "Details navigate")
-            val deviceAddress = backStackEntry.arguments?.getString("index") ?: ""
-            DeviceOperationScreen(navController, deviceAddress)
+            //val deviceAddress = backStackEntry.arguments?.getString("index") ?: ""
+            DeviceOperationScreen(navController)
         }
     }
 }

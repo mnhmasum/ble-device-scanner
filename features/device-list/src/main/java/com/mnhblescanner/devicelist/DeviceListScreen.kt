@@ -31,6 +31,7 @@ import com.mnh.bledevicescanner.core.theme.AppTheme
 fun DeviceListScreen(navController: NavController) {
     Log.d("MyComposable", "Main ")
     val homeViewModel: HomeViewModel = hiltViewModel()
+
     val bleScannedDeviceList by homeViewModel.scannedDeviceList.collectAsStateWithLifecycle(
         emptyList()
     )
@@ -52,7 +53,6 @@ fun DeviceListScreen(navController: NavController) {
         }
     }
 
-
     MainContentBody(deviceList = bleScannedDeviceList, onClick = {
         onClick(it)
     })
@@ -73,7 +73,6 @@ fun DeviceList(
     scanResults: List<ScanResult>?,
     onClick: (device: Int) -> Unit,
 ) {
-
     val bleDeviceList = scanResults ?: emptyList()
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
