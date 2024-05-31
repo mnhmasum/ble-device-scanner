@@ -10,38 +10,6 @@ import java.util.UUID
 class Utility {
 
     companion object {
-        fun encryptData(data: ByteArray, key: ByteArray?): ByteArray {
-            val encryptedData = ByteArray(20)
-            val paddedData = ByteArray(20)
-            val encryptionKey = key ?: ByteArray(20)
-
-            for (i in data.indices) {
-                paddedData[i] = data[i]
-            }
-
-            for (i in data.size until 15) {
-                paddedData[i] = 0x20.toByte()
-            }
-
-            for (i in 0 until 20) {
-                encryptedData[i] = (paddedData[i] + encryptionKey[i]).toByte()
-            }
-
-            return encryptedData
-        }
-
-        fun passData(password: String): ByteArray {
-            val badgeNo = "".toLong()
-            val pktLen = 15
-            val passData = ByteArray(pktLen)
-
-            for (i in 0 until 8) {
-                passData[i] = ((badgeNo shr (i * 8)) and 0xff).toByte()
-            }
-
-            return passData
-        }
-
         fun bytesToHexString(bytes: ByteArray): String {
             val sb = java.lang.StringBuilder(bytes.size * 2)
             val formatter = Formatter(sb)
