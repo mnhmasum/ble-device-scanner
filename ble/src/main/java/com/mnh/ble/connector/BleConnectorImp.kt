@@ -14,8 +14,6 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.mnh.ble.model.Characteristic
-import com.mnh.ble.model.Device
 import com.mnh.ble.model.Service
 import com.mnh.ble.model.ServiceInfo
 import com.mnh.ble.utils.Utility
@@ -29,19 +27,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.io.UnsupportedEncodingException
 import java.util.UUID
 
 
 @SuppressLint("MissingPermission")
 class BleConnectorImp(private val context: Context) : BleConnector {
-    private var lockFullStatus: ByteArray = ByteArray(4)
-    private var seqLB: Int = -1
-    private var hasEncryptionKey = false
-    private lateinit var encryptByte: ByteArray
-
-    private val device1: Device = Device()
-
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
@@ -58,20 +48,13 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         _bleGattConnectionResult.asSharedFlow()
 
     override fun connect(address: String) {
-        showLoading()
-
         val device = getDevice(address)
         device?.connectGatt(context, false, gattCallback)
     }
 
-    private fun showLoading() {
-        scope.launch {
-            _bleGattConnectionResult.emit(DataState.loading())
-        }
-    }
-
     override fun disconnect() {
         bluetoothGatt?.disconnect()
+        bluetoothGatt = null
     }
 
     private fun updateConnectionStatus() {
@@ -167,11 +150,6 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             super.onServicesDiscovered(peripheralGatt, status)
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-
-                Log.d(TAG, "onServicesDiscovered: Enable Notification")
-
-                //enableTxTypeNotification(gatt)
-
                 scope.launch {
                     val serviceDetails: ServiceInfo = parseServiceDetails(peripheralGatt.services)
                     _bleGattConnectionResult.emit(DataState.success(serviceDetails))
@@ -180,22 +158,15 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
         fun parseServiceDetails(serviceList: List<BluetoothGattService>): ServiceInfo {
-            val services = HashMap<Service, List<Characteristic>>()
-
-            for (service in serviceList) {
-
-                val characteristics = ArrayList<Characteristic>()
-
-                for (bleCharacteristic in service.characteristics) {
-                    val characteristic = extractCharacteristicInfo(bleCharacteristic)
-                    characteristics.add(characteristic)
-                    Log.d(TAG, "getPeripheralInfo char : ${bleCharacteristic.uuid}")
+            val services = serviceList.associate { service ->
+                val characteristics = service.characteristics.map { bleCharacteristic ->
+                    extractCharacteristicInfo(bleCharacteristic)
                 }
 
                 val serviceName = Utility.getServiceName(service.uuid)
                 val newService = Service(name = serviceName, uuid = service.getUUID())
 
-                services[newService] = characteristics
+                newService to characteristics
             }
 
             return ServiceInfo(services)
@@ -222,22 +193,12 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                val service = gatt.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-                val charRxType = service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_TYPE)
 
-                if (characteristic == charRxType) {
-                    val charRxBuffer =
-                        service.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_BUFFER)
-                    writePassword(charRxBuffer, gatt)
-                }
             }
         }
 
         @Suppress("DEPRECATION")
-        @Deprecated(
-            "Used natively in Android 12 and lower",
-            ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)")
-        )
+        @Deprecated("Used natively in Android 12 and lower", ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)"))
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
@@ -245,14 +206,11 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             super.onCharacteristicChanged(gatt, characteristic)
             val characteristicsValue: ByteArray? = characteristic?.value
 
-            Log.d(TAG, "Characteristics Read value2: ${characteristicsValue?.contentToString()}")
-            Log.d(TAG, "Characteristics Read value2: ${characteristic?.uuid.toString()}")
             Log.d(
-                TAG,
-                "Characteristics Read value2: ${Utility.bytesToHexString(characteristic?.value!!)}"
+                TAG, "Characteristics Reading from deprecated function: `" +
+                        "Characteristic UUID ${characteristic?.uuid.toString()} " +
+                        "Response: ${Utility.bytesToHexString(characteristicsValue!!)}`"
             )
-
-            processCharacteristicChangedData(gatt, characteristic)
         }
 
         override fun onCharacteristicChanged(
@@ -272,88 +230,18 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             status: Int,
         ) {
             super.onCharacteristicRead(gatt, characteristic, value, status)
-            //processCharacteristicChangedData(null, null)
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "Characteristics Read NEW: ${characteristic.uuid.toString()}")
+                Log.d(TAG, "Characteristics Read NEW: ${characteristic.uuid}")
                 Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(value)}")
             }
-        }
-
-    }
-
-    fun processCharacteristicChangedData(
-        gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?,
-    ) {
-        val characteristicBytes = characteristic?.value ?: byteArrayOf()
-
-        when (characteristic?.uuid) {
-            Constants.CHARACTERISTIC_DATA_TX_TYPE -> handleTxType(characteristicBytes)
-            Constants.CHARACTERISTIC_DATA_TX_BUFFER -> handleTxBuffer(characteristicBytes, gatt)
-        }
-    }
-
-    private fun handleTxType(characteristicBytes: ByteArray) {
-        lockFullStatus[0] = characteristicBytes.getOrNull(0) ?: 0
-        seqLB = characteristicBytes.getOrNull(1)?.toInt() ?: 0
-    }
-
-    private fun handleTxBuffer(characteristicBytes: ByteArray, gatt: BluetoothGatt?) {
-        lockFullStatus[1] = characteristicBytes.getOrNull(0) ?: 0
-        lockFullStatus[2] = characteristicBytes.getOrNull(1) ?: 0
-
-        if (characteristicBytes.contentEquals(byteArrayOf(0x30, 0x34))) {
-            // Unlock Success
-            return
-        }
-
-        if (lockFullStatus[0].toInt() == 0x15) {
-            encryptByte = characteristicBytes
-            hasEncryptionKey = true
-        }
-
-        if (hasEncryptionKey) {
-            writeRxType(gatt)
-        }
-    }
-
-
-    private fun writePassword(charRxBuffer: BluetoothGattCharacteristic, gatt: BluetoothGatt) {
-        try {
-            val devicePassword = device1.lockPassword
-            val passData = Utility.passData(devicePassword)
-            val password = Utility.encryptData(passData, encryptByte)
-
-            if (password.size <= 20) {
-                charRxBuffer.setValue(password)
-                gatt.writeCharacteristic(charRxBuffer)
-            }
-
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun writeRxType(gatt: BluetoothGatt?) {
-        val isLockStatus = lockFullStatus[0] == Constants.LOCK_STATUS
-        val isLockReady = lockFullStatus[1] == Constants.LOCK_READY
-        val isLockLocked = lockFullStatus[2] == Constants.LOCKED
-
-        if (isLockStatus && isLockReady && isLockLocked) {
-            lockFullStatus = byteArrayOf(0, 0, 0, 0)
-            val writeRxType = byteArrayOf(Constants.PASSWORD, (seqLB + 1).toByte())
-            val service = gatt?.getService(Constants.SERVICE_ALARM_LOCK_DATA)
-            val charRxType = service?.getCharacteristic(Constants.CHARACTERISTIC_DATA_RX_TYPE)
-            charRxType?.value = writeRxType
-            gatt?.writeCharacteristic(charRxType)
         }
     }
 
     private fun enableNotificationOrIndication(
         serviceUUID: UUID,
         characteristicUUID: UUID,
-        descriptorValue: ByteArray,
+        value: ByteArray,
     ) {
         val bluetoothGattService = bluetoothGatt?.getService(serviceUUID)
         val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
@@ -362,18 +250,18 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             return
         }
 
-        bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
+        scope.launch {
+            bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
 
-        val descriptor =
-            gattCharacteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG) ?: return
+            val descriptor = gattCharacteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
 
-        if (Build.VERSION.SDK_INT < 33) {
-            descriptor.value = descriptorValue
-            bluetoothGatt?.writeDescriptor(descriptor)
-        } else {
-            bluetoothGatt?.writeDescriptor(descriptor, descriptorValue)
+            if (Build.VERSION.SDK_INT < 33) {
+                descriptor.value = value
+                bluetoothGatt?.writeDescriptor(descriptor)
+            } else {
+                bluetoothGatt?.writeDescriptor(descriptor, value)
+            }
         }
     }
-
 
 }
