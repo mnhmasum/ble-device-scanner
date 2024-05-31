@@ -198,7 +198,10 @@ class BleConnectorImp(private val context: Context) : BleConnector {
         }
 
         @Suppress("DEPRECATION")
-        @Deprecated("Used natively in Android 12 and lower", ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)"))
+        @Deprecated(
+            "Used natively in Android 12 and lower",
+            ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)")
+        )
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
@@ -250,17 +253,15 @@ class BleConnectorImp(private val context: Context) : BleConnector {
             return
         }
 
-        scope.launch {
-            bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
+        bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
 
-            val descriptor = gattCharacteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
+        val descriptor = gattCharacteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
 
-            if (Build.VERSION.SDK_INT < 33) {
-                descriptor.value = value
-                bluetoothGatt?.writeDescriptor(descriptor)
-            } else {
-                bluetoothGatt?.writeDescriptor(descriptor, value)
-            }
+        if (Build.VERSION.SDK_INT < 33) {
+            descriptor.value = value
+            bluetoothGatt?.writeDescriptor(descriptor)
+        } else {
+            bluetoothGatt?.writeDescriptor(descriptor, value)
         }
     }
 
