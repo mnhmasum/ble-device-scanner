@@ -44,11 +44,9 @@ import com.napco.utils.DataState
 
 @Composable
 fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
-    Log.d("Details", "Details")
-
-    val detailsViewModel: DetailsViewModel = hiltViewModel()
     val effectTriggered = rememberSaveable { mutableStateOf(false) }
 
+    val detailsViewModel: DetailsViewModel = hiltViewModel()
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
         DataState.Loading()
     )
@@ -64,8 +62,12 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
 
     DisposableEffect(Unit) {
         onDispose {
-            detailsViewModel.disconnect()
+            //detailsViewModel.disconnect()
         }
+    }
+
+    BackHandler {
+        navController.navigateUp()
     }
 
     when (connectionResult) {
@@ -84,11 +86,6 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     }
 
     serviceInfo?.let { DeviceInfo(navController, serviceInfo = it) }
-
-    BackHandler {
-        navController.navigateUp()
-    }
-
 
 }
 
@@ -121,16 +118,16 @@ fun ServiceItem(
         )
         Divider(color = Color.Gray, thickness = 0.5.dp)
         Spacer(modifier = Modifier.height(16.dp))
-        service.second.forEach {
-            CharacteristicItem(characteristic = it) {
-                navController.navigate("${Screen.DeviceOperation.route}/12")
-            }
+        service.second.forEach { characteristic ->
+            CharacteristicItem(characteristic = characteristic, onClickCharacteristic = {
+                navController.navigate("${Screen.DeviceOperation.route}/${service.first.uuid}/${characteristic.uuid}")
+            })
         }
     }
 }
 
 @Composable
-private fun CharacteristicItem(characteristic: Characteristic, onClickNavigation: () -> Unit) {
+private fun CharacteristicItem(characteristic: Characteristic, onClickCharacteristic: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -147,7 +144,7 @@ private fun CharacteristicItem(characteristic: Characteristic, onClickNavigation
         }
         if (characteristic.properties.isNotEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onClickNavigation) {
+            Button(onClick = onClickCharacteristic) {
                 Text("►")
             }
         }

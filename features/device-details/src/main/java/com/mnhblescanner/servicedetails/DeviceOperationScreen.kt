@@ -19,47 +19,61 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
 @Composable
-fun DeviceOperationScreen(navController: NavController) {
+fun DeviceOperationScreen(navController: NavController, service: String, characteristic: String) {
     Log.d("DeviceOperationScreen", "DeviceOperation")
-
-    Properties()
+    val detailsViewModel: DetailsViewModel = hiltViewModel()
 
     BackHandler {
         navController.navigateUp()
     }
 
+    Properties(
+        onClickRead = {
+            detailsViewModel.readCharacteristic(service, characteristic)
+        },
+        onClickNotification = {
+            detailsViewModel.enableNotification(service, characteristic)
+        },
+        onClickWrite = {
+            detailsViewModel.writeCharacteristic(service, characteristic)
+        }
+    )
+
 }
 
 @Composable
-fun Properties() {
+fun Properties(
+    onClickRead: () -> Unit,
+    onClickNotification: () -> Unit,
+    onClickWrite: () -> Unit,
+) {
     Column(modifier = Modifier.padding(all = 16.dp)) {
         BasicText(
             text = "PROPERTIES",
             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
         )
+
         Divider(
             color = Color.Gray,
             thickness = 0.5.dp,
             modifier = Modifier.padding(vertical = 4.dp)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
-        BasicText(text = "Device Address")
-        BasicText(text = "D6:55....")
+        RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
-        BasicText(text = "Service UUID")
-        BasicText(text = "D6:55....")
+        RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
-        BasicText(text = "Characteristic UUID")
-        BasicText(text = "D6:55....")
+        RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
-        BasicText(text = "Characteristic Name")
-        BasicText(text = "D6:55....")
+        RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
         BasicText(text = "READ/INDICATED VALUES")
@@ -71,12 +85,22 @@ fun Properties() {
         )
 
         Row {
-            Button(onClick = {}) {
+            Button(onClick = onClickRead) {
                 Text(text = "READ")
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = {}) {
+            Button(onClick = onClickNotification) {
                 Text(text = "SUBSCRIBE")
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = onClickWrite) {
+                Text(text = "WRITE")
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = onClickWrite) {
+                Text(text = "WRITE WITH NO RESPONSE")
             }
         }
 
@@ -90,6 +114,12 @@ fun Properties() {
         )
 
     }
+}
+
+@Composable
+private fun RowItem() {
+    BasicText(text = "Device Address")
+    BasicText(text = "D6:55....")
 }
 
 
