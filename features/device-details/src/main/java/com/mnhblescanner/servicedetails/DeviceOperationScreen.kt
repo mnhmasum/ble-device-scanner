@@ -28,49 +28,41 @@ import com.mnh.ble.utils.Utility
 @Composable
 fun DeviceOperationScreen(navController: NavController, service: String, characteristic: String) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
-    val response by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(initialValue = emptyList())
+    val gattServerResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
 
     BackHandler {
         navController.navigateUp()
     }
 
     Properties(
+        { gattServerResponse },
         onClickRead = {
             detailsViewModel.readCharacteristic(service, characteristic)
-            Log.d("onclick Read", "DeviceOperationScreen: ")
         },
         onClickNotification = {
-            Log.d("onclick subscribe", "DeviceOperationScreen: ")
             detailsViewModel.enableNotification(service, characteristic)
         },
         onClickWrite = {
             detailsViewModel.writeCharacteristic(service, characteristic)
-        },
-        { response }
+        }
     )
 
 }
 
 @Composable
 fun Properties(
+    gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     onClickWrite: () -> Unit,
-    result: () -> List<ByteArray>,
 ) {
     Column(modifier = Modifier.padding(all = 16.dp)) {
-        BasicText(
-            text = "PROPERTIES",
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        )
 
-        Divider(
-            color = Color.Gray,
-            thickness = 0.5.dp,
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
-
+        OperationTitle("PROPERTIES")
         Spacer(modifier = Modifier.height(16.dp))
+
         RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -83,48 +75,81 @@ fun Properties(
         RowItem()
         Spacer(modifier = Modifier.height(16.dp))
 
-        BasicText(text = "READ/INDICATED VALUES")
-
-        Divider(
-            color = Color.Gray,
-            thickness = 0.5.dp,
-            modifier = Modifier.padding(vertical = 4.dp)
+        ReadAndNotifyIndicationOperation(
+            onClickRead,
+            onClickNotification,
+            gattServerResponse
         )
 
-        Row {
-            Button(onClick = onClickRead) {
-                Text(text = "READ")
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = onClickNotification) {
-                Text(text = "SUBSCRIBE")
-            }
+        WriteOperation(onClickWrite)
 
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = onClickWrite) {
-                Text(text = "WRITE")
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = onClickWrite) {
-                Text(text = "WRITE WITH NO RESPONSE")
-            }
-        }
-
-        BasicText(text = "Response:")
-
-        result.invoke().forEach {
-            Text(text = Utility.bytesToHexString(it))
-        }
-
-        BasicText(text = "DESCRIPTORS")
-        Divider(
-            color = Color.Gray,
-            thickness = 0.5.dp,
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
+        OperationTitle("DESCRIPTORS")
+        BasicText(text = "Not implemented yet")
 
     }
+}
+
+@Composable
+private fun WriteOperation(onClickWrite: () -> Unit) {
+    OperationTitle("Write Operation")
+
+    Row {
+        Button(onClick = onClickWrite) {
+            Text(text = "WRITE")
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Button(onClick = onClickWrite) {
+            Text(text = "WRITE WITH NO RESPONSE")
+        }
+    }
+
+    Spacer(modifier = Modifier.height(20.dp))
+}
+
+@Composable
+private fun OperationTitle(title: String) {
+    BasicText(
+        text = title, style = TextStyle(
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+    )
+    Divider(
+        color = Color.Gray,
+        thickness = 0.5.dp,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+}
+
+@Composable
+private fun ReadAndNotifyIndicationOperation(
+    onClickRead: () -> Unit,
+    onClickNotification: () -> Unit,
+    gattServerResponse: () -> List<ByteArray>,
+) {
+    BasicText(text = "READ/INDICATED VALUES")
+
+    Divider(
+        color = Color.Gray,
+        thickness = 0.5.dp,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+
+    Row {
+        Button(onClick = onClickRead) {
+            Text(text = "READ")
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Button(onClick = onClickNotification) {
+            Text(text = "SUBSCRIBE")
+        }
+    }
+
+    BasicText(text = "Response:")
+    gattServerResponse.invoke().forEach {
+        Text(text = Utility.bytesToHexString(it))
+    }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable

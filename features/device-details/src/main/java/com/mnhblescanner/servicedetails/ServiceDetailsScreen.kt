@@ -59,11 +59,7 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     }
 
     DisposableEffect(Unit) {
-        onDispose {
-//            if (effectTriggered.value) {
-//                detailsViewModel.disconnect()
-//            }
-        }
+        onDispose { }
     }
 
     BackHandler {
@@ -136,9 +132,9 @@ fun ServiceItem(
             CharacteristicItem(
                 characteristic = characteristic,
                 onClickCharacteristic = {
-                    val deviceOperationScreen =
+                    val deviceOperationScreenRoute =
                         "${Screen.DeviceOperation.route}/${service.first.uuid}/${characteristic.uuid}"
-                    navController.navigate(deviceOperationScreen)
+                    navController.navigate(deviceOperationScreenRoute)
                 })
         }
     }

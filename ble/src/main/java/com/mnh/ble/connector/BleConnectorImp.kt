@@ -52,6 +52,9 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
 
     override fun connect(address: String) {
         val device = getDevice(address)
+        if (_bluetoothGatt != null) {
+            _bluetoothGatt?.close()
+        }
         device?.connectGatt(context, false, this)
     }
 
@@ -239,9 +242,11 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
                     "Characteristic UUID ${characteristic?.uuid.toString()} " +
                     "Response: ${Utility.bytesToHexString(newValue!!)}`"
         )
-        val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-        val updatedList = existingValues + newValue
-        _gattServerResponse.tryEmit(updatedList)
+        scope.launch {
+            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
+            val updatedList = existingValues + newValue
+            _gattServerResponse.emit(updatedList)
+        }
     }
 
     override fun onCharacteristicChanged(
@@ -251,10 +256,12 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
     ) {
         super.onCharacteristicChanged(gatt, characteristic, newValue)
         Log.d(TAG, "Characteristics Read value new: ${characteristic.uuid}")
+        scope.launch {
+            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
+            val updatedList = existingValues + newValue
+            _gattServerResponse.emit(updatedList)
+        }
 
-        val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-        val updatedList = existingValues + newValue
-        _gattServerResponse.tryEmit(updatedList)
     }
 
     override fun onCharacteristicRead(
@@ -287,7 +294,10 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         super.onCharacteristicRead(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             Log.d(TAG, "Characteristics Read C: ${characteristic?.uuid}")
-            Log.d(TAG, "Characteristics Read Value: ${Utility.bytesToHexString(characteristic!!.value)}")
+            Log.d(
+                TAG,
+                "Characteristics Read Value: ${Utility.bytesToHexString(characteristic!!.value)}"
+            )
 
             scope.launch {
                 val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
