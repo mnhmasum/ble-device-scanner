@@ -6,8 +6,8 @@ import com.napco.utils.DataState
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
-class PeripheralDetailsRepositoryImp(private val bleConnector: BleConnector) :
-    PeripheralDetailsRepository {
+class DeviceDetailsRepositoryImp(private val bleConnector: BleConnector) :
+    DeviceDetailsRepository {
     override fun connect(address: String) {
         bleConnector.connect(address)
     }
@@ -18,6 +18,10 @@ class PeripheralDetailsRepositoryImp(private val bleConnector: BleConnector) :
 
     override fun getGattConnectionResult(): Flow<DataState<ServiceInfo>> {
         return bleConnector.bleGattConnectionResult()
+    }
+
+    override fun gattServerResponse(): Flow<List<ByteArray>> {
+        return bleConnector.gattServerResponse()
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {

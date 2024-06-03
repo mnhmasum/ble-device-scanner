@@ -60,9 +60,9 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
 
     DisposableEffect(Unit) {
         onDispose {
-            if (effectTriggered.value) {
-                detailsViewModel.disconnect()
-            }
+//            if (effectTriggered.value) {
+//                detailsViewModel.disconnect()
+//            }
         }
     }
 

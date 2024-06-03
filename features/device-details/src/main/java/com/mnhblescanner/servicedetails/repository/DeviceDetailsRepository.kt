@@ -5,10 +5,11 @@ import com.napco.utils.DataState
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
-interface PeripheralDetailsRepository {
+interface DeviceDetailsRepository {
     fun connect(address: String)
     fun disconnect()
     fun getGattConnectionResult(): Flow<DataState<ServiceInfo>>
+    fun gattServerResponse(): Flow<List<ByteArray>>
     fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
     fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(service: UUID, characteristic: UUID)

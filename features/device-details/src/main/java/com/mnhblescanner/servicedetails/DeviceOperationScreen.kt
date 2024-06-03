@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -20,12 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mnh.ble.utils.Utility
 
 @Composable
 fun DeviceOperationScreen(navController: NavController, service: String, characteristic: String) {
-    Log.d("DeviceOperationScreen", "DeviceOperation")
     val detailsViewModel: DetailsViewModel = hiltViewModel()
+    val response by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(initialValue = emptyList())
 
     BackHandler {
         navController.navigateUp()
@@ -34,13 +37,16 @@ fun DeviceOperationScreen(navController: NavController, service: String, charact
     Properties(
         onClickRead = {
             detailsViewModel.readCharacteristic(service, characteristic)
+            Log.d("onclick Read", "DeviceOperationScreen: ")
         },
         onClickNotification = {
+            Log.d("onclick subscribe", "DeviceOperationScreen: ")
             detailsViewModel.enableNotification(service, characteristic)
         },
         onClickWrite = {
             detailsViewModel.writeCharacteristic(service, characteristic)
-        }
+        },
+        { response }
     )
 
 }
@@ -50,6 +56,7 @@ fun Properties(
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     onClickWrite: () -> Unit,
+    result: () -> List<ByteArray>,
 ) {
     Column(modifier = Modifier.padding(all = 16.dp)) {
         BasicText(
@@ -105,6 +112,10 @@ fun Properties(
         }
 
         BasicText(text = "Response:")
+
+        result.invoke().forEach {
+            Text(text = Utility.bytesToHexString(it))
+        }
 
         BasicText(text = "DESCRIPTORS")
         Divider(

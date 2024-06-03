@@ -1,7 +1,7 @@
 package com.mnhblescanner.servicedetails.usecase
 
 import com.mnh.ble.model.ServiceInfo
-import com.mnhblescanner.servicedetails.repository.PeripheralDetailsRepository
+import com.mnhblescanner.servicedetails.repository.DeviceDetailsRepository
 import com.napco.utils.DataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -10,38 +10,41 @@ import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
-class PeripheralDetailsUseCase @Inject constructor(private val peripheralDetailsRepository: PeripheralDetailsRepository) {
+class DeviceDetailsUseCase @Inject constructor(private val deviceDetailsRepository: DeviceDetailsRepository) {
     fun connect(device: String) {
-        return peripheralDetailsRepository.connect(device)
+        return deviceDetailsRepository.connect(device)
     }
 
     fun enableNotification(service: UUID, chara: UUID) {
-        peripheralDetailsRepository.enableNotification(service, chara)
+        deviceDetailsRepository.enableNotification(service, chara)
     }
 
     fun enableIndication(service: UUID, chara: UUID) {
-        peripheralDetailsRepository.enableIndication(service, chara)
+        deviceDetailsRepository.enableIndication(service, chara)
     }
 
     fun readCharacteristic(service: UUID, chara: UUID) {
-        peripheralDetailsRepository.readCharacteristic(service, chara)
+        deviceDetailsRepository.readCharacteristic(service, chara)
     }
 
     fun writeCharacteristic(service: UUID, chara: UUID) {
-        peripheralDetailsRepository.readCharacteristic(service, chara)
+        deviceDetailsRepository.readCharacteristic(service, chara)
     }
 
     fun writeCharacteristicWithNoResponse(service: UUID, chara: UUID) {
-        peripheralDetailsRepository.readCharacteristic(service, chara)
+        deviceDetailsRepository.readCharacteristic(service, chara)
     }
 
     fun disconnect() {
-        peripheralDetailsRepository.disconnect()
+        deviceDetailsRepository.disconnect()
     }
 
     fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> =
-        peripheralDetailsRepository.getGattConnectionResult()
+        deviceDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
             .map { it }
+
+    fun gattServerResponse(): Flow<List<ByteArray>> =
+        deviceDetailsRepository.gattServerResponse().flowOn(Dispatchers.IO).map { it }
 
 }

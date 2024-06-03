@@ -3,7 +3,7 @@ package com.mnhblescanner.servicedetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnh.ble.model.ServiceInfo
-import com.mnhblescanner.servicedetails.usecase.PeripheralDetailsUseCase
+import com.mnhblescanner.servicedetails.usecase.DeviceDetailsUseCase
 import com.napco.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,10 +15,14 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailsViewModel @Inject constructor(private val detailsUseCase: PeripheralDetailsUseCase) :
+class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDetailsUseCase) :
     ViewModel() {
+
     val bleConnectionResult: Flow<DataState<ServiceInfo>> = detailsUseCase.bleGattConnectionResult()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
+
+    val gattServerResponse: Flow<List<ByteArray>> = detailsUseCase.gattServerResponse()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun connect(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
