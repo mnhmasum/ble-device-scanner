@@ -1,8 +1,8 @@
-package com.mnhblescanner.servicedetails.di
+package com.mnh.blescanner.devicedetails.di
 
 import com.mnh.ble.connector.BleConnector
-import com.mnhblescanner.servicedetails.repository.DeviceDetailsRepository
-import com.mnhblescanner.servicedetails.repository.DeviceDetailsRepositoryImp
+import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
+import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepositoryImp
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

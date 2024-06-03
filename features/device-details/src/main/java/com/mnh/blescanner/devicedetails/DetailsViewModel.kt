@@ -1,9 +1,9 @@
-package com.mnhblescanner.servicedetails
+package com.mnh.blescanner.devicedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnh.ble.model.ServiceInfo
-import com.mnhblescanner.servicedetails.usecase.DeviceDetailsUseCase
+import com.mnh.blescanner.devicedetails.usecase.DeviceDetailsUseCase
 import com.napco.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

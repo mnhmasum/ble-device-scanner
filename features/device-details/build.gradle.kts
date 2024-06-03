@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.mnh.features.details"
+    namespace = "com.mnh.blescanner.devicedetails"
     compileSdk = 34
 
     defaultConfig {

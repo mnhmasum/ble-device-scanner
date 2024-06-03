@@ -1,4 +1,4 @@
-package com.mnhblescanner.servicedetails
+package com.mnh.blescanner.devicedetails
 
 import android.util.Log
 import androidx.activity.compose.BackHandler

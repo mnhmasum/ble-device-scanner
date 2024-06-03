@@ -8,9 +8,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mnh.bledevicescanner.core.Screen
-import com.mnhblescanner.devicelist.DeviceListScreen
-import com.mnhblescanner.servicedetails.DeviceOperationScreen
-import com.mnhblescanner.servicedetails.ServiceDetailsScreen
+import com.mnh.blescanner.devicelist.DeviceListScreen
+import com.mnh.blescanner.devicedetails.DeviceOperationScreen
+import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
 
 @Composable
 fun Navigation() {

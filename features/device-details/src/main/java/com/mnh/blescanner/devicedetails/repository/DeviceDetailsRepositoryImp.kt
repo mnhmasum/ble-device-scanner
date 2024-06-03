@@ -1,4 +1,4 @@
-package com.mnhblescanner.servicedetails.repository
+package com.mnh.blescanner.devicedetails.repository
 
 import com.mnh.ble.connector.BleConnector
 import com.mnh.ble.model.ServiceInfo
