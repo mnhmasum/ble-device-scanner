@@ -51,8 +51,6 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
         DataState.Loading()
     )
 
-    var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
-
     LaunchedEffect(deviceAddress) {
         if (!effectTriggered.value) {
             detailsViewModel.connect(deviceAddress)
@@ -62,7 +60,9 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
 
     DisposableEffect(Unit) {
         onDispose {
-            //detailsViewModel.disconnect()
+            if (effectTriggered.value) {
+                detailsViewModel.disconnect()
+            }
         }
     }
 
@@ -70,10 +70,21 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
         navController.navigateUp()
     }
 
+    ServiceDetails(navController, connectionResult)
+
+}
+
+@Composable
+private fun ServiceDetails(
+    navController: NavController,
+    connectionResult: DataState<ServiceInfo>,
+) {
+    var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
+
     when (connectionResult) {
         is DataState.Loading -> Loader()
         is DataState.Success -> {
-            serviceInfo = (connectionResult as DataState.Success<ServiceInfo>).data
+            serviceInfo = connectionResult.data
         }
 
         is DataState.Error -> {
@@ -85,12 +96,13 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
         }
     }
 
-    serviceInfo?.let { DeviceInfo(navController, serviceInfo = it) }
-
+    serviceInfo?.let { serviceDetails ->
+        DeviceDetailsContent(navController, serviceInfo = { serviceDetails })
+    }
 }
 
 @Composable
-fun DeviceInfo(navController: NavController, serviceInfo: ServiceInfo) {
+fun DeviceDetailsContent(navController: NavController, serviceInfo: () -> ServiceInfo) {
     Log.d("Details", "DeviceInfo: ")
 
     LazyColumn(
@@ -98,9 +110,7 @@ fun DeviceInfo(navController: NavController, serviceInfo: ServiceInfo) {
             .fillMaxSize()
             .padding(16.dp), horizontalAlignment = Alignment.Start
     ) {
-        items(
-            serviceInfo.serviceInfo.toList(),
-            key = { it.first.uuid }) { service ->
+        items(serviceInfo().serviceInfo.toList(), key = { it.first.uuid }) { service ->
             ServiceItem(service, navController)
         }
     }
@@ -114,14 +124,22 @@ fun ServiceItem(
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         BasicText(
             text = service.first.name,
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
         )
         Divider(color = Color.Gray, thickness = 0.5.dp)
         Spacer(modifier = Modifier.height(16.dp))
+
         service.second.forEach { characteristic ->
-            CharacteristicItem(characteristic = characteristic, onClickCharacteristic = {
-                navController.navigate("${Screen.DeviceOperation.route}/${service.first.uuid}/${characteristic.uuid}")
-            })
+            CharacteristicItem(
+                characteristic = characteristic,
+                onClickCharacteristic = {
+                    val deviceOperationScreen =
+                        "${Screen.DeviceOperation.route}/${service.first.uuid}/${characteristic.uuid}"
+                    navController.navigate(deviceOperationScreen)
+                })
         }
     }
 }
@@ -137,9 +155,8 @@ private fun CharacteristicItem(characteristic: Characteristic, onClickCharacteri
         Column {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList, style = TextStyle(
-                    fontSize = 13.sp
-                )
+                text = characteristic.acceptedPropertyList,
+                style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
@@ -157,7 +174,8 @@ fun Loader() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), contentAlignment = Alignment.Center
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
