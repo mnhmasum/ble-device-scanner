@@ -1,6 +1,5 @@
 package com.mnh.bledevicescanner.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,9 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mnh.bledevicescanner.core.Screen
-import com.mnh.blescanner.devicelist.DeviceListScreen
 import com.mnh.blescanner.devicedetails.DeviceOperationScreen
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
+import com.mnh.blescanner.devicelist.DeviceListScreen
 
 @Composable
 fun Navigation() {
@@ -18,7 +17,6 @@ fun Navigation() {
 
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            Log.d("Navigation", "Main navigate")
             DeviceListScreen(navController)
         }
 
@@ -26,7 +24,6 @@ fun Navigation() {
             route = "${Screen.Details.route}/{index}",
             arguments = listOf(navArgument("index") { type = NavType.StringType })
         ) { backStackEntry ->
-            Log.d("Navigation", "Details navigate")
             val deviceAddress = backStackEntry.arguments?.getString("index") ?: ""
             ServiceDetailsScreen(navController, deviceAddress)
         }
@@ -37,7 +34,6 @@ fun Navigation() {
                 navArgument("service") { type = NavType.StringType },
                 navArgument("characteristic") { type = NavType.StringType })
         ) { backStackEntry ->
-            Log.d("Navigation", "Details navigate")
             val service = backStackEntry.arguments?.getString("service") ?: ""
             val characteristic = backStackEntry.arguments?.getString("characteristic") ?: ""
             DeviceOperationScreen(navController, service, characteristic)
