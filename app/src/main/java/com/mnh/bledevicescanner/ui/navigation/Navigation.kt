@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.mnh.bledevicescanner.core.Screen
 import com.mnh.blescanner.devicedetails.DeviceOperationScreen
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
@@ -28,17 +29,12 @@ fun Navigation() {
             ServiceDetailsScreen(navController, deviceAddress)
         }
 
-        composable(
-            route = "${Screen.DeviceOperation.route}/{service}/{characteristic}",
-            arguments = listOf(
-                navArgument("service") { type = NavType.StringType },
-                navArgument("characteristic") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val service = backStackEntry.arguments?.getString("service") ?: ""
-            val characteristic = backStackEntry.arguments?.getString("characteristic") ?: ""
-            DeviceOperationScreen(navController, service, characteristic)
+        composable<Screen.ScreenDeviceOperation> {
+            val args: Screen.ScreenDeviceOperation = it.toRoute<Screen.ScreenDeviceOperation>()
+            DeviceOperationScreen(navController, args)
         }
     }
 }
+
 
 
