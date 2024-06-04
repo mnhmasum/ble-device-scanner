@@ -45,46 +45,45 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
         return serviceUUID to characteristicUUID
     }
 
-    fun enableNotification(serviceUUIDString: String, characteristicUUIDString: String) {
-        val (serviceUUID, characteristicUUID) = getUUIDs(
-            serviceUUIDString,
-            characteristicUUIDString
-        )
+    private fun toUUID(serviceUUIDString: String): UUID {
+        return UUID.fromString(serviceUUIDString)
+    }
+
+    fun enableNotification(serviceUUIDString: String?, characteristicUUIDString: String?) {
+        if (serviceUUIDString == null || characteristicUUIDString == null) return
+        val serviceUUID = toUUID(serviceUUIDString)
+        val characteristicUUID = toUUID(characteristicUUIDString)
         detailsUseCase.enableNotification(serviceUUID, characteristicUUID)
     }
 
-    fun enableIndication(serviceUUIDString: String, characteristicUUIDString: String) {
-        val (serviceUUID, characteristicUUID) = getUUIDs(
-            serviceUUIDString,
-            characteristicUUIDString
-        )
+    fun enableIndication(serviceUUIDString: String?, characteristicUUIDString: String?) {
+        if (serviceUUIDString == null || characteristicUUIDString == null) return
+        val serviceUUID = toUUID(serviceUUIDString)
+        val characteristicUUID = toUUID(characteristicUUIDString)
         detailsUseCase.enableIndication(serviceUUID, characteristicUUID)
     }
 
-    fun readCharacteristic(serviceUUIDString: String, characteristicUUIDString: String) {
-        val (serviceUUID, characteristicUUID) = getUUIDs(
-            serviceUUIDString,
-            characteristicUUIDString
-        )
+    fun readCharacteristic(serviceUUIDString: String?, characteristicUUIDString: String?) {
+        if (serviceUUIDString == null || characteristicUUIDString == null) return
+        val serviceUUID = toUUID(serviceUUIDString)
+        val characteristicUUID = toUUID(characteristicUUIDString)
         detailsUseCase.readCharacteristic(serviceUUID, characteristicUUID)
     }
 
-    fun writeCharacteristic(serviceUUIDString: String, characteristicUUIDString: String) {
-        val (serviceUUID, characteristicUUID) = getUUIDs(
-            serviceUUIDString,
-            characteristicUUIDString
-        )
+    fun writeCharacteristic(serviceUUIDString: String?, characteristicUUIDString: String?) {
+        if (serviceUUIDString == null || characteristicUUIDString == null) return
+        val serviceUUID = toUUID(serviceUUIDString)
+        val characteristicUUID = toUUID(characteristicUUIDString)
         detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID)
     }
 
     fun writeCharacteristicWithNoResponse(
-        serviceUUIDString: String,
-        characteristicUUIDString: String,
+        serviceUUIDString: String?,
+        characteristicUUIDString: String?,
     ) {
-        val (serviceUUID, characteristicUUID) = getUUIDs(
-            serviceUUIDString,
-            characteristicUUIDString
-        )
+        if (serviceUUIDString == null || characteristicUUIDString == null) return
+        val serviceUUID = toUUID(serviceUUIDString)
+        val characteristicUUID = toUUID(characteristicUUIDString)
         detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID)
     }
 

@@ -23,9 +23,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mnh.ble.utils.Utility
+import com.mnh.bledevicescanner.core.Screen
 
 @Composable
-fun DeviceOperationScreen(navController: NavController, service: String, characteristic: String) {
+fun DeviceOperationScreen(
+    navController: NavController,
+    screenDeviceOperation: Screen.ScreenDeviceOperation,
+) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
     val gattServerResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -35,23 +39,25 @@ fun DeviceOperationScreen(navController: NavController, service: String, charact
         navController.navigateUp()
     }
 
-    Properties(
-        { gattServerResponse },
-        onClickRead = {
-            detailsViewModel.readCharacteristic(service, characteristic)
-        },
-        onClickNotification = {
-            detailsViewModel.enableNotification(service, characteristic)
-        },
-        onClickWrite = {
-            detailsViewModel.writeCharacteristic(service, characteristic)
-        }
-    )
+    Properties(screenDeviceOperation, { gattServerResponse }, onClickRead = {
+        detailsViewModel.readCharacteristic(
+            screenDeviceOperation.service, screenDeviceOperation.characteristic
+        )
+    }, onClickNotification = {
+        detailsViewModel.enableNotification(
+            screenDeviceOperation.service, screenDeviceOperation.characteristic
+        )
+    }, onClickWrite = {
+        detailsViewModel.writeCharacteristic(
+            screenDeviceOperation.service, screenDeviceOperation.characteristic
+        )
+    })
 
 }
 
 @Composable
 fun Properties(
+    serviceOperationDetails: Screen.ScreenDeviceOperation,
     gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
@@ -62,25 +68,26 @@ fun Properties(
         OperationTitle("PROPERTIES")
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem()
+        RowItem("Device Name", serviceOperationDetails.deviceName)
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem()
+        RowItem("Device Address", "2343535")
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem()
+        RowItem("Device Address", "2343535")
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem()
+        RowItem("Device Address", "2343535")
         Spacer(modifier = Modifier.height(16.dp))
 
         ReadAndNotifyIndicationOperation(
+            serviceOperationDetails,
             onClickRead,
             onClickNotification,
             gattServerResponse
         )
 
-        WriteOperation(onClickWrite)
+        WriteOperation(serviceOperationDetails, onClickWrite)
 
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
@@ -89,7 +96,15 @@ fun Properties(
 }
 
 @Composable
-private fun WriteOperation(onClickWrite: () -> Unit) {
+private fun WriteOperation(
+    serviceOperationDetails: Screen.ScreenDeviceOperation,
+    onClickWrite: () -> Unit,
+) {
+    val isWritable = serviceOperationDetails.properties.any { it.contains("Writable") }
+    if (!isWritable) {
+        return
+    }
+
     OperationTitle("Write Operation")
 
     Row {
@@ -109,53 +124,102 @@ private fun WriteOperation(onClickWrite: () -> Unit) {
 private fun OperationTitle(title: String) {
     BasicText(
         text = title, style = TextStyle(
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
+            fontWeight = FontWeight.Bold, fontSize = 16.sp
         )
     )
     Divider(
-        color = Color.Gray,
-        thickness = 0.5.dp,
-        modifier = Modifier.padding(vertical = 4.dp)
+        color = Color.Gray, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp)
     )
 }
 
 @Composable
 private fun ReadAndNotifyIndicationOperation(
+    serviceOperationDetails: Screen.ScreenDeviceOperation,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     gattServerResponse: () -> List<ByteArray>,
 ) {
+    val isReadable = serviceOperationDetails.properties.any { it.contains("Readable") }
+    val isNotifyAble = serviceOperationDetails.properties.any {
+        it.contains("Notify") || it.contains("Indication")
+    }
+
+    if (!isNotifyAble && !isReadable) {
+        return
+    }
+
     BasicText(text = "READ/INDICATED VALUES")
 
     Divider(
-        color = Color.Gray,
-        thickness = 0.5.dp,
+        color = Color.Gray, thickness = 0.5.dp,
         modifier = Modifier.padding(vertical = 4.dp)
     )
 
-    Row {
-        Button(onClick = onClickRead) {
-            Text(text = "READ")
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Button(onClick = onClickNotification) {
-            Text(text = "SUBSCRIBE")
-        }
-    }
+    ActionButtonsRow(
+        isReadable = isReadable,
+        isNotifyAble = isNotifyAble,
+        onClickRead = onClickRead,
+        onClickNotification = onClickNotification
+    )
 
     BasicText(text = "Response:")
-    gattServerResponse.invoke().forEach {
-        Text(text = Utility.bytesToHexString(it))
-    }
+    ResponseList(gattServerResponse = gattServerResponse)
     Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
-private fun RowItem() {
-    BasicText(text = "Device Address")
-    BasicText(text = "D6:55....")
+fun ResponseList(gattServerResponse: () -> List<ByteArray>) {
+    gattServerResponse.invoke().forEach {
+        Text(text = Utility.bytesToHexString(it))
+    }
 }
+
+@Composable
+fun ActionButton(
+    isVisible: Boolean,
+    onClick: () -> Unit,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    if (isVisible) {
+        Button(onClick = onClick, modifier = modifier) {
+            Text(text = text)
+        }
+    }
+}
+
+
+@Composable
+fun ActionButtonsRow(
+    isReadable: Boolean,
+    isNotifyAble: Boolean,
+    onClickRead: () -> Unit,
+    onClickNotification: () -> Unit,
+) {
+    Row {
+        ActionButton(
+            isVisible = isReadable,
+            onClick = onClickRead,
+            text = "READ",
+            modifier = Modifier.padding(end = 20.dp)
+        )
+        ActionButton(
+            isVisible = isNotifyAble,
+            onClick = onClickNotification,
+            text = "SUBSCRIBE"
+        )
+    }
+}
+
+@Composable
+private fun RowItem(title: String, value: String?) {
+    BasicText(text = title)
+    if (value != null) {
+        BasicText(text = value)
+    }
+}
+
+
 
 
 

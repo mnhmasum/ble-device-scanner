@@ -132,9 +132,14 @@ fun ServiceItem(
             CharacteristicItem(
                 characteristic = characteristic,
                 onClickCharacteristic = {
-                    val deviceOperationScreenRoute =
-                        "${Screen.DeviceOperation.route}/${service.first.uuid}/${characteristic.uuid}"
-                    navController.navigate(deviceOperationScreenRoute)
+                    val deviceScreenOperation =
+                        Screen.ScreenDeviceOperation(
+                            "Xyz",
+                            service.first.uuid,
+                            characteristic.uuid,
+                            characteristic.properties
+                        )
+                    navController.navigate(deviceScreenOperation)
                 })
         }
     }
