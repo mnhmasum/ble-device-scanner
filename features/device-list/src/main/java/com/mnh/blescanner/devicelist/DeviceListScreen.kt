@@ -69,14 +69,18 @@ fun MainContentBody(
 @Composable
 fun DeviceList(
     scanResults: List<ScanResult>?,
-    onClickConnect: (device: Int) -> Unit,
+    onClickConnect: (listIndex: Int) -> Unit,
 ) {
     val bleDeviceList = scanResults ?: emptyList()
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(bleDeviceList.size,
-            key = { index -> bleDeviceList[index].device?.address ?: index }) { index ->
-            DeviceItem(index, bleDeviceList[index], onClickConnect = { onClickConnect(index) })
+        items(
+            bleDeviceList.size,
+            key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
+            DeviceItem(
+                itemIndex,
+                bleDeviceList[itemIndex],
+                onClickConnect = { onClickConnect(itemIndex) })
         }
     }
 }
