@@ -2,7 +2,6 @@ package com.mnh.blescanner.devicelist
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import com.mnh.bledevicescanner.core.theme.AppTheme
 
 @Composable
 fun DeviceListScreen(navController: NavController) {
-    Log.d("MyComposable", "Main ")
     val homeViewModel: HomeViewModel = hiltViewModel()
 
     val bleScannedDeviceList by homeViewModel.scannedDeviceList.collectAsStateWithLifecycle(
@@ -104,15 +102,18 @@ fun DeviceItem(
     ) {
         Column(modifier = Modifier.padding(all = 16.dp)) {
             Text(
-                modifier = Modifier.padding(bottom = 8.dp), text = device.name ?: "Unknown"
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = device.name ?: "Unknown"
             )
 
             Text(
-                modifier = Modifier.padding(vertical = 4.dp), text = device.address
+                modifier = Modifier.padding(vertical = 4.dp),
+                text = device.address
             )
 
             Text(
-                modifier = Modifier.padding(vertical = 4.dp), text = "RSSI $rssi"
+                modifier = Modifier.padding(vertical = 4.dp),
+                text = "RSSI $rssi"
             )
 
             Button(onClick = { onClickConnect(index) }) {
