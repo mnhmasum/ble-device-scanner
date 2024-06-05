@@ -36,10 +36,10 @@ fun DeviceListScreen(navController: NavController) {
         emptyList()
     )
 
-    val onClick: (Int) -> Unit = remember(bleScannedDeviceList) {
-        { index ->
-            val deviceAddress: String = bleScannedDeviceList[index].device?.address ?: ""
-            navController.navigate("${Screen.Details.route}/$deviceAddress")
+    val onClickConnect: (Int) -> Unit = remember(bleScannedDeviceList) {
+        { listIndex ->
+            val deviceAddress: String = bleScannedDeviceList[listIndex].device?.address ?: ""
+            navController.navigate(Screen.DeviceDetails(deviceAddress))
         }
     }
 
@@ -53,32 +53,32 @@ fun DeviceListScreen(navController: NavController) {
         }
     }
 
-    MainContentBody(deviceList = bleScannedDeviceList, onClick = {
-        onClick(it)
+    MainContentBody(deviceList = bleScannedDeviceList, onClickConnect = {
+        onClickConnect(it)
     })
 }
 
 @Composable
 fun MainContentBody(
     deviceList: List<ScanResult>?,
-    onClick: (index: Int) -> Unit,
+    onClickConnect: (index: Int) -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        DeviceList(scanResults = deviceList, onClick)
+        DeviceList(scanResults = deviceList, onClickConnect)
     }
 }
 
 @Composable
 fun DeviceList(
     scanResults: List<ScanResult>?,
-    onClick: (device: Int) -> Unit,
+    onClickConnect: (device: Int) -> Unit,
 ) {
     val bleDeviceList = scanResults ?: emptyList()
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { index ->
-            DeviceItem(index, bleDeviceList[index], onClick = { onClick(index) })
+            DeviceItem(index, bleDeviceList[index], onClickConnect = { onClickConnect(index) })
         }
     }
 }
@@ -88,7 +88,7 @@ fun DeviceList(
 fun DeviceItem(
     index: Int,
     scanResult: ScanResult,
-    onClick: (index: Int) -> Unit,
+    onClickConnect: (index: Int) -> Unit,
 ) {
     val device = scanResult.device
     val rssi = scanResult.rssi
@@ -115,7 +115,7 @@ fun DeviceItem(
                 modifier = Modifier.padding(vertical = 4.dp), text = "RSSI $rssi"
             )
 
-            Button(onClick = { onClick(index) }) {
+            Button(onClick = { onClickConnect(index) }) {
                 Text("Connect")
             }
         }
@@ -127,6 +127,6 @@ fun DeviceItem(
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBody(deviceList = emptyList(), onClick = { })
+        MainContentBody(deviceList = emptyList(), onClickConnect = { })
     }
 }

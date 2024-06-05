@@ -28,7 +28,7 @@ import com.mnh.bledevicescanner.core.Screen
 @Composable
 fun DeviceOperationScreen(
     navController: NavController,
-    screenDeviceOperation: Screen.ScreenDeviceOperation,
+    screenDeviceOperation: Screen.DeviceOperation,
 ) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
     val gattServerResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
@@ -57,7 +57,7 @@ fun DeviceOperationScreen(
 
 @Composable
 fun Properties(
-    serviceOperationDetails: Screen.ScreenDeviceOperation,
+    serviceOperationDetails: Screen.DeviceOperation,
     gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
@@ -97,7 +97,7 @@ fun Properties(
 
 @Composable
 private fun WriteOperation(
-    serviceOperationDetails: Screen.ScreenDeviceOperation,
+    serviceOperationDetails: Screen.DeviceOperation,
     onClickWrite: () -> Unit,
 ) {
     val isWritable = serviceOperationDetails.properties.any { it.contains("Writable") }
@@ -134,7 +134,7 @@ private fun OperationTitle(title: String) {
 
 @Composable
 private fun ReadAndNotifyIndicationOperation(
-    serviceOperationDetails: Screen.ScreenDeviceOperation,
+    serviceOperationDetails: Screen.DeviceOperation,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     gattServerResponse: () -> List<ByteArray>,

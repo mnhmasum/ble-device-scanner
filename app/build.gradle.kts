@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -86,7 +85,6 @@ dependencies {
 
     implementation (libs.androidx.lifecycle.runtime.compose)
 
-    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":data:local"))
     implementation(project(":core:utils"))

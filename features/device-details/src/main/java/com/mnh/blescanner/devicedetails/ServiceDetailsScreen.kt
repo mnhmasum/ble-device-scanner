@@ -1,6 +1,5 @@
 package com.mnh.blescanner.devicedetails
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,15 +98,23 @@ private fun ServiceDetails(
 
 @Composable
 fun DeviceDetailsContent(navController: NavController, serviceInfo: () -> ServiceInfo) {
-    Log.d("Details", "DeviceInfo: ")
+    val services = serviceInfo().serviceInfo.toList()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp), horizontalAlignment = Alignment.Start
     ) {
-        items(serviceInfo().serviceInfo.toList(), key = { it.first.uuid }) { service ->
-            ServiceItem(service, navController)
+        items(services, key = { it.first.uuid }) { service ->
+            ServiceItem(service,
+                onSelectCharacteristic = { deviceName, serviceUUID, characteristicUUID, properties ->
+                    navController.navigate(
+                        Screen.DeviceOperation(
+                            deviceName, serviceUUID, characteristicUUID, properties
+                        )
+                    )
+                })
+
         }
     }
 }
@@ -115,38 +122,31 @@ fun DeviceDetailsContent(navController: NavController, serviceInfo: () -> Servic
 @Composable
 fun ServiceItem(
     service: Pair<Service, List<Characteristic>>,
-    navController: NavController,
+    onSelectCharacteristic: (deviceName: String, serviceUUID: String, characteristicUUID: String, properties: List<String>) -> Unit,
 ) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         BasicText(
             text = service.first.name,
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
         )
         Divider(color = Color.Gray, thickness = 0.5.dp)
         Spacer(modifier = Modifier.height(16.dp))
 
         service.second.forEach { characteristic ->
-            CharacteristicItem(
-                characteristic = characteristic,
-                onClickCharacteristic = {
-                    navController.navigate(
-                        Screen.ScreenDeviceOperation(
-                            "Xyz",
-                            service.first.uuid,
-                            characteristic.uuid,
-                            characteristic.properties
-                        )
-                    )
-                })
+            CharacteristicItem(characteristic = characteristic, onSelectCharacteristic = {
+                onSelectCharacteristic(
+                    "Device Name",
+                    service.first.uuid,
+                    characteristic.uuid,
+                    characteristic.properties
+                )
+            })
         }
     }
 }
 
 @Composable
-private fun CharacteristicItem(characteristic: Characteristic, onClickCharacteristic: () -> Unit) {
+private fun CharacteristicItem(characteristic: Characteristic, onSelectCharacteristic: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,13 +156,12 @@ private fun CharacteristicItem(characteristic: Characteristic, onClickCharacteri
         Column {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList,
-                style = TextStyle(fontSize = 13.sp)
+                text = characteristic.acceptedPropertyList, style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onClickCharacteristic) {
+            Button(onClick = onSelectCharacteristic) {
                 Text("►")
             }
         }
@@ -175,8 +174,7 @@ fun Loader() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp), contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }

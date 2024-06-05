@@ -2,16 +2,15 @@ package com.mnh.bledevicescanner.core
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-sealed class Screen(val route: String) {
-    data object Home : Screen("Main")
+sealed class Screen() {
+    @Serializable
+    object DeviceList
 
     @Serializable
-    data object Details : Screen("details")
-    data object DeviceOperation : Screen("DetailsAction")
+    data class DeviceDetails(val macAddress: String)
 
     @Serializable
-    data class ScreenDeviceOperation(
+    data class DeviceOperation(
         val deviceName: String?,
         val service: String?,
         val characteristic: String?,
