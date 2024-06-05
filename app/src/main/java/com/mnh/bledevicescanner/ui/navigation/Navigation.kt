@@ -20,8 +20,8 @@ fun Navigation() {
         }
 
         composable<Screen.DeviceDetails> { backStackEntry ->
-            val address = backStackEntry.toRoute<Screen.DeviceDetails>()
-            ServiceDetailsScreen(navController, address.macAddress)
+            val address = backStackEntry.toRoute<Screen.DeviceDetails>().macAddress
+            ServiceDetailsScreen(navController, address)
         }
 
         composable<Screen.DeviceOperation> {
@@ -30,6 +30,3 @@ fun Navigation() {
         }
     }
 }
-
-
-
