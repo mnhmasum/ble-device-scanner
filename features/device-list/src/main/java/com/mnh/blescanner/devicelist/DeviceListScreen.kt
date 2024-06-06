@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mnh.bledevicescanner.core.Screen
 import com.mnh.bledevicescanner.core.theme.AppTheme
+import com.napco.utils.DeviceDetailsScreen
 
 @Composable
 fun DeviceListScreen(navController: NavController) {
@@ -35,9 +35,9 @@ fun DeviceListScreen(navController: NavController) {
     )
 
     val onClickConnect: (Int) -> Unit = remember(bleScannedDeviceList) {
-        { listIndex ->
-            val deviceAddress: String = bleScannedDeviceList[listIndex].device?.address ?: ""
-            navController.navigate(Screen.DeviceDetails(deviceAddress))
+        { selectedIndex ->
+            val deviceAddress: String = bleScannedDeviceList[selectedIndex].device?.address ?: ""
+            navController.navigate(DeviceDetailsScreen(deviceAddress))
         }
     }
 

@@ -2,7 +2,7 @@ package com.mnh.blescanner.devicedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnh.ble.model.ServiceInfo
+import com.napco.utils.model.DeviceDetails
 import com.mnh.blescanner.devicedetails.usecase.DeviceDetailsUseCase
 import com.napco.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDetailsUseCase) :
     ViewModel() {
 
-    val bleConnectionResult: Flow<DataState<ServiceInfo>> = detailsUseCase.bleGattConnectionResult()
+    val bleConnectionResult: Flow<DataState<DeviceDetails>> = detailsUseCase.bleGattConnectionResult()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
 
     val gattServerResponse: Flow<List<ByteArray>> = detailsUseCase.gattServerResponse()

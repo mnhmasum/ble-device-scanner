@@ -13,8 +13,8 @@ class Constants {
     }
 
     companion object {
-        val DESCRIPTOR_PRE_CLIENT_CONFIG: UUID = UUID.fromString("00002902-0000-1000-8000-00805F9B34FB")
-        const val NOTIFICATION_CHANNEL_ID = "BlE_DEVICE_SCANNING_NOTIFICATION_CHANNEL"
+        val DESCRIPTOR_PRE_CLIENT_CONFIG: UUID =
+            UUID.fromString("00002902-0000-1000-8000-00805F9B34FB")
     }
 
 }

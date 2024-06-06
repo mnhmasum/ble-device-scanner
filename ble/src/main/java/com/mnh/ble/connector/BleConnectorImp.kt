@@ -14,12 +14,14 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.mnh.ble.model.Service
-import com.mnh.ble.model.ServiceInfo
-import com.mnh.ble.utils.Utility
-import com.mnh.ble.utils.Utility.Companion.extractCharacteristicInfo
 import com.napco.utils.Constants
 import com.napco.utils.DataState
+import com.napco.utils.Utility
+import com.napco.utils.Utility.Companion.extractCharacteristicInfo
+import com.napco.utils.model.Characteristic
+import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.DeviceInfo
+import com.napco.utils.model.Service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,14 +38,14 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private var _bluetoothGatt: BluetoothGatt? = null
-    private val _gattConnectionResult = MutableSharedFlow<DataState<ServiceInfo>>()
+    private val _gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
     private val _gattServerResponse = MutableSharedFlow<List<ByteArray>>()
 
     private companion object {
         val TAG: String = BleConnectorImp::class.java.simpleName
     }
 
-    override fun bleGattConnectionResult(): Flow<DataState<ServiceInfo>> =
+    override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         _gattConnectionResult.asSharedFlow()
 
     override fun gattServerResponse(): Flow<List<ByteArray>> {
@@ -71,17 +73,13 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
         enableNotificationOrIndication(
-            serviceUUID,
-            characteristicUUID,
-            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
         )
     }
 
     override fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID) {
         enableNotificationOrIndication(
-            serviceUUID,
-            characteristicUUID,
-            BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
         )
     }
 
@@ -174,30 +172,45 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         }
     }
 
-    override fun onServicesDiscovered(peripheralGatt: BluetoothGatt, status: Int) {
-        super.onServicesDiscovered(peripheralGatt, status)
+    override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+        super.onServicesDiscovered(gatt, status)
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
-                val serviceDetails: ServiceInfo = extractServiceInfo(peripheralGatt.services)
-                _gattConnectionResult.emit(DataState.success(serviceDetails))
+                emitAttributes(gatt)
             }
         }
     }
 
-    private fun extractServiceInfo(serviceList: List<BluetoothGattService>): ServiceInfo {
+    private suspend fun emitAttributes(peripheralGatt: BluetoothGatt) {
+        val serviceCharacteristicsMap = extractServicesWithCharacteristics(peripheralGatt.services)
+
+        val deviceInfo = DeviceInfo(
+            name = peripheralGatt.device.name,
+            address = peripheralGatt.device.address,
+            generalInfo = "${peripheralGatt.device.bondState}",
+        )
+
+        val details = DeviceDetails(
+            deviceInfo = deviceInfo, services = serviceCharacteristicsMap
+        )
+
+        _gattConnectionResult.emit(DataState.success(details))
+    }
+
+    private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> {
         val services = serviceList.associate { service ->
             val characteristics = service.characteristics.map { bleCharacteristic ->
                 extractCharacteristicInfo(bleCharacteristic)
             }
 
-            val serviceName = Utility.getServiceName(service.uuid)
-            val newService = Service(name = serviceName, uuid = service.getUUID())
+            val serviceReadableTitleName = Utility.getServiceName(service.uuid)
+            val newService = Service(serviceReadableTitleName, service.getUUID())
 
             newService to characteristics
         }
 
-        return ServiceInfo(services)
+        return services
     }
 
     private fun BluetoothGattService.getUUID(): String {
@@ -238,9 +251,10 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         val newValue: ByteArray? = characteristic?.value
 
         Log.d(
-            TAG, "Characteristics Reading from deprecated function: `" +
-                    "Characteristic UUID ${characteristic?.uuid.toString()} " +
-                    "Response: ${Utility.bytesToHexString(newValue!!)}`"
+            TAG,
+            "Characteristics Reading from deprecated function: `" + "Characteristic UUID ${characteristic?.uuid.toString()} " + "Response: ${
+                Utility.bytesToHexString(newValue!!)
+            }`"
         )
         scope.launch {
             val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()

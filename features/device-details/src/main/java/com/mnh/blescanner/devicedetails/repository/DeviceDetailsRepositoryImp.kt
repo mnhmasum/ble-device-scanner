@@ -1,7 +1,7 @@
 package com.mnh.blescanner.devicedetails.repository
 
 import com.mnh.ble.connector.BleConnector
-import com.mnh.ble.model.ServiceInfo
+import com.napco.utils.model.DeviceDetails
 import com.napco.utils.DataState
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
@@ -16,7 +16,7 @@ class DeviceDetailsRepositoryImp(private val bleConnector: BleConnector) :
         bleConnector.disconnect()
     }
 
-    override fun getGattConnectionResult(): Flow<DataState<ServiceInfo>> {
+    override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
         return bleConnector.bleGattConnectionResult()
     }
 

@@ -5,27 +5,29 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.mnh.bledevicescanner.core.Screen
 import com.mnh.blescanner.devicedetails.DeviceOperationScreen
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
 import com.mnh.blescanner.devicelist.DeviceListScreen
+import com.napco.utils.DeviceDetailsScreen
+import com.napco.utils.DeviceListScreen
+import com.napco.utils.DeviceOperationScreen
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.DeviceList) {
-        composable<Screen.DeviceList> {
+    NavHost(navController = navController, startDestination = DeviceListScreen) {
+        composable<DeviceListScreen> {
             DeviceListScreen(navController)
         }
 
-        composable<Screen.DeviceDetails> { backStackEntry ->
-            val address = backStackEntry.toRoute<Screen.DeviceDetails>().macAddress
+        composable<DeviceDetailsScreen> { backStackEntry ->
+            val address = backStackEntry.toRoute<DeviceDetailsScreen>().macAddress
             ServiceDetailsScreen(navController, address)
         }
 
-        composable<Screen.DeviceOperation> {
-            val args: Screen.DeviceOperation = it.toRoute<Screen.DeviceOperation>()
+        composable<DeviceOperationScreen> {
+            val args: DeviceOperationScreen = it.toRoute<DeviceOperationScreen>()
             DeviceOperationScreen(navController, args)
         }
     }

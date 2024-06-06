@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.daggerHiltAndroid)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -45,6 +46,7 @@ dependencies {
 
     implementation(libs.dagger.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":core:utils"))
 

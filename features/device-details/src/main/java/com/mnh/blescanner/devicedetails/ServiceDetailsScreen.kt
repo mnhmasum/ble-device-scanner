@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
@@ -21,9 +22,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,25 +34,26 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mnh.ble.model.Characteristic
-import com.mnh.ble.model.Service
-import com.mnh.ble.model.ServiceInfo
-import com.mnh.bledevicescanner.core.Screen
 import com.napco.utils.DataState
+import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.model.Characteristic
+import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.Service
+
 
 @Composable
 fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
-    val effectTriggered = rememberSaveable { mutableStateOf(false) }
+    val isAlreadyConnected = rememberSaveable { mutableStateOf(false) }
 
     val detailsViewModel: DetailsViewModel = hiltViewModel()
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
-        DataState.Loading()
+        initialValue = DataState.Loading()
     )
 
     LaunchedEffect(deviceAddress) {
-        if (!effectTriggered.value) {
+        if (!isAlreadyConnected.value) {
             detailsViewModel.connect(deviceAddress)
-            effectTriggered.value = true
+            isAlreadyConnected.value = true
         }
     }
 
@@ -66,55 +66,43 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     }
 
     ServiceDetails(navController, connectionResult)
-
 }
 
 @Composable
 private fun ServiceDetails(
     navController: NavController,
-    connectionResult: DataState<ServiceInfo>,
+    connectionResult: DataState<DeviceDetails>,
 ) {
-    var serviceInfo: ServiceInfo? by remember { mutableStateOf(null) }
-
     when (connectionResult) {
         is DataState.Loading -> Loader()
-        is DataState.Success -> {
-            serviceInfo = connectionResult.data
-        }
-
-        is DataState.Error -> {
-            Text(
-                text = "Disconnected",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-
-    serviceInfo?.let { serviceDetails ->
-        DeviceDetailsContent(navController, serviceInfo = { serviceDetails })
+        is DataState.Success -> DeviceDetailsContent(navController, connectionResult.data)
+        is DataState.Error -> DisconnectedMessage()
     }
 }
 
 @Composable
-fun DeviceDetailsContent(navController: NavController, serviceInfo: () -> ServiceInfo) {
-    val services = serviceInfo().serviceInfo.toList()
+fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDetails) {
+    val services = deviceDetails.services.toList()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), horizontalAlignment = Alignment.Start
+            .padding(16.dp),
+        horizontalAlignment = Alignment.Start
     ) {
         items(services, key = { it.first.uuid }) { service ->
             ServiceItem(service,
-                onSelectCharacteristic = { deviceName, serviceUUID, characteristicUUID, properties ->
+                onNavigateCharacteristic = { characteristic ->
                     navController.navigate(
-                        Screen.DeviceOperation(
-                            deviceName, serviceUUID, characteristicUUID, properties
+                        DeviceOperationScreen(
+                            deviceAddress = deviceDetails.deviceInfo.address,
+                            serviceUUID = service.first.uuid,
+                            characteristicName = characteristic.name,
+                            characteristicUUID = characteristic.uuid,
+                            properties = characteristic.properties
                         )
                     )
                 })
-
         }
     }
 }
@@ -122,7 +110,7 @@ fun DeviceDetailsContent(navController: NavController, serviceInfo: () -> Servic
 @Composable
 fun ServiceItem(
     service: Pair<Service, List<Characteristic>>,
-    onSelectCharacteristic: (deviceName: String, serviceUUID: String, characteristicUUID: String, properties: List<String>) -> Unit,
+    onNavigateCharacteristic: (Characteristic) -> Unit,
 ) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         BasicText(
@@ -133,20 +121,18 @@ fun ServiceItem(
         Spacer(modifier = Modifier.height(16.dp))
 
         service.second.forEach { characteristic ->
-            CharacteristicItem(characteristic = characteristic, onSelectCharacteristic = {
-                onSelectCharacteristic(
-                    "Device Name",
-                    service.first.uuid,
-                    characteristic.uuid,
-                    characteristic.properties
-                )
-            })
+            CharacteristicItem(characteristic = characteristic) {
+                onNavigateCharacteristic(characteristic)
+            }
         }
     }
 }
 
 @Composable
-private fun CharacteristicItem(characteristic: Characteristic, onSelectCharacteristic: () -> Unit) {
+private fun CharacteristicItem(
+    characteristic: Characteristic,
+    onSelectCharacteristic: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,17 +142,17 @@ private fun CharacteristicItem(characteristic: Characteristic, onSelectCharacter
         Column {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList, style = TextStyle(fontSize = 13.sp)
+                text = characteristic.acceptedPropertyList,
+                style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onSelectCharacteristic) {
+            Button(onClick = onSelectCharacteristic, modifier = Modifier.width(24.dp)) {
                 Text("►")
             }
         }
     }
-
 }
 
 @Composable
@@ -174,11 +160,19 @@ fun Loader() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), contentAlignment = Alignment.Center
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
 }
 
-
+@Composable
+fun DisconnectedMessage() {
+    Text(
+        text = "Disconnected",
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center
+    )
+}
 

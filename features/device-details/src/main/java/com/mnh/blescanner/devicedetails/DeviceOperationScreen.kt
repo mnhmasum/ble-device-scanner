@@ -22,13 +22,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mnh.ble.utils.Utility
-import com.mnh.bledevicescanner.core.Screen
+import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.Utility
 
 @Composable
 fun DeviceOperationScreen(
     navController: NavController,
-    screenDeviceOperation: Screen.DeviceOperation,
+    deviceOperationScreen: DeviceOperationScreen,
 ) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
     val gattServerResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
@@ -39,55 +39,51 @@ fun DeviceOperationScreen(
         navController.navigateUp()
     }
 
-    Properties(screenDeviceOperation, { gattServerResponse }, onClickRead = {
-        detailsViewModel.readCharacteristic(
-            screenDeviceOperation.service, screenDeviceOperation.characteristic
-        )
-    }, onClickNotification = {
-        detailsViewModel.enableNotification(
-            screenDeviceOperation.service, screenDeviceOperation.characteristic
-        )
-    }, onClickWrite = {
-        detailsViewModel.writeCharacteristic(
-            screenDeviceOperation.service, screenDeviceOperation.characteristic
-        )
-    })
+    Properties(
+        deviceOperationScreen,
+        { gattServerResponse },
+        onClickRead = {
+            detailsViewModel.readCharacteristic(
+                deviceOperationScreen.serviceUUID,
+                deviceOperationScreen.characteristicUUID
+            )
+        }, onClickWrite = {
+            detailsViewModel.writeCharacteristic(
+                deviceOperationScreen.serviceUUID,
+                deviceOperationScreen.characteristicUUID
+            )
+        }, onClickNotification = {
+            detailsViewModel.enableNotification(
+                deviceOperationScreen.serviceUUID,
+                deviceOperationScreen.characteristicUUID
+            )
+        })
 
 }
 
 @Composable
 fun Properties(
-    serviceOperationDetails: Screen.DeviceOperation,
+    deviceOperationScreen: DeviceOperationScreen,
     gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
-    onClickNotification: () -> Unit,
     onClickWrite: () -> Unit,
+    onClickNotification: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(all = 16.dp)) {
 
         OperationTitle("PROPERTIES")
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem("Device Name", serviceOperationDetails.deviceName)
-        Spacer(modifier = Modifier.height(16.dp))
+        RowItem("Device Address", deviceOperationScreen.deviceAddress)
 
-        RowItem("Device Address", "2343535")
-        Spacer(modifier = Modifier.height(16.dp))
-
-        RowItem("Device Address", "2343535")
-        Spacer(modifier = Modifier.height(16.dp))
-
-        RowItem("Device Address", "2343535")
-        Spacer(modifier = Modifier.height(16.dp))
+        RowItem("Characteristic Name", deviceOperationScreen.characteristicName)
 
         ReadAndNotifyIndicationOperation(
-            serviceOperationDetails,
-            onClickRead,
-            onClickNotification,
-            gattServerResponse
+            deviceOperationScreen, onClickRead, onClickNotification, gattServerResponse
         )
 
-        WriteOperation(serviceOperationDetails, onClickWrite)
+        WriteOperation(deviceOperationScreen, onClickWrite)
 
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
@@ -97,10 +93,11 @@ fun Properties(
 
 @Composable
 private fun WriteOperation(
-    serviceOperationDetails: Screen.DeviceOperation,
+    deviceOperationScreen: DeviceOperationScreen,
     onClickWrite: () -> Unit,
 ) {
-    val isWritable = serviceOperationDetails.properties.any { it.contains("Writable") }
+    val isWritable =
+        deviceOperationScreen.properties.any { it.contains("Writable") }
     if (!isWritable) {
         return
     }
@@ -134,13 +131,14 @@ private fun OperationTitle(title: String) {
 
 @Composable
 private fun ReadAndNotifyIndicationOperation(
-    serviceOperationDetails: Screen.DeviceOperation,
+    deviceOperationScreen: DeviceOperationScreen,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     gattServerResponse: () -> List<ByteArray>,
 ) {
-    val isReadable = serviceOperationDetails.properties.any { it.contains("Readable") }
-    val isNotifyAble = serviceOperationDetails.properties.any {
+    val isReadable =
+        deviceOperationScreen.properties.any { it.contains("Readable") }
+    val isNotifyAble = deviceOperationScreen.properties.any {
         it.contains("Notify") || it.contains("Indication")
     }
 
@@ -151,8 +149,7 @@ private fun ReadAndNotifyIndicationOperation(
     BasicText(text = "READ/INDICATED VALUES")
 
     Divider(
-        color = Color.Gray, thickness = 0.5.dp,
-        modifier = Modifier.padding(vertical = 4.dp)
+        color = Color.Gray, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp)
     )
 
     ActionButtonsRow(
@@ -204,19 +201,16 @@ fun ActionButtonsRow(
             modifier = Modifier.padding(end = 20.dp)
         )
         ActionButton(
-            isVisible = isNotifyAble,
-            onClick = onClickNotification,
-            text = "SUBSCRIBE"
+            isVisible = isNotifyAble, onClick = onClickNotification, text = "SUBSCRIBE"
         )
     }
 }
 
 @Composable
-private fun RowItem(title: String, value: String?) {
+private fun RowItem(title: String, value: String) {
     BasicText(text = title)
-    if (value != null) {
-        BasicText(text = value)
-    }
+    BasicText(text = value)
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 

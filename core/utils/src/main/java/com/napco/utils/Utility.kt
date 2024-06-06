@@ -1,8 +1,7 @@
-package com.mnh.ble.utils
+package com.napco.utils
 
 import android.bluetooth.BluetoothGattCharacteristic
-import com.mnh.ble.model.Characteristic
-import com.napco.utils.Constants
+import com.napco.utils.model.Characteristic
 import java.util.Formatter
 import java.util.UUID
 
