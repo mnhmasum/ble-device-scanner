@@ -21,7 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "ble-device-scanner"
 include(":app")
-include(":data:local")
 include(":core:utils")
 include(":core:ui")
 include(":ble")

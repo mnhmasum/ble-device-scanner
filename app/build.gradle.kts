@@ -87,8 +87,6 @@ dependencies {
     implementation (libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.serialization.json)
 
-
-    implementation(project(":data:local"))
     implementation(project(":core:utils"))
     implementation(project(":core:ui"))
     implementation(project(":ble"))

@@ -1,8 +1,5 @@
 package com.mnh.bledevicescanner.di
 
-import com.lightnotebook.data.database.DeviceDao
-import com.lightnotebook.data.repository.DeviceRepository
-import com.lightnotebook.data.repository.DeviceRepositoryImp
 import com.mnh.ble.connector.BleConnector
 import com.mnh.ble.repository.BleRepository
 import com.mnh.ble.repository.BleRepositoryImp
@@ -16,11 +13,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class RepositoryModule {
-    @Provides
-    @Singleton
-    fun provideDeviceRepository(deviceDao: DeviceDao): DeviceRepository {
-        return DeviceRepositoryImp(deviceDao)
-    }
 
     @Provides
     @Singleton
