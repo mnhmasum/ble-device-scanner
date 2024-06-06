@@ -87,22 +87,20 @@ fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDeta
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(16.dp), horizontalAlignment = Alignment.Start
     ) {
         items(services, key = { it.first.uuid }) { service ->
-            ServiceItem(service,
-                onNavigateCharacteristic = { characteristic ->
-                    navController.navigate(
-                        DeviceOperationScreen(
-                            deviceAddress = deviceDetails.deviceInfo.address,
-                            serviceUUID = service.first.uuid,
-                            characteristicName = characteristic.name,
-                            characteristicUUID = characteristic.uuid,
-                            properties = characteristic.properties
-                        )
+            ServiceItem(service, onNavigateCharacteristic = { characteristic ->
+                navController.navigate(
+                    DeviceOperationScreen(
+                        deviceAddress = deviceDetails.deviceInfo.address,
+                        serviceUUID = service.first.uuid,
+                        characteristicName = characteristic.name,
+                        characteristicUUID = characteristic.uuid,
+                        properties = characteristic.properties
                     )
-                })
+                )
+            })
         }
     }
 }
@@ -139,17 +137,16 @@ private fun CharacteristicItem(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(3f)) {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList,
-                style = TextStyle(fontSize = 13.sp)
+                text = characteristic.acceptedPropertyList, style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onSelectCharacteristic, modifier = Modifier.width(24.dp)) {
-                Text("►")
+            Button(onClick = onSelectCharacteristic, modifier = Modifier.width(50.dp)) {
+                Text(">")
             }
         }
     }
@@ -160,8 +157,7 @@ fun Loader() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp), contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
@@ -170,9 +166,7 @@ fun Loader() {
 @Composable
 fun DisconnectedMessage() {
     Text(
-        text = "Disconnected",
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center
+        text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
     )
 }
 
