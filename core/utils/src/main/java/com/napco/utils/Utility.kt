@@ -1,6 +1,7 @@
 package com.napco.utils
 
 import android.bluetooth.BluetoothGattCharacteristic
+import android.util.Log
 import com.napco.utils.model.Characteristic
 import java.util.Formatter
 import java.util.UUID
@@ -158,5 +159,27 @@ class Utility {
         private fun Int.isPresent(characteristic: BluetoothGattCharacteristic): Boolean {
             return (characteristic.properties and this) != 0
         }
+
+        fun Any.logV(message: String) {
+            Log.v(this::class.java.simpleName, message)
+        }
+
+        fun Any.logD(message: String) {
+            Log.d(this::class.java.simpleName, message)
+        }
+
+        fun Any.logI(message: String) {
+            Log.i(this::class.java.simpleName, message)
+        }
+
+        fun Any.logW(message: String) {
+            Log.w(this::class.java.simpleName, message)
+        }
+
+        fun Any.logE(message: String) {
+            Log.e(this::class.java.simpleName, message)
+        }
+
+
     }
 }

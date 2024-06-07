@@ -32,7 +32,7 @@ fun DeviceOperationScreen(
     deviceOperationScreen: DeviceOperationScreen,
 ) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
-    val gattServerResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
+    val serverResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
 
@@ -42,15 +42,15 @@ fun DeviceOperationScreen(
 
     Properties(
         deviceOperationScreen,
-        { gattServerResponse },
+        { serverResponse },
         onClickRead = {
             detailsViewModel.readCharacteristic(deviceOperationScreen)
         },
         onClickWrite = {
-            detailsViewModel.writeCharacteristic(deviceOperationScreen)
+            detailsViewModel.writeCharacteristic(deviceOperationScreen, "")
         },
         onClickWriteWithoutResponse = {
-            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen)
+            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen, "")
         },
         onClickNotification = {
             detailsViewModel.enableNotification(deviceOperationScreen)
@@ -64,7 +64,7 @@ fun DeviceOperationScreen(
 @Composable
 fun Properties(
     deviceOperationScreen: DeviceOperationScreen,
-    gattServerResponse: () -> List<ByteArray>,
+    serverResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickWrite: () -> Unit,
     onClickWriteWithoutResponse: () -> Unit,
@@ -83,7 +83,7 @@ fun Properties(
 
         ReadAndNotifyIndicationOperation(
             deviceOperationScreen,
-            gattServerResponse,
+            serverResponse,
             onClickRead,
             onClickNotification,
             onClickIndication
