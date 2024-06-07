@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.napco.utils.Constants
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.Utility
 
@@ -88,7 +89,11 @@ fun Properties(
             onClickIndication
         )
 
-        WriteOperation(deviceOperationScreen, onClickWrite, onClickWriteWithoutResponse)
+        WriteOperation(
+            deviceOperationScreen,
+            onClickWrite,
+            onClickWriteWithoutResponse
+        )
 
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
@@ -103,22 +108,32 @@ private fun WriteOperation(
     onClickWriteWithoutResponse: () -> Unit,
 ) {
     val isWritable = deviceOperationScreen.properties.any {
-        it.contains("Writable")
+        it.contains(Constants.CharType.WRITABLE.type)
     }
 
-    if (!isWritable) {
+    val isWritableNoResponse = deviceOperationScreen.properties.any {
+        it.contains(Constants.CharType.WRITABLE_NO_RESPONSE.type)
+    }
+
+    if (!isWritable && !isWritableNoResponse) {
         return
     }
 
     OperationTitle("WRITE")
 
     Row {
-        Button(onClick = onClickWrite) {
-            Text(text = "WRITE")
+        if (isWritable) {
+            Button(onClick = onClickWrite) {
+                Text(text = "WRITE")
+            }
         }
+
         Spacer(modifier = Modifier.width(16.dp))
-        Button(onClick = onClickWrite) {
-            Text(text = "WRITE WITH NO RESPONSE")
+
+        if (isWritableNoResponse) {
+            Button(onClick = onClickWriteWithoutResponse) {
+                Text(text = "WRITE WITH NO RESPONSE")
+            }
         }
     }
 

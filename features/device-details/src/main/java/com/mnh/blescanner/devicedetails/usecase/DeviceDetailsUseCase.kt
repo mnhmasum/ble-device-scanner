@@ -1,8 +1,8 @@
 package com.mnh.blescanner.devicedetails.usecase
 
-import com.napco.utils.model.DeviceDetails
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
 import com.napco.utils.DataState
+import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -27,12 +27,12 @@ class DeviceDetailsUseCase @Inject constructor(private val deviceDetailsReposito
         deviceDetailsRepository.readCharacteristic(service, chara)
     }
 
-    fun writeCharacteristic(service: UUID, chara: UUID) {
-        deviceDetailsRepository.readCharacteristic(service, chara)
+    fun writeCharacteristic(service: UUID, chara: UUID, bytes: ByteArray) {
+        deviceDetailsRepository.writeCharacteristic(service, chara, bytes)
     }
 
-    fun writeCharacteristicWithNoResponse(service: UUID, chara: UUID) {
-        deviceDetailsRepository.readCharacteristic(service, chara)
+    fun writeCharacteristicWithNoResponse(service: UUID, chara: UUID, bytes: ByteArray) {
+        deviceDetailsRepository.writeCharacteristicWithNoResponse(service, chara, bytes)
     }
 
     fun disconnect() {

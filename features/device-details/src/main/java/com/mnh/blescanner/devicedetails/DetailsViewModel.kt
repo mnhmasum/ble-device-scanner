@@ -69,16 +69,31 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
         detailsUseCase.readCharacteristic(serviceUUID, characteristicUUID)
     }
 
-    fun writeCharacteristic(deviceDetailsScreen: DeviceOperationScreen) {
+    fun writeCharacteristic(deviceDetailsScreen: DeviceOperationScreen, string: String) {
         val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
         val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
-        detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID)
+        val hexString = string.replace("\\s".toRegex(), "")
+        val byteArray = hexStringToByteArray(hexString)
+        detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID, byteArray)
     }
 
-    fun writeCharacteristicWithNoResponse(deviceDetailsScreen: DeviceOperationScreen) {
+    fun writeCharacteristicWithNoResponse(deviceDetailsScreen: DeviceOperationScreen, string: String) {
         val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
         val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
-        detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID)
+        val hexString = string.replace("\\s".toRegex(), "")
+        val byteArray = hexStringToByteArray(hexString)
+        detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, byteArray)
+    }
+
+    private fun hexStringToByteArray(s: String): ByteArray {
+        val len = s.length
+        val data = ByteArray(len / 2)
+        var i = 0
+        while (i < len) {
+            data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+            i += 2
+        }
+        return data
     }
 
 }

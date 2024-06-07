@@ -5,8 +5,6 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
@@ -31,7 +29,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-
 @SuppressLint("MissingPermission")
 class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGattCallback() {
     private val job = Job()
@@ -48,123 +45,80 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         _gattConnectionResult.asSharedFlow()
 
-    override fun gattServerResponse(): Flow<List<ByteArray>> {
-        return _gattServerResponse.asSharedFlow()
-    }
+    override fun gattServerResponse(): Flow<List<ByteArray>> = _gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
-        val device = getDevice(address)
-        if (_bluetoothGatt != null) {
-            _bluetoothGatt?.close()
-        }
-        device?.connectGatt(context, false, this)
+        _bluetoothGatt?.close()
+        getDevice(address)?.connectGatt(context, false, this)
     }
 
     override fun disconnect() {
         _bluetoothGatt?.disconnect()
     }
 
-    private fun updateConnectionStatus() {
-        scope.launch {
-            val throwable = Throwable("Error: Disconnected ")
-            _gattConnectionResult.emit(DataState.error("Disconnected", throwable))
-        }
-    }
-
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
-        enableNotificationOrIndication(
-            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-        )
+        enableNotificationOrIndication(serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
     }
 
     override fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID) {
-        enableNotificationOrIndication(
-            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-        )
+        enableNotificationOrIndication(serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
     }
 
     override fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID) {
-        val bluetoothGattService = _bluetoothGatt?.getService(serviceUUID)
-        val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
-        _bluetoothGatt?.readCharacteristic(gattCharacteristic)
+        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+            _bluetoothGatt?.readCharacteristic(it)
+        }
     }
 
-    override fun writeCharacteristic(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        bytes: ByteArray,
-    ) {
-        val bluetoothGattService = _bluetoothGatt?.getService(serviceUUID)
-        val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
-        writeCharacteristic(gattCharacteristic, bytes, WRITE_TYPE_DEFAULT)
+    override fun writeCharacteristic(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
+        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+            writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+        }
     }
 
-    override fun writeCharacteristicWithNoResponse(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        bytes: ByteArray,
-    ) {
-        val bluetoothGattService = _bluetoothGatt?.getService(serviceUUID)
-        val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
-        writeCharacteristic(gattCharacteristic, bytes, WRITE_TYPE_NO_RESPONSE)
+    override fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
+        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+            writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+        }
     }
 
-    private fun writeCharacteristic(
-        gattCharacteristic: BluetoothGattCharacteristic?,
-        bytes: ByteArray,
-        writeType: Int,
-    ) {
-        if (Build.VERSION.SDK_INT < 33) {
+    private fun writeCharacteristic(gattCharacteristic: BluetoothGattCharacteristic, bytes: ByteArray, writeType: Int) {
+        gattCharacteristic.writeType = writeType
+        if (Build.VERSION.SDK_INT >= 33) {
+            _bluetoothGatt?.writeCharacteristic(gattCharacteristic, bytes, writeType)
+        } else {
+            gattCharacteristic.value = bytes
             _bluetoothGatt?.writeCharacteristic(gattCharacteristic)
-        } else {
-            gattCharacteristic?.let {
-                _bluetoothGatt?.writeCharacteristic(it, bytes, writeType)
+        }
+    }
+
+    private fun provideBluetoothManager(): BluetoothManager =
+        context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+
+    private fun getDevice(address: String): BluetoothDevice? =
+        provideBluetoothManager().adapter.getRemoteDevice(address)
+
+    private fun enableNotificationOrIndication(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
+        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let { characteristic ->
+            _bluetoothGatt?.setCharacteristicNotification(characteristic, true)
+            characteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)?.let { descriptor ->
+                if (Build.VERSION.SDK_INT >= 33) {
+                    _bluetoothGatt?.writeDescriptor(descriptor, value)
+                } else {
+                    descriptor.value = value
+                    _bluetoothGatt?.writeDescriptor(descriptor)
+                }
             }
-        }
-    }
-
-    private fun provideBluetoothManager(): BluetoothManager {
-        return context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    }
-
-    private fun getDevice(address: String): BluetoothDevice? {
-        val adapter = provideBluetoothManager().adapter
-        return adapter.getRemoteDevice(address)
-    }
-
-    private fun enableNotificationOrIndication(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        value: ByteArray,
-    ) {
-        val bluetoothGattService = _bluetoothGatt?.getService(serviceUUID)
-        val gattCharacteristic = bluetoothGattService?.getCharacteristic(characteristicUUID)
-
-        if (bluetoothGattService == null || gattCharacteristic == null) {
-            return
-        }
-
-        _bluetoothGatt?.setCharacteristicNotification(gattCharacteristic, true)
-
-        val descriptor = gattCharacteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
-
-        if (Build.VERSION.SDK_INT < 33) {
-            descriptor.value = value
-            _bluetoothGatt?.writeDescriptor(descriptor)
-        } else {
-            _bluetoothGatt?.writeDescriptor(descriptor, value)
         }
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
-
         when (newState) {
             BluetoothProfile.STATE_CONNECTED -> {
                 _bluetoothGatt = gatt
                 _bluetoothGatt?.discoverServices()
             }
-
             BluetoothProfile.STATE_DISCONNECTED -> {
                 updateConnectionStatus()
                 Log.d(TAG, "Device disconnected")
@@ -174,7 +128,6 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
 
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
         super.onServicesDiscovered(gatt, status)
-
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 emitAttributes(gatt)
@@ -188,138 +141,91 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         val deviceInfo = DeviceInfo(
             name = peripheralGatt.device.name,
             address = peripheralGatt.device.address,
-            generalInfo = "${peripheralGatt.device.bondState}",
+            generalInfo = "${peripheralGatt.device.bondState}"
         )
 
-        val details = DeviceDetails(
-            deviceInfo = deviceInfo, services = serviceCharacteristicsMap
-        )
+        val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
         _gattConnectionResult.emit(DataState.success(details))
     }
 
-    private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> {
-        val services = serviceList.associate { service ->
+    private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> =
+        serviceList.associate { service ->
             val characteristics = service.characteristics.map { bleCharacteristic ->
                 extractCharacteristicInfo(bleCharacteristic)
             }
-
             val serviceReadableTitleName = Utility.getServiceName(service.uuid)
-            val newService = Service(serviceReadableTitleName, service.getUUID())
-
+            val newService = Service(serviceReadableTitleName, service.uuid.toString())
             newService to characteristics
         }
 
-        return services
-    }
-
-    private fun BluetoothGattService.getUUID(): String {
-        return this.uuid.toString()
-    }
-
-    override fun onDescriptorWrite(
-        gatt: BluetoothGatt,
-        descriptor: BluetoothGattDescriptor?,
-        status: Int,
-    ) {
+    override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
         super.onDescriptorWrite(gatt, descriptor, status)
-
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            //When descriptor is written successfully
+            // When descriptor is written successfully
         }
     }
 
-    override fun onCharacteristicWrite(
-        gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int,
-    ) {
+    override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
         super.onCharacteristicWrite(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
-
+            // Handle successful characteristic write
         }
     }
 
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Used natively in Android 12 and lower",
-        ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)")
-    )
-    override fun onCharacteristicChanged(
-        gatt: BluetoothGatt?,
-        characteristic: BluetoothGattCharacteristic?,
-    ) {
-        super.onCharacteristicChanged(gatt, characteristic)
-        val newValue: ByteArray? = characteristic?.value
-
-        Log.d(
-            TAG,
-            "Characteristics Reading from deprecated function: `" + "Characteristic UUID ${characteristic?.uuid.toString()} " + "Response: ${
-                Utility.bytesToHexString(newValue!!)
-            }`"
-        )
-        scope.launch {
-            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-            val updatedList = existingValues + newValue
-            _gattServerResponse.emit(updatedList)
-        }
-    }
-
-    override fun onCharacteristicChanged(
-        gatt: BluetoothGatt,
-        characteristic: BluetoothGattCharacteristic,
-        newValue: ByteArray,
-    ) {
+    override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, newValue: ByteArray) {
         super.onCharacteristicChanged(gatt, characteristic, newValue)
-        Log.d(TAG, "Characteristics Read value new: ${characteristic.uuid}")
-        scope.launch {
-            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-            val updatedList = existingValues + newValue
-            _gattServerResponse.emit(updatedList)
-        }
-
+        handleCharacteristicChange(characteristic, newValue)
     }
 
-    override fun onCharacteristicRead(
-        gatt: BluetoothGatt,
-        characteristic: BluetoothGattCharacteristic,
-        newValue: ByteArray,
-        status: Int,
-    ) {
+    @Deprecated("Used natively in Android 12 and lower", ReplaceWith("onCharacteristicChanged(gatt, characteristic, characteristic.value)"))
+    override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+        super.onCharacteristicChanged(gatt, characteristic)
+        characteristic?.value?.let { newValue ->
+            handleCharacteristicChange(characteristic, newValue)
+        }
+    }
+
+    override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, newValue: ByteArray, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, newValue, status)
-
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            Log.d(TAG, "Characteristics Read NEW: ${characteristic.uuid}")
-            Log.d(TAG, "Characteristics Read New Value: ${Utility.bytesToHexString(newValue)}")
-
-            scope.launch {
-                val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-                val updatedList = existingValues + newValue
-                _gattServerResponse.emit(updatedList)
-            }
-
+            handleCharacteristicRead(characteristic, newValue)
         }
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onCharacteristicRead(
-        gatt: BluetoothGatt?,
-        characteristic: BluetoothGattCharacteristic?,
-        status: Int,
-    ) {
+    override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            Log.d(TAG, "Characteristics Read C: ${characteristic?.uuid}")
-            Log.d(
-                TAG,
-                "Characteristics Read Value: ${Utility.bytesToHexString(characteristic!!.value)}"
-            )
-
-            scope.launch {
-                val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-                val updatedList = existingValues + characteristic.value
-                _gattServerResponse.emit(updatedList)
+            characteristic?.value?.let { newValue ->
+                handleCharacteristicRead(characteristic, newValue)
             }
-
         }
     }
 
+    private fun handleCharacteristicChange(characteristic: BluetoothGattCharacteristic, newValue: ByteArray) {
+        Log.d(TAG, "Characteristic Changed: ${characteristic.uuid}")
+        scope.launch {
+            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
+            val updatedList = existingValues + newValue
+            _gattServerResponse.emit(updatedList)
+        }
+    }
+
+    private fun handleCharacteristicRead(characteristic: BluetoothGattCharacteristic, newValue: ByteArray) {
+        Log.d(TAG, "Characteristic Read: ${characteristic.uuid}")
+        Log.d(TAG, "Characteristic Value: ${Utility.bytesToHexString(newValue)}")
+        scope.launch {
+            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
+            val updatedList = existingValues + newValue
+            _gattServerResponse.emit(updatedList)
+        }
+    }
+
+    private fun updateConnectionStatus() {
+        scope.launch {
+            val throwable = Throwable("Error: Disconnected")
+            _gattConnectionResult.emit(DataState.error("Disconnected", throwable))
+        }
+    }
 }
