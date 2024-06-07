@@ -43,20 +43,19 @@ fun DeviceOperationScreen(
         deviceOperationScreen,
         { gattServerResponse },
         onClickRead = {
-            detailsViewModel.readCharacteristic(
-                deviceOperationScreen.serviceUUID,
-                deviceOperationScreen.characteristicUUID
-            )
-        }, onClickWrite = {
-            detailsViewModel.writeCharacteristic(
-                deviceOperationScreen.serviceUUID,
-                deviceOperationScreen.characteristicUUID
-            )
-        }, onClickNotification = {
-            detailsViewModel.enableNotification(
-                deviceOperationScreen.serviceUUID,
-                deviceOperationScreen.characteristicUUID
-            )
+            detailsViewModel.readCharacteristic(deviceOperationScreen)
+        },
+        onClickWrite = {
+            detailsViewModel.writeCharacteristic(deviceOperationScreen)
+        },
+        onClickWriteWithoutResponse = {
+            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen)
+        },
+        onClickNotification = {
+            detailsViewModel.enableNotification(deviceOperationScreen)
+        },
+        onClickIndication = {
+            detailsViewModel.enableIndication(deviceOperationScreen)
         })
 
 }
@@ -67,7 +66,9 @@ fun Properties(
     gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickWrite: () -> Unit,
+    onClickWriteWithoutResponse: () -> Unit,
     onClickNotification: () -> Unit,
+    onClickIndication: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(all = 16.dp)) {
 
@@ -80,10 +81,14 @@ fun Properties(
         RowItem("Characteristic Name", deviceOperationScreen.characteristicName)
 
         ReadAndNotifyIndicationOperation(
-            deviceOperationScreen, onClickRead, onClickNotification, gattServerResponse
+            deviceOperationScreen,
+            gattServerResponse,
+            onClickRead,
+            onClickNotification,
+            onClickIndication
         )
 
-        WriteOperation(deviceOperationScreen, onClickWrite)
+        WriteOperation(deviceOperationScreen, onClickWrite, onClickWriteWithoutResponse)
 
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
@@ -95,14 +100,17 @@ fun Properties(
 private fun WriteOperation(
     deviceOperationScreen: DeviceOperationScreen,
     onClickWrite: () -> Unit,
+    onClickWriteWithoutResponse: () -> Unit,
 ) {
-    val isWritable =
-        deviceOperationScreen.properties.any { it.contains("Writable") }
+    val isWritable = deviceOperationScreen.properties.any {
+        it.contains("Writable")
+    }
+
     if (!isWritable) {
         return
     }
 
-    OperationTitle("Write Operation")
+    OperationTitle("WRITE")
 
     Row {
         Button(onClick = onClickWrite) {
@@ -132,77 +140,52 @@ private fun OperationTitle(title: String) {
 @Composable
 private fun ReadAndNotifyIndicationOperation(
     deviceOperationScreen: DeviceOperationScreen,
+    gattServerResponse: () -> List<ByteArray>,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
-    gattServerResponse: () -> List<ByteArray>,
+    onClickIndication: () -> Unit,
 ) {
-    val isReadable =
-        deviceOperationScreen.properties.any { it.contains("Readable") }
-    val isNotifyAble = deviceOperationScreen.properties.any {
-        it.contains("Notify") || it.contains("Indication")
+    val properties = deviceOperationScreen.properties
+    val isReadable = properties.any { it.contains("Readable") }
+    val isNotifyAble = properties.any { it.contains("Notify") }
+    val isSupportIndication = properties.any { it.contains("Indication") }
+
+    if (isNotifyAble || isSupportIndication || isReadable) {
+        OperationTitle("READ/INDICATED VALUES")
+
+        Row {
+            if (isNotifyAble) {
+                Button(onClick = onClickNotification, modifier = Modifier.padding(end = 20.dp)) {
+                    Text(text = "Notify")
+                }
+            }
+
+            if (isSupportIndication) {
+                Button(onClick = onClickIndication, modifier = Modifier.padding(end = 20.dp)) {
+                    Text(text = "Indication")
+                }
+            }
+
+            if (isReadable) {
+                Button(onClick = onClickRead, modifier = Modifier.padding(end = 20.dp)) {
+                    Text(text = "Read")
+                }
+            }
+
+        }
+
+        BasicText(text = "Response:")
+        ResponseList(gattServerResponse = gattServerResponse)
+        Spacer(modifier = Modifier.height(20.dp))
+
     }
 
-    if (!isNotifyAble && !isReadable) {
-        return
-    }
-
-    BasicText(text = "READ/INDICATED VALUES")
-
-    Divider(
-        color = Color.Gray, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp)
-    )
-
-    ActionButtonsRow(
-        isReadable = isReadable,
-        isNotifyAble = isNotifyAble,
-        onClickRead = onClickRead,
-        onClickNotification = onClickNotification
-    )
-
-    BasicText(text = "Response:")
-    ResponseList(gattServerResponse = gattServerResponse)
-    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
 fun ResponseList(gattServerResponse: () -> List<ByteArray>) {
     gattServerResponse.invoke().forEach {
         Text(text = Utility.bytesToHexString(it))
-    }
-}
-
-@Composable
-fun ActionButton(
-    isVisible: Boolean,
-    onClick: () -> Unit,
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    if (isVisible) {
-        Button(onClick = onClick, modifier = modifier) {
-            Text(text = text)
-        }
-    }
-}
-
-
-@Composable
-fun ActionButtonsRow(
-    isReadable: Boolean,
-    isNotifyAble: Boolean,
-    onClickRead: () -> Unit,
-    onClickNotification: () -> Unit,
-) {
-    Row {
-        ActionButton(
-            isVisible = isReadable,
-            onClick = onClickRead,
-            text = "READ",
-            modifier = Modifier.padding(end = 20.dp)
-        )
-        ActionButton(
-            isVisible = isNotifyAble, onClick = onClickNotification, text = "SUBSCRIBE"
-        )
     }
 }
 

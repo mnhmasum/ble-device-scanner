@@ -2,9 +2,10 @@ package com.mnh.blescanner.devicedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.napco.utils.model.DeviceDetails
 import com.mnh.blescanner.devicedetails.usecase.DeviceDetailsUseCase
 import com.napco.utils.DataState
+import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.model.DeviceDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,8 +19,9 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDetailsUseCase) :
     ViewModel() {
 
-    val bleConnectionResult: Flow<DataState<DeviceDetails>> = detailsUseCase.bleGattConnectionResult()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
+    val bleConnectionResult: Flow<DataState<DeviceDetails>> =
+        detailsUseCase.bleGattConnectionResult()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
 
     val gattServerResponse: Flow<List<ByteArray>> = detailsUseCase.gattServerResponse()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
@@ -49,41 +51,33 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
         return UUID.fromString(serviceUUIDString)
     }
 
-    fun enableNotification(serviceUUIDString: String?, characteristicUUIDString: String?) {
-        if (serviceUUIDString == null || characteristicUUIDString == null) return
-        val serviceUUID = toUUID(serviceUUIDString)
-        val characteristicUUID = toUUID(characteristicUUIDString)
+    fun enableNotification(deviceDetailsScreen: DeviceOperationScreen) {
+        val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
+        val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         detailsUseCase.enableNotification(serviceUUID, characteristicUUID)
     }
 
-    fun enableIndication(serviceUUIDString: String?, characteristicUUIDString: String?) {
-        if (serviceUUIDString == null || characteristicUUIDString == null) return
-        val serviceUUID = toUUID(serviceUUIDString)
-        val characteristicUUID = toUUID(characteristicUUIDString)
+    fun enableIndication(deviceDetailsScreen: DeviceOperationScreen) {
+        val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
+        val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         detailsUseCase.enableIndication(serviceUUID, characteristicUUID)
     }
 
-    fun readCharacteristic(serviceUUIDString: String?, characteristicUUIDString: String?) {
-        if (serviceUUIDString == null || characteristicUUIDString == null) return
-        val serviceUUID = toUUID(serviceUUIDString)
-        val characteristicUUID = toUUID(characteristicUUIDString)
+    fun readCharacteristic(deviceDetailsScreen: DeviceOperationScreen) {
+        val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
+        val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         detailsUseCase.readCharacteristic(serviceUUID, characteristicUUID)
     }
 
-    fun writeCharacteristic(serviceUUIDString: String?, characteristicUUIDString: String?) {
-        if (serviceUUIDString == null || characteristicUUIDString == null) return
-        val serviceUUID = toUUID(serviceUUIDString)
-        val characteristicUUID = toUUID(characteristicUUIDString)
+    fun writeCharacteristic(deviceDetailsScreen: DeviceOperationScreen) {
+        val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
+        val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID)
     }
 
-    fun writeCharacteristicWithNoResponse(
-        serviceUUIDString: String?,
-        characteristicUUIDString: String?,
-    ) {
-        if (serviceUUIDString == null || characteristicUUIDString == null) return
-        val serviceUUID = toUUID(serviceUUIDString)
-        val characteristicUUID = toUUID(characteristicUUIDString)
+    fun writeCharacteristicWithNoResponse(deviceDetailsScreen: DeviceOperationScreen) {
+        val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
+        val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID)
     }
 
