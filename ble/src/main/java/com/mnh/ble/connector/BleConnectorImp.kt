@@ -49,6 +49,8 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         _gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
+        readCharacteristicResponseBytes.clear()
+        writeCharacteristicResponseBytes.clear()
         _bluetoothGatt?.close()
         getDevice(address)?.connectGatt(context, false, this)
     }
@@ -203,7 +205,11 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 writeCharacteristicResponseBytes.add(characteristic.value)
-                _gattServerResponse.emit(ServerResponseState.writeSuccess(writeCharacteristicResponseBytes))
+                _gattServerResponse.emit(
+                    ServerResponseState.writeSuccess(
+                        writeCharacteristicResponseBytes
+                    )
+                )
             }
         }
     }
@@ -264,7 +270,11 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             readCharacteristicResponseBytes.add(newValue)
-            _gattServerResponse.emit(ServerResponseState.notifySuccess(readCharacteristicResponseBytes))
+            _gattServerResponse.emit(
+                ServerResponseState.notifySuccess(
+                    readCharacteristicResponseBytes
+                )
+            )
         }
     }
 
