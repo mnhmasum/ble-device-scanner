@@ -149,18 +149,23 @@ private fun WriteOperation(
             Button(onClick = { onClickWrite(text.text) }) {
                 Text(text = "WRITE")
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
         }
 
 
         if (isWritableNoResponse) {
-            Spacer(modifier = Modifier.width(16.dp))
             Button(onClick = { onClickWriteWithoutResponse(text.text) }) {
-                Text(text = "WRITE WITH NO RESPONSE")
+                Text(text = "WRITE WITHOUT RESPONSE")
             }
         }
     }
 
     Spacer(modifier = Modifier.height(20.dp))
+
+    if (!isWritable) {
+        return
+    }
 
     when (gattServerResponse) {
         is ServerResponseState.WriteSuccess -> gattServerResponse.data.forEach {
