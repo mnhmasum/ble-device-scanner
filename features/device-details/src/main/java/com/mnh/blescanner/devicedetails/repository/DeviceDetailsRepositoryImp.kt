@@ -1,8 +1,9 @@
 package com.mnh.blescanner.devicedetails.repository
 
 import com.mnh.ble.connector.BleConnector
-import com.napco.utils.model.DeviceDetails
 import com.napco.utils.DataState
+import com.napco.utils.ServerResponseState
+import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
@@ -20,7 +21,7 @@ class DeviceDetailsRepositoryImp(private val bleConnector: BleConnector) :
         return bleConnector.bleGattConnectionResult()
     }
 
-    override fun gattServerResponse(): Flow<List<ByteArray>> {
+    override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> {
         return bleConnector.gattServerResponse()
     }
 

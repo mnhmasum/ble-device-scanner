@@ -13,6 +13,7 @@ import android.content.Context
 import android.os.Build
 import com.napco.utils.Constants
 import com.napco.utils.DataState
+import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
 import com.napco.utils.Utility.Companion.extractCharacteristicInfo
 import com.napco.utils.Utility.Companion.logD
@@ -37,12 +38,15 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
 
     private var _bluetoothGatt: BluetoothGatt? = null
     private val _gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
-    private val _gattServerResponse = MutableSharedFlow<List<ByteArray>>()
+    private val _gattServerResponse = MutableSharedFlow<ServerResponseState<List<ByteArray>>>()
+    private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
+    private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
 
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         _gattConnectionResult.asSharedFlow()
 
-    override fun gattServerResponse(): Flow<List<ByteArray>> = _gattServerResponse.asSharedFlow()
+    override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> =
+        _gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
         _bluetoothGatt?.close()
@@ -55,17 +59,13 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
         enableNotificationOrIndication(
-            serviceUUID,
-            characteristicUUID,
-            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
         )
     }
 
     override fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID) {
         enableNotificationOrIndication(
-            serviceUUID,
-            characteristicUUID,
-            BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+            serviceUUID, characteristicUUID, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
         )
     }
 
@@ -201,7 +201,10 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
     ) {
         super.onCharacteristicWrite(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            // Handle successful characteristic write
+            scope.launch {
+                writeCharacteristicResponseBytes.add(characteristic.value)
+                _gattServerResponse.emit(ServerResponseState.writeSuccess(writeCharacteristicResponseBytes))
+            }
         }
     }
 
@@ -260,9 +263,8 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
     ) {
         logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
-            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-            val updatedList = existingValues + newValue
-            _gattServerResponse.emit(updatedList)
+            readCharacteristicResponseBytes.add(newValue)
+            _gattServerResponse.emit(ServerResponseState.notifySuccess(readCharacteristicResponseBytes))
         }
     }
 
@@ -273,9 +275,8 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         logD("Characteristic Read: ${characteristic.uuid}")
         logD("Characteristic Value: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
-            val existingValues = _gattServerResponse.replayCache.firstOrNull() ?: emptyList()
-            val updatedList = existingValues + newValue
-            _gattServerResponse.emit(updatedList)
+            readCharacteristicResponseBytes.add(newValue)
+            _gattServerResponse.emit(ServerResponseState.readSuccess(readCharacteristicResponseBytes))
         }
     }
 

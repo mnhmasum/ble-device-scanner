@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mnh.blescanner.devicedetails.usecase.DeviceDetailsUseCase
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +24,8 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
         detailsUseCase.bleGattConnectionResult()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
 
-    val gattServerResponse: Flow<List<ByteArray>> = detailsUseCase.gattServerResponse()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val gattServerResponse: Flow<ServerResponseState<List<ByteArray>>> = detailsUseCase.gattServerResponse()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ServerResponseState.loading())
 
     fun connect(address: String) {
         viewModelScope.launch(Dispatchers.IO) {

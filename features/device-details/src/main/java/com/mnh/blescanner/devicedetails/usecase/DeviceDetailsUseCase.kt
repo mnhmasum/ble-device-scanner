@@ -2,6 +2,7 @@ package com.mnh.blescanner.devicedetails.usecase
 
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
 import com.napco.utils.DataState
+import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +45,7 @@ class DeviceDetailsUseCase @Inject constructor(private val deviceDetailsReposito
             .flowOn(Dispatchers.IO)
             .map { it }
 
-    fun gattServerResponse(): Flow<List<ByteArray>> =
+    fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> =
         deviceDetailsRepository.gattServerResponse().flowOn(Dispatchers.IO).map { it }
 
 }

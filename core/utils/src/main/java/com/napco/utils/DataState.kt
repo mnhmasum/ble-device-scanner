@@ -20,15 +20,22 @@ sealed class DataState<T> {
 }
 
 sealed class ServerResponseState<T> {
+    class Loading<T> : ServerResponseState<T>()
     data class ReadSuccess<T>(var data: T) : ServerResponseState<T>()
     data class WriteSuccess<T>(var data: T) : ServerResponseState<T>()
+    data class NotifySuccess<T>(var data: T) : ServerResponseState<T>()
     companion object {
         fun <T> readSuccess(data: T): ServerResponseState<T> =
             ServerResponseState.ReadSuccess(data)
 
         fun <T> writeSuccess(data: T): ServerResponseState<T> =
-            ServerResponseState.ReadSuccess(data)
+            ServerResponseState.writeSuccess(data)
 
+        fun <T> notifySuccess(data: T): ServerResponseState<T> =
+            ServerResponseState.notifySuccess(data)
+
+        fun <T> loading(): ServerResponseState<T> =
+            ServerResponseState.Loading()
 
     }
 }

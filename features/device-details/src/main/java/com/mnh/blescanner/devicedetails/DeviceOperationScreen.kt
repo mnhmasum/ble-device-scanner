@@ -4,19 +4,25 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.napco.utils.Constants
 import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
 
 @Composable
@@ -33,7 +40,7 @@ fun DeviceOperationScreen(
 ) {
     val detailsViewModel: DetailsViewModel = hiltViewModel()
     val serverResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
-        initialValue = emptyList()
+        initialValue = ServerResponseState.loading()
     )
 
     BackHandler {
@@ -42,15 +49,15 @@ fun DeviceOperationScreen(
 
     Properties(
         deviceOperationScreen,
-        { serverResponse },
+        serverResponse,
         onClickRead = {
             detailsViewModel.readCharacteristic(deviceOperationScreen)
         },
         onClickWrite = {
-            detailsViewModel.writeCharacteristic(deviceOperationScreen, "")
+            detailsViewModel.writeCharacteristic(deviceOperationScreen, it)
         },
         onClickWriteWithoutResponse = {
-            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen, "")
+            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen, it)
         },
         onClickNotification = {
             detailsViewModel.enableNotification(deviceOperationScreen)
@@ -64,10 +71,10 @@ fun DeviceOperationScreen(
 @Composable
 fun Properties(
     deviceOperationScreen: DeviceOperationScreen,
-    serverResponse: () -> List<ByteArray>,
+    serverResponse: ServerResponseState<List<ByteArray>>,
     onClickRead: () -> Unit,
-    onClickWrite: () -> Unit,
-    onClickWriteWithoutResponse: () -> Unit,
+    onClickWrite: (String) -> Unit,
+    onClickWriteWithoutResponse: (String) -> Unit,
     onClickNotification: () -> Unit,
     onClickIndication: () -> Unit,
 ) {
@@ -91,6 +98,7 @@ fun Properties(
 
         WriteOperation(
             deviceOperationScreen,
+            serverResponse,
             onClickWrite,
             onClickWriteWithoutResponse
         )
@@ -104,11 +112,15 @@ fun Properties(
 @Composable
 private fun WriteOperation(
     deviceOperationScreen: DeviceOperationScreen,
-    onClickWrite: () -> Unit,
-    onClickWriteWithoutResponse: () -> Unit,
+    gattServerResponse: ServerResponseState<List<ByteArray>>,
+    onClickWrite: (String) -> Unit,
+    onClickWriteWithoutResponse: (String) -> Unit,
 ) {
+
+    var text by remember { mutableStateOf(TextFieldValue("")) }
+
     val isWritable = deviceOperationScreen.properties.any {
-        it.contains(Constants.CharType.WRITABLE.type)
+        it == Constants.CharType.WRITABLE.type
     }
 
     val isWritableNoResponse = deviceOperationScreen.properties.any {
@@ -121,30 +133,52 @@ private fun WriteOperation(
 
     OperationTitle("WRITE")
 
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+        },
+        placeholder = { Text("ex: D1 D2 D3") },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
     Row {
         if (isWritable) {
-            Button(onClick = onClickWrite) {
+            Button(onClick = { onClickWrite(text.text) }) {
                 Text(text = "WRITE")
             }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
 
         if (isWritableNoResponse) {
-            Button(onClick = onClickWriteWithoutResponse) {
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = { onClickWriteWithoutResponse(text.text) }) {
                 Text(text = "WRITE WITH NO RESPONSE")
             }
         }
     }
 
     Spacer(modifier = Modifier.height(20.dp))
+
+    when (gattServerResponse) {
+        is ServerResponseState.WriteSuccess -> gattServerResponse.data.forEach {
+            Text(text = Utility.bytesToHexString(it))
+        }
+
+        else -> {}
+    }
+
 }
 
 @Composable
 private fun OperationTitle(title: String) {
     BasicText(
-        text = title, style = TextStyle(
-            fontWeight = FontWeight.Bold, fontSize = 16.sp
+        text = title,
+        style = TextStyle(
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
         )
     )
     Divider(
@@ -155,7 +189,7 @@ private fun OperationTitle(title: String) {
 @Composable
 private fun ReadAndNotifyIndicationOperation(
     deviceOperationScreen: DeviceOperationScreen,
-    gattServerResponse: () -> List<ByteArray>,
+    gattServerResponse: ServerResponseState<List<ByteArray>>,
     onClickRead: () -> Unit,
     onClickNotification: () -> Unit,
     onClickIndication: () -> Unit,
@@ -189,19 +223,38 @@ private fun ReadAndNotifyIndicationOperation(
 
         }
 
-        BasicText(text = "Response:")
-        ResponseList(gattServerResponse = gattServerResponse)
-        Spacer(modifier = Modifier.height(20.dp))
+        ResponseView(gattServerResponse)
 
     }
 
 }
 
 @Composable
-fun ResponseList(gattServerResponse: () -> List<ByteArray>) {
-    gattServerResponse.invoke().forEach {
-        Text(text = Utility.bytesToHexString(it))
+private fun ResponseView(gattServerResponse: ServerResponseState<List<ByteArray>>) {
+    BasicText(text = "Response:")
+    ResponseList(gattServerResponse = gattServerResponse)
+    Spacer(modifier = Modifier.height(20.dp))
+}
+
+@Composable
+fun ResponseList(gattServerResponse: ServerResponseState<List<ByteArray>>) {
+
+    when (gattServerResponse) {
+
+        is ServerResponseState.NotifySuccess -> {
+            gattServerResponse.data.forEach {
+                Text(text = Utility.bytesToHexString(it))
+            }
+        }
+
+        is ServerResponseState.ReadSuccess -> gattServerResponse.data.forEach {
+            Text(text = Utility.bytesToHexString(it))
+        }
+
+        else -> {}
+
     }
+
 }
 
 @Composable
@@ -210,8 +263,3 @@ private fun RowItem(title: String, value: String) {
     BasicText(text = value)
     Spacer(modifier = Modifier.height(16.dp))
 }
-
-
-
-
-
