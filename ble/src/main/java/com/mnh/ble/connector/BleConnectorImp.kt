@@ -49,14 +49,15 @@ class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGat
         _gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
+        disconnect()
         readCharacteristicResponseBytes.clear()
         writeCharacteristicResponseBytes.clear()
-        _bluetoothGatt?.close()
         getDevice(address)?.connectGatt(context, false, this)
     }
 
     override fun disconnect() {
         _bluetoothGatt?.disconnect()
+        _bluetoothGatt?.close()
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
