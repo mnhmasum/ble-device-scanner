@@ -1,4 +1,4 @@
-package com.mnh.blescanner.devicedetails
+package com.mnh.blescanner.deviceoperation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -38,7 +38,7 @@ fun DeviceOperationScreen(
     navController: NavController,
     deviceOperationScreen: DeviceOperationScreen,
 ) {
-    val detailsViewModel: DetailsViewModel = hiltViewModel()
+    val detailsViewModel: DeviceOperationViewModel = hiltViewModel()
     val serverResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
         initialValue = ServerResponseState.loading()
     )
