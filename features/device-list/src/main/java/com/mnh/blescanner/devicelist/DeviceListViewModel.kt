@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
+class DeviceListViewModel @Inject constructor(private val bleUseCase: BleUseCase) :
     ViewModel() {
     val scannedDeviceList: Flow<List<ScanResult>> =
         bleUseCase.getBleDeviceList()

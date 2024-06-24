@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
 import com.mnh.blescanner.devicelist.DeviceListScreen
+import com.mnh.blescanner.deviceoperation.DeviceOperationScreen
 import com.napco.utils.DeviceDetailsScreen
 import com.napco.utils.DeviceListScreen
 import com.napco.utils.DeviceOperationScreen
@@ -27,7 +28,7 @@ fun Navigation() {
 
         composable<DeviceOperationScreen> {
             val args: DeviceOperationScreen = it.toRoute<DeviceOperationScreen>()
-            com.mnh.blescanner.deviceoperation.DeviceOperationScreen(navController, args)
+            DeviceOperationScreen(navController, args)
         }
     }
 }

@@ -28,9 +28,9 @@ import com.napco.utils.DeviceDetailsScreen
 
 @Composable
 fun DeviceListScreen(navController: NavController) {
-    val homeViewModel: HomeViewModel = hiltViewModel()
+    val deviceListViewModel: DeviceListViewModel = hiltViewModel()
 
-    val bleScannedDeviceList by homeViewModel.scannedDeviceList.collectAsStateWithLifecycle(
+    val bleScannedDeviceList by deviceListViewModel.scannedDeviceList.collectAsStateWithLifecycle(
         emptyList()
     )
 
@@ -42,12 +42,12 @@ fun DeviceListScreen(navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        homeViewModel.startScanning()
+        deviceListViewModel.startScanning()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            homeViewModel.stopScanning()
+            deviceListViewModel.stopScanning()
         }
     }
 
