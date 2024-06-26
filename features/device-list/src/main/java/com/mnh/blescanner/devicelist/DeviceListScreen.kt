@@ -3,8 +3,8 @@ package com.mnh.blescanner.devicelist
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,9 +17,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -74,11 +79,9 @@ fun DeviceList(
     val bleDeviceList = scanResults ?: emptyList()
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(
-            bleDeviceList.size,
+        items(bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
-            DeviceItem(
-                itemIndex,
+            DeviceItem(itemIndex,
                 bleDeviceList[itemIndex],
                 onClickConnect = { onClickConnect(itemIndex) })
         }
@@ -95,34 +98,40 @@ fun DeviceItem(
     val device = scanResult.device
     val rssi = scanResult.rssi
 
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(all = 8.dp)
             .background(
-                color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(8.dp)
-            )
+                color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(8.dp)
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.padding(all = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .weight(1f)
+        ) {
             Text(
-                modifier = Modifier.padding(bottom = 8.dp),
-                text = device.name ?: "Unknown"
+                text = device.name ?: "Unknown", style = TextStyle(
+                    fontSize = 18.sp, fontWeight = FontWeight.SemiBold
+                )
             )
-
             Text(
-                modifier = Modifier.padding(vertical = 4.dp),
-                text = device.address
+                modifier = Modifier.padding(vertical = 2.dp),
+                text = device.address,
+                style = TextStyle(fontSize = 12.sp, color = Color.Gray)
             )
-
             Text(
-                modifier = Modifier.padding(vertical = 4.dp),
-                text = "RSSI $rssi"
+                modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
             )
+        }
 
-            Button(onClick = { onClickConnect(index) }) {
-                Text("Connect")
-            }
+        Button(
+            onClick = { onClickConnect(index) },
+            shape = RoundedCornerShape(16),
+        ) {
+            Text("Connect")
         }
     }
 
