@@ -66,7 +66,7 @@ fun MainContentBody(
     deviceList: List<ScanResult>?,
     onClickConnect: (index: Int) -> Unit,
 ) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(8.dp)) {
         DeviceList(scanResults = deviceList, onClickConnect)
     }
 }
@@ -101,7 +101,7 @@ fun DeviceItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(8.dp)
             ),
@@ -130,6 +130,7 @@ fun DeviceItem(
         Button(
             onClick = { onClickConnect(index) },
             shape = RoundedCornerShape(16),
+            modifier = Modifier.padding(end = 8.dp)
         ) {
             Text("Connect")
         }
