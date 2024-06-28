@@ -3,7 +3,7 @@ package com.mnh.blescanner.devicelist
 import android.bluetooth.le.ScanResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnh.ble.usecase.BleUseCase
+import com.mnh.blescanner.devicelist.usecase.BleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

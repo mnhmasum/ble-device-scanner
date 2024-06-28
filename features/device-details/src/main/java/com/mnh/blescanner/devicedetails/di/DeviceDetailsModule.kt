@@ -1,6 +1,6 @@
 package com.mnh.blescanner.devicedetails.di
 
-import com.mnh.ble.connector.BleConnector
+import com.mnh.ble.connector.BleConnectionManager
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepositoryImp
 import dagger.Module
@@ -11,12 +11,12 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class DetailsModule {
+class DeviceDetailsModule {
 
     @Provides
     @Singleton
-    fun providePeripheralDetailsRepositoryImpl(bleConnector: BleConnector): DeviceDetailsRepository {
-        return DeviceDetailsRepositoryImp(bleConnector)
+    fun provideDeviceDetailsRepositoryImpl(bleConnectionManager: BleConnectionManager): DeviceDetailsRepository {
+        return DeviceDetailsRepositoryImp(bleConnectionManager)
     }
 
 }

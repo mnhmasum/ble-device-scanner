@@ -6,7 +6,7 @@ import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
-interface BleConnector {
+interface BleConnectionManager {
     fun connect(address: String)
     fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>>
     fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>>

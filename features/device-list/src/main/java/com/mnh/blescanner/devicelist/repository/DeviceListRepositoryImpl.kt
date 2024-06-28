@@ -1,14 +1,13 @@
-package com.mnh.ble.repository
+package com.mnh.blescanner.devicelist.repository
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
-import com.mnh.ble.connector.BleConnector
 import com.mnh.ble.scanner.BleScanner
 import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("MissingPermission")
-class BleRepositoryImp(private val bleSource: BleScanner, private val bleConnector: BleConnector) :
-    BleRepository {
+class DeviceListRepositoryImpl(private val bleSource: BleScanner) :
+    DeviceListRepository {
 
     override fun getScannedDeviceList(): Flow<List<ScanResult>> {
         return bleSource.scanResults

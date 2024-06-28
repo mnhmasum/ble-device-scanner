@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class BleConnectorImp(private val context: Context) : BleConnector, BluetoothGattCallback() {
+class BleConnectionManagerImp(private val context: Context) : BleConnectionManager, BluetoothGattCallback() {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 

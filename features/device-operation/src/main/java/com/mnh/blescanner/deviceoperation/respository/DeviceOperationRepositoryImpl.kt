@@ -1,40 +1,40 @@
 package com.mnh.blescanner.deviceoperation.respository
 
-import com.mnh.ble.connector.BleConnector
+import com.mnh.ble.connector.BleConnectionManager
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
-class DeviceOperationRepositoryImp(private val bleConnector: BleConnector) :
+class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnectionManager) :
     DeviceOperationRepository {
     override fun connect(address: String) {
-        bleConnector.connect(address)
+        bleConnectionManager.connect(address)
     }
 
     override fun disconnect() {
-        bleConnector.disconnect()
+        bleConnectionManager.disconnect()
     }
 
     override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
-        return bleConnector.bleGattConnectionResult()
+        return bleConnectionManager.bleGattConnectionResult()
     }
 
     override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> {
-        return bleConnector.gattServerResponse()
+        return bleConnectionManager.gattServerResponse()
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
-        bleConnector.enableNotification(serviceUUID, characteristicUUID)
+        bleConnectionManager.enableNotification(serviceUUID, characteristicUUID)
     }
 
     override fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID) {
-        bleConnector.enableIndication(serviceUUID, characteristicUUID)
+        bleConnectionManager.enableIndication(serviceUUID, characteristicUUID)
     }
 
     override fun readCharacteristic(service: UUID, characteristic: UUID) {
-        bleConnector.readCharacteristic(service, characteristic)
+        bleConnectionManager.readCharacteristic(service, characteristic)
     }
 
     override fun writeCharacteristic(
@@ -42,7 +42,7 @@ class DeviceOperationRepositoryImp(private val bleConnector: BleConnector) :
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        bleConnector.writeCharacteristic(serviceUUID, characteristicUUID, bytes)
+        bleConnectionManager.writeCharacteristic(serviceUUID, characteristicUUID, bytes)
     }
 
     override fun writeCharacteristicWithNoResponse(
@@ -50,6 +50,6 @@ class DeviceOperationRepositoryImp(private val bleConnector: BleConnector) :
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        bleConnector.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, bytes)
+        bleConnectionManager.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, bytes)
     }
 }

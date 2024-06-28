@@ -1,8 +1,8 @@
 package com.mnh.blescanner.deviceoperation.di
 
-import com.mnh.ble.connector.BleConnector
+import com.mnh.ble.connector.BleConnectionManager
 import com.mnh.blescanner.deviceoperation.respository.DeviceOperationRepository
-import com.mnh.blescanner.deviceoperation.respository.DeviceOperationRepositoryImp
+import com.mnh.blescanner.deviceoperation.respository.DeviceOperationRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,8 +15,8 @@ class DeviceOperationModule {
 
     @Provides
     @Singleton
-    fun providePeripheralDetailsRepositoryImpl(bleConnector: BleConnector): DeviceOperationRepository {
-        return DeviceOperationRepositoryImp(bleConnector)
+    fun providePeripheralDetailsRepositoryImpl(bleConnectionManager: BleConnectionManager): DeviceOperationRepository {
+        return DeviceOperationRepositoryImpl(bleConnectionManager)
     }
 
 }
