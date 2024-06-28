@@ -5,7 +5,7 @@ import com.napco.utils.DataState
 import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.flow.Flow
 
-class DeviceDetailsRepositoryImp(private val bleConnectionManager: BleConnectionManager) :
+class DeviceDetailsRepositoryImpl(private val bleConnectionManager: BleConnectionManager) :
     DeviceDetailsRepository {
     override fun connect(address: String) {
         bleConnectionManager.connect(address)

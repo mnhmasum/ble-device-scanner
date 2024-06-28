@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 
 
 @SuppressLint("MissingPermission")
-class BleScannerImp(
+class BleScannerImpl(
     private val bluetoothLeScanner: BluetoothLeScanner,
     private val deviceList: MutableMap<String, ScanResult> = mutableMapOf(),
     private val channel: Channel<List<ScanResult>> = Channel(Channel.BUFFERED),

@@ -2,7 +2,7 @@ package com.mnh.blescanner.devicedetails.di
 
 import com.mnh.ble.connector.BleConnectionManager
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
-import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepositoryImp
+import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +16,7 @@ class DeviceDetailsModule {
     @Provides
     @Singleton
     fun provideDeviceDetailsRepositoryImpl(bleConnectionManager: BleConnectionManager): DeviceDetailsRepository {
-        return DeviceDetailsRepositoryImp(bleConnectionManager)
+        return DeviceDetailsRepositoryImpl(bleConnectionManager)
     }
 
 }

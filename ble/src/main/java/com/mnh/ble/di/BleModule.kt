@@ -9,7 +9,7 @@ import android.content.SharedPreferences
 import com.mnh.ble.connector.BleConnectionManager
 import com.mnh.ble.connector.BleConnectionManagerImp
 import com.mnh.ble.scanner.BleScanner
-import com.mnh.ble.scanner.BleScannerImp
+import com.mnh.ble.scanner.BleScannerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,7 +58,7 @@ class BleModule {
         sharedPreferences: SharedPreferences,
     ): BleScanner {
 
-        return BleScannerImp(bluetoothLeScanner)
+        return BleScannerImpl(bluetoothLeScanner)
     }
 
     @Provides
