@@ -1,6 +1,6 @@
 package com.mnh.blescanner.deviceoperation.respository
 
-import com.mnh.ble.connector.BleConnectionManager
+import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails

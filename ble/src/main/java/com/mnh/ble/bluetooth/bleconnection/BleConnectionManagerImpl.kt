@@ -1,4 +1,4 @@
-package com.mnh.ble.connector
+package com.mnh.ble.bluetooth.bleconnection
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class BleConnectionManagerImp(private val context: Context) : BleConnectionManager, BluetoothGattCallback() {
+class BleConnectionManagerImpl(private val context: Context) : BleConnectionManager, BluetoothGattCallback() {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 

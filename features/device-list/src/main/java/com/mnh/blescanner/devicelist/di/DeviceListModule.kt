@@ -1,6 +1,6 @@
 package com.mnh.blescanner.devicelist.di
 
-import com.mnh.ble.scanner.BleScanner
+import com.mnh.ble.bluetooth.scanner.BleScanner
 import com.mnh.blescanner.devicelist.repository.DeviceListRepository
 import com.mnh.blescanner.devicelist.repository.DeviceListRepositoryImpl
 import dagger.Module

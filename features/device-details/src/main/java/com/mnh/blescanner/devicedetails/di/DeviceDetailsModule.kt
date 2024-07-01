@@ -1,6 +1,6 @@
 package com.mnh.blescanner.devicedetails.di
 
-import com.mnh.ble.connector.BleConnectionManager
+import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepositoryImpl
 import dagger.Module

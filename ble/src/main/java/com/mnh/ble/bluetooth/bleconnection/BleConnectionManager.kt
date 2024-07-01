@@ -1,4 +1,4 @@
-package com.mnh.ble.connector
+package com.mnh.ble.bluetooth.bleconnection
 
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
