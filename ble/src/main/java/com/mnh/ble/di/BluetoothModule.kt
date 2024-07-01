@@ -23,12 +23,6 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreference(@ApplicationContext appContext: Context): SharedPreferences {
-        return appContext.getSharedPreferences("threshold_key", Context.MODE_PRIVATE)
-    }
-
-    @Provides
-    @Singleton
     fun provideNotificationManager(@ApplicationContext appContext: Context): NotificationManager {
         return appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
