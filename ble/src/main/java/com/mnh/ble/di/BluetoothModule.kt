@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
-import android.content.SharedPreferences
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.mnh.ble.bluetooth.scanner.BleScanner
@@ -47,11 +46,7 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideBleScannerDataSourceImp(
-        bluetoothLeScanner: BluetoothLeScanner,
-        sharedPreferences: SharedPreferences,
-    ): BleScanner {
-
+    fun provideBleScannerDataSourceImp(bluetoothLeScanner: BluetoothLeScanner): BleScanner {
         return BleScannerImpl(bluetoothLeScanner)
     }
 

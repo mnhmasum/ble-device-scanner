@@ -58,7 +58,9 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
     }
 
     DisposableEffect(Unit) {
-        onDispose { }
+        onDispose {
+           //detailsViewModel.disconnect()
+        }
     }
 
     BackHandler {

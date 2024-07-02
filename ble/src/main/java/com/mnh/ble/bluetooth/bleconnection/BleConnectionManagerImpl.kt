@@ -36,17 +36,17 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    private var _bluetoothGatt: BluetoothGatt? = null
-    private val _gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
-    private val _gattServerResponse = MutableSharedFlow<ServerResponseState<List<ByteArray>>>()
+    private var bluetoothGatt: BluetoothGatt? = null
+    private val gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
+    private val gattServerResponse = MutableSharedFlow<ServerResponseState<List<ByteArray>>>()
     private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
     private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
 
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
-        _gattConnectionResult.asSharedFlow()
+        gattConnectionResult.asSharedFlow()
 
     override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> =
-        _gattServerResponse.asSharedFlow()
+        gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
         disconnect()
@@ -56,8 +56,8 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
     }
 
     override fun disconnect() {
-        _bluetoothGatt?.disconnect()
-        _bluetoothGatt?.close()
+        bluetoothGatt?.disconnect()
+        bluetoothGatt?.close()
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
@@ -73,8 +73,8 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
     }
 
     override fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID) {
-        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
-            _bluetoothGatt?.readCharacteristic(it)
+        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+            bluetoothGatt?.readCharacteristic(it)
         }
     }
 
@@ -83,7 +83,7 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
             writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
         }
     }
@@ -93,7 +93,7 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
             writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
         }
     }
@@ -105,10 +105,10 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
     ) {
         gattCharacteristic.writeType = writeType
         if (Build.VERSION.SDK_INT >= 33) {
-            _bluetoothGatt?.writeCharacteristic(gattCharacteristic, bytes, writeType)
+            bluetoothGatt?.writeCharacteristic(gattCharacteristic, bytes, writeType)
         } else {
             gattCharacteristic.value = bytes
-            _bluetoothGatt?.writeCharacteristic(gattCharacteristic)
+            bluetoothGatt?.writeCharacteristic(gattCharacteristic)
         }
     }
 
@@ -123,16 +123,16 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         characteristicUUID: UUID,
         value: ByteArray,
     ) {
-        _bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
+        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
             ?.let { characteristic ->
-                _bluetoothGatt?.setCharacteristicNotification(characteristic, true)
+                bluetoothGatt?.setCharacteristicNotification(characteristic, true)
                 characteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
                     ?.let { descriptor ->
                         if (Build.VERSION.SDK_INT >= 33) {
-                            _bluetoothGatt?.writeDescriptor(descriptor, value)
+                            bluetoothGatt?.writeDescriptor(descriptor, value)
                         } else {
                             descriptor.value = value
-                            _bluetoothGatt?.writeDescriptor(descriptor)
+                            bluetoothGatt?.writeDescriptor(descriptor)
                         }
                     }
             }
@@ -142,8 +142,8 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         super.onConnectionStateChange(gatt, status, newState)
         when (newState) {
             BluetoothProfile.STATE_CONNECTED -> {
-                _bluetoothGatt = gatt
-                _bluetoothGatt?.discoverServices()
+                bluetoothGatt = gatt
+                bluetoothGatt?.discoverServices()
             }
 
             BluetoothProfile.STATE_DISCONNECTED -> {
@@ -173,7 +173,7 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
 
         val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
-        _gattConnectionResult.emit(DataState.success(details))
+        gattConnectionResult.emit(DataState.success(details))
     }
 
     private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> =
@@ -206,7 +206,7 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 writeCharacteristicResponseBytes.add(characteristic.value)
-                _gattServerResponse.emit(
+                gattServerResponse.emit(
                     ServerResponseState.writeSuccess(
                         writeCharacteristicResponseBytes
                     )
@@ -271,7 +271,7 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             readCharacteristicResponseBytes.add(newValue)
-            _gattServerResponse.emit(
+            gattServerResponse.emit(
                 ServerResponseState.notifySuccess(
                     readCharacteristicResponseBytes
                 )
@@ -287,14 +287,14 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         logD("Characteristic Value: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             readCharacteristicResponseBytes.add(newValue)
-            _gattServerResponse.emit(ServerResponseState.readSuccess(readCharacteristicResponseBytes))
+            gattServerResponse.emit(ServerResponseState.readSuccess(readCharacteristicResponseBytes))
         }
     }
 
     private fun updateConnectionStatus() {
         scope.launch {
             val throwable = Throwable("Error: Disconnected")
-            _gattConnectionResult.emit(DataState.error("Disconnected", throwable))
+            gattConnectionResult.emit(DataState.error("Disconnected", throwable))
         }
     }
 }

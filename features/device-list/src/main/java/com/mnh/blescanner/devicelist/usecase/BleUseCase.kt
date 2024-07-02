@@ -27,7 +27,7 @@ class BleUseCase @Inject constructor(private val deviceListRepository: com.mnh.b
         deviceListRepository.startScanning()
     }
 
-    suspend fun stopScanning() {
+    fun stopScanning() {
         deviceListRepository.stopScanning()
     }
 
