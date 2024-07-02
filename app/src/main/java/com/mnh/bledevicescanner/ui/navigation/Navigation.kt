@@ -1,6 +1,9 @@
 package com.mnh.bledevicescanner.ui.navigation
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,7 +18,7 @@ import com.napco.utils.DeviceOperationScreen
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-
+    BackHandler(navController) // Custom back handler
     NavHost(navController = navController, startDestination = DeviceListScreen) {
         composable<DeviceListScreen> {
             DeviceListScreen(navController)
@@ -29,6 +32,18 @@ fun Navigation() {
         composable<DeviceOperationScreen> {
             val args: DeviceOperationScreen = it.toRoute<DeviceOperationScreen>()
             DeviceOperationScreen(navController, args)
+        }
+    }
+}
+
+@Composable
+fun BackHandler(navController: NavController) {
+    val context = LocalContext.current
+    val activity = (context as? Activity)
+
+    androidx.activity.compose.BackHandler {
+        if (!navController.popBackStack()) {
+            activity?.finish()
         }
     }
 }
