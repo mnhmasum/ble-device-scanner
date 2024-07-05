@@ -1,4 +1,4 @@
-package com.mnh.ble.bluetooth.scanner
+package com.mnh.ble.bluetooth.blescanner
 
 import android.bluetooth.le.ScanResult
 import kotlinx.coroutines.flow.Flow

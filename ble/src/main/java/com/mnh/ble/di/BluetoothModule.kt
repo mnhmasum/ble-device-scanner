@@ -7,8 +7,8 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
-import com.mnh.ble.bluetooth.scanner.BleScanner
-import com.mnh.ble.bluetooth.scanner.BleScannerImpl
+import com.mnh.ble.bluetooth.blescanner.BleScanner
+import com.mnh.ble.bluetooth.blescanner.BleScannerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

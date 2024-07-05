@@ -1,4 +1,4 @@
-package com.mnh.ble.bluetooth.scanner
+package com.mnh.ble.bluetooth.blescanner
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.BluetoothLeScanner

@@ -2,7 +2,7 @@ package com.mnh.blescanner.devicelist.repository
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
-import com.mnh.ble.bluetooth.scanner.BleScanner
+import com.mnh.ble.bluetooth.blescanner.BleScanner
 import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("MissingPermission")

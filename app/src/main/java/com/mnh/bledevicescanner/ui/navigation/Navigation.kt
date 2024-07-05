@@ -18,7 +18,7 @@ import com.napco.utils.DeviceOperationScreen
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-    BackHandler(navController) // Custom back handler
+    BackHandler(navController)
     NavHost(navController = navController, startDestination = DeviceListScreen) {
         composable<DeviceListScreen> {
             DeviceListScreen(navController)
