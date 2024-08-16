@@ -48,6 +48,11 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.kotlinx.serialization.json)
 
+    testImplementation(libs.mockito.core) // Use the latest version
+
+    testImplementation(libs.mockito.kotlin) // Use the latest version
+
+    testImplementation(kotlin("test"))
     implementation(project(":core:utils"))
 
 }

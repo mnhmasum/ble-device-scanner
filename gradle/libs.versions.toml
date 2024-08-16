@@ -12,6 +12,9 @@ composeBom = "2023.10.01"
 hilt-android = "2.50"
 lifecycle-viewmodel-compose = "2.4.0"
 lifecycleService = "2.7.0"
+mockitoCore = "1.10.19"
+mockitoCoreVersion = "5.3.1"
+mockitoKotlin = "5.0.0"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 roomCommon = "2.6.1"
@@ -57,6 +60,8 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "nav_version" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
