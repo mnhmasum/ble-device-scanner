@@ -18,6 +18,7 @@ class BleScannerImpl(
     private val channel: Channel<List<ScanResult>> = Channel(Channel.BUFFERED),
     private val logger: (String) -> Unit = { message -> Log.d("BLE_Connector", message) },
     private val close: (Throwable) -> Unit = { throwable -> channel.close(throwable) },
+    private val settings: ScanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build(),
 ) : BleScanner,
     ScanCallback() {
 
@@ -40,8 +41,6 @@ class BleScannerImpl(
     }
 
     override fun startScanning() {
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
-            .build()
         bluetoothLeScanner.startScan(null, settings, this)
     }
 
