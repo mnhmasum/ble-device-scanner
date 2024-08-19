@@ -26,10 +26,14 @@ class BleScannerImpl(
 
     override fun onScanResult(callbackType: Int, result: ScanResult?) {
         if (result != null) {
-            deviceList[result.device.address] = result
-            trySend(deviceList.values.toList())
-            logger("onScanResult: ${deviceList.values.toList()}")
+            //deviceList[result.device.address] = result
+            //trySend(deviceList.values.toList())
+            //logger("onScanResult: ${deviceList.values.toList()}")
         }
+    }
+
+    fun getDeviceList(): MutableMap<String, ScanResult> {
+        return deviceList;
     }
 
     override fun onScanFailed(errorCode: Int) {

@@ -54,5 +54,6 @@ dependencies {
 
     testImplementation(kotlin("test"))
     implementation(project(":core:utils"))
+    testImplementation ("io.mockk:mockk:1.13.7")
 
 }
