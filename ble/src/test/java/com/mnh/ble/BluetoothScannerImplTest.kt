@@ -6,11 +6,14 @@ import android.bluetooth.le.ScanSettings
 import com.mnh.ble.bluetooth.blescanner.BleScannerImpl
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import kotlin.test.assertEquals
 
 
 class BluetoothScannerImplTest {
@@ -34,32 +37,49 @@ class BluetoothScannerImplTest {
     @Test
     fun testStopScanning() {
         bleScannerImpl.stopScanning()
-
-        // Verify that stopScan is called with the ScanCallback instance
         verify(bluetoothLeScanner).stopScan(bleScannerImpl)
     }
 
+
     @Test
-    fun testOnScanResult(): Unit = runBlocking {
-        val deviceAddress = "00:11:22:33:44:55"
+    fun testOnScanResult() {
+        val deviceAddress = "00:1B:2D:D1:32:11"
+
         every { scanResult.device.address } returns deviceAddress
-        every { scanResult.device } returns mockk()
-        // Trigger onScanResult
+
         bleScannerImpl.onScanResult(1, scanResult)
 
-        // Verify deviceList contains result
-        /*val expectedDeviceList = listOf(scanResult)
+        assertEquals(scanResult.device.address, deviceAddress)
+
+        val deviceList: MutableMap<String, ScanResult> = mutableMapOf()
+
+        deviceList[deviceAddress] = scanResult
+
+        assertEquals(deviceList[deviceAddress], scanResult)
+
+    }
+
+    @Test
+    fun testOnScanResultWithCoroutine(): Unit = runBlocking {
+        val deviceAddress = "00:1A:7D:DA:71:13"
+
+        every { scanResult.device.address } returns deviceAddress
+
+        bleScannerImpl.onScanResult(1, scanResult)
+
+        val expectedDeviceList = listOf(scanResult)
+
         val actualDeviceList = mutableListOf<List<ScanResult>>()
 
-        // Collect results from channel
         launch {
             bleScannerImpl.scanResults.take(1).collect {
                 actualDeviceList.add(it)
             }
         }.join()
 
-        assertEquals(expectedDeviceList, actualDeviceList.first())*/
-        //verify { logger("onScanResult: $expectedDeviceList") }
+        assertEquals(expectedDeviceList, actualDeviceList.first())
+
     }
+
 
 }
