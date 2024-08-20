@@ -5,7 +5,6 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -16,7 +15,6 @@ class BleScannerImpl(
     private val bluetoothLeScanner: BluetoothLeScanner,
     private val deviceList: MutableMap<String, ScanResult> = mutableMapOf(),
     private val channel: Channel<List<ScanResult>> = Channel(Channel.BUFFERED),
-    private val logger: (String) -> Unit = { message -> Log.d("BLE_Connector", message) },
     private val close: (Throwable) -> Unit = { throwable -> channel.close(throwable) },
     private val settings: ScanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build(),
 ) : BleScanner,
@@ -26,14 +24,9 @@ class BleScannerImpl(
 
     override fun onScanResult(callbackType: Int, result: ScanResult?) {
         if (result != null) {
-            //deviceList[result.device.address] = result
-            //trySend(deviceList.values.toList())
-            //logger("onScanResult: ${deviceList.values.toList()}")
+            deviceList[result.device.address] = result
+            trySend(deviceList.values.toList())
         }
-    }
-
-    fun getDeviceList(): MutableMap<String, ScanResult> {
-        return deviceList;
     }
 
     override fun onScanFailed(errorCode: Int) {
