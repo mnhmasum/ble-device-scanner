@@ -52,8 +52,8 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideBleConnector(@ApplicationContext appContext: Context): BleConnectionManager {
-        return BleConnectionManagerImpl(appContext)
+    fun provideBleConnector(@ApplicationContext appContext: Context, bluetoothAdapter: BluetoothAdapter): BleConnectionManager {
+        return BleConnectionManagerImpl(appContext, bluetoothAdapter)
     }
 
 }

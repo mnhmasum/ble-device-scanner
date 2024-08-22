@@ -1,13 +1,13 @@
 package com.mnh.ble.bluetooth.bleconnection
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
-import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.Build
@@ -32,7 +32,9 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class BleConnectionManagerImpl(private val context: Context) : BleConnectionManager, BluetoothGattCallback() {
+class BleConnectionManagerImpl(private val context: Context, private val bluetoothAdapter: BluetoothAdapter) :
+    BleConnectionManager,
+    BluetoothGattCallback() {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
@@ -49,7 +51,6 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
-        disconnect()
         readCharacteristicResponseBytes.clear()
         writeCharacteristicResponseBytes.clear()
         getDevice(address)?.connectGatt(context, false, this)
@@ -112,11 +113,8 @@ class BleConnectionManagerImpl(private val context: Context) : BleConnectionMana
         }
     }
 
-    private fun provideBluetoothManager(): BluetoothManager =
-        context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-
     private fun getDevice(address: String): BluetoothDevice? =
-        provideBluetoothManager().adapter.getRemoteDevice(address)
+        bluetoothAdapter.getRemoteDevice(address)
 
     private fun enableNotificationOrIndication(
         serviceUUID: UUID,
