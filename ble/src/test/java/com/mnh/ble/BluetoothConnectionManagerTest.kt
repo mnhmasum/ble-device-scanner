@@ -1,32 +1,39 @@
 package com.mnh.ble
 
-import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
-import io.mockk.mockk
 import org.junit.Before
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.verify
 import kotlin.test.Test
 
 
 class BluetoothConnectionManagerTest {
-    private lateinit var bleConnectionManagerImpl: BleConnectionManagerImpl
-    private var bluetoothGatt: BluetoothGatt = mock()
 
-    private val context: Context = mockk()
+    private var mockContext: Context = mock()
+
+    private  var mockBluetoothAdapter: BluetoothAdapter = mock()
+
+    private lateinit  var bleConnectionManager: BleConnectionManagerImpl
 
     @Before
     fun setUp() {
-        bleConnectionManagerImpl = BleConnectionManagerImpl(context)
-
+        bleConnectionManager = BleConnectionManagerImpl(mockContext, mockBluetoothAdapter)
     }
 
     @Test
-    fun testBLEConnection() {
-        bleConnectionManagerImpl.connect("abcd")
-        verify(bluetoothGatt).disconnect()
-    }
+    fun testConnectCallConnectGattWithBLEDevice() {
+        val bluetoothLEDevice = mock(BluetoothDevice::class.java)
 
+        Mockito.`when`(mockBluetoothAdapter.getRemoteDevice(anyString())).thenReturn(bluetoothLEDevice)
+
+        bleConnectionManager.connect(anyString())
+
+        Mockito.verify(bluetoothLEDevice).connectGatt(any(), Mockito.eq(false), any())
+    }
 
 }

@@ -32,7 +32,10 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class BleConnectionManagerImpl(private val context: Context, private val bluetoothAdapter: BluetoothAdapter) :
+class BleConnectionManagerImpl(
+    private val context: Context,
+    private val bluetoothAdapter: BluetoothAdapter,
+) :
     BleConnectionManager,
     BluetoothGattCallback() {
     private val job = Job()
@@ -53,7 +56,7 @@ class BleConnectionManagerImpl(private val context: Context, private val bluetoo
     override fun connect(address: String) {
         readCharacteristicResponseBytes.clear()
         writeCharacteristicResponseBytes.clear()
-        getDevice(address)?.connectGatt(context, false, this)
+        bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
     }
 
     override fun disconnect() {
