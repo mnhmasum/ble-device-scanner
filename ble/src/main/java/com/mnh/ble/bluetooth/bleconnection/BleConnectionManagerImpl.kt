@@ -2,7 +2,6 @@ package com.mnh.ble.bluetooth.bleconnection
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
@@ -116,9 +115,6 @@ class BleConnectionManagerImpl(
         }
     }
 
-    private fun getDevice(address: String): BluetoothDevice? =
-        bluetoothAdapter.getRemoteDevice(address)
-
     private fun enableNotificationOrIndication(
         serviceUUID: UUID,
         characteristicUUID: UUID,
@@ -140,7 +136,6 @@ class BleConnectionManagerImpl(
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-        super.onConnectionStateChange(gatt, status, newState)
         when (newState) {
             BluetoothProfile.STATE_CONNECTED -> {
                 bluetoothGatt = gatt
@@ -155,7 +150,6 @@ class BleConnectionManagerImpl(
     }
 
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-        super.onServicesDiscovered(gatt, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 emitAttributes(gatt)
@@ -192,7 +186,6 @@ class BleConnectionManagerImpl(
         descriptor: BluetoothGattDescriptor,
         status: Int,
     ) {
-        super.onDescriptorWrite(gatt, descriptor, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             // When descriptor is written successfully
         }
@@ -203,7 +196,6 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         status: Int,
     ) {
-        super.onCharacteristicWrite(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 writeCharacteristicResponseBytes.add(characteristic.value)
@@ -221,7 +213,6 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         newValue: ByteArray,
     ) {
-        super.onCharacteristicChanged(gatt, characteristic, newValue)
         handleCharacteristicChange(characteristic, newValue)
     }
 
@@ -233,7 +224,6 @@ class BleConnectionManagerImpl(
         gatt: BluetoothGatt?,
         characteristic: BluetoothGattCharacteristic?,
     ) {
-        super.onCharacteristicChanged(gatt, characteristic)
         characteristic?.value?.let { newValue ->
             handleCharacteristicChange(characteristic, newValue)
         }
@@ -245,7 +235,6 @@ class BleConnectionManagerImpl(
         newValue: ByteArray,
         status: Int,
     ) {
-        super.onCharacteristicRead(gatt, characteristic, newValue, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             handleCharacteristicRead(characteristic, newValue)
         }
@@ -257,7 +246,6 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic?,
         status: Int,
     ) {
-        super.onCharacteristicRead(gatt, characteristic, status)
         if (status == BluetoothGatt.GATT_SUCCESS) {
             characteristic?.value?.let { newValue ->
                 handleCharacteristicRead(characteristic, newValue)
