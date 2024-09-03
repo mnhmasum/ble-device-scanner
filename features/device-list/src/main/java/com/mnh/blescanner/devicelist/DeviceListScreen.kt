@@ -120,7 +120,7 @@ fun DeviceItem(
             Text(
                 modifier = Modifier.padding(vertical = 2.dp),
                 text = device.address,
-                style = TextStyle(fontSize = 12.sp, color = Color.Gray)
+                style = TextStyle(fontSize = 12.sp, color = Color.DarkGray)
             )
             Text(
                 modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
