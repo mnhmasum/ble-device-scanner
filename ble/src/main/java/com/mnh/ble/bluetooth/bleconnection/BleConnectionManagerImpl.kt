@@ -23,7 +23,6 @@ import com.napco.utils.model.DeviceInfo
 import com.napco.utils.model.Service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -33,12 +32,11 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class BleConnectionManagerImpl(
     private val context: Context,
-    private val bluetoothAdapter: BluetoothAdapter,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    private val bluetoothAdapter: BluetoothAdapter
 ) :
     BleConnectionManager,
     BluetoothGattCallback() {
-    private val job = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private var bluetoothGatt: BluetoothGatt? = null
     private val gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
