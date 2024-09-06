@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -33,13 +34,12 @@ import java.util.UUID
 class BleConnectionManagerImpl(
     private val context: Context,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
-    private val bluetoothAdapter: BluetoothAdapter
-) :
-    BleConnectionManager,
-    BluetoothGattCallback() {
+    private val bluetoothAdapter: BluetoothAdapter,
+    private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
+) : BleConnectionManager, BluetoothGattCallback() {
 
     private var bluetoothGatt: BluetoothGatt? = null
-    private val gattConnectionResult = MutableSharedFlow<DataState<DeviceDetails>>()
+
     private val gattServerResponse = MutableSharedFlow<ServerResponseState<List<ByteArray>>>()
     private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
     private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
@@ -57,6 +57,7 @@ class BleConnectionManagerImpl(
     }
 
     override fun disconnect() {
+        gattConnectionResult.drop(1)
         bluetoothGatt?.disconnect()
         bluetoothGatt?.close()
     }
@@ -156,6 +157,9 @@ class BleConnectionManagerImpl(
     }
 
     private suspend fun emitAttributes(peripheralGatt: BluetoothGatt) {
+
+        println("start emitting")
+
         val serviceCharacteristicsMap = extractServicesWithCharacteristics(peripheralGatt.services)
 
         val deviceInfo = DeviceInfo(
@@ -163,10 +167,12 @@ class BleConnectionManagerImpl(
             address = peripheralGatt.device.address,
             generalInfo = "${peripheralGatt.device.bondState}"
         )
-
         val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
         gattConnectionResult.emit(DataState.success(details))
+
+        println("end emitting")
+
     }
 
     private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> =
@@ -284,4 +290,6 @@ class BleConnectionManagerImpl(
             gattConnectionResult.emit(DataState.error("Disconnected", throwable))
         }
     }
+
+
 }
