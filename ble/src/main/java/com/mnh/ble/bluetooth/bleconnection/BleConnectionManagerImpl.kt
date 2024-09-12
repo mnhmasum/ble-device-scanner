@@ -44,6 +44,14 @@ class BleConnectionManagerImpl(
     private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
     private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
 
+    fun setBluetoothGatt(gatt: BluetoothGatt) {
+        this.bluetoothGatt = gatt
+    }
+
+    fun getBluetoothGatt(): BluetoothGatt? {
+        return bluetoothGatt
+    }
+
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         gattConnectionResult.asSharedFlow()
 
@@ -137,7 +145,7 @@ class BleConnectionManagerImpl(
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         when (newState) {
             BluetoothProfile.STATE_CONNECTED -> {
-                bluetoothGatt = gatt
+                setBluetoothGatt(gatt)
                 bluetoothGatt?.discoverServices()
             }
 
