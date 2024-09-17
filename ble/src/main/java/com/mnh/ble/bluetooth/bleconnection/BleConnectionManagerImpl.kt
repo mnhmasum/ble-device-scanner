@@ -48,7 +48,7 @@ class BleConnectionManagerImpl(
         this.bluetoothGatt = gatt
     }
 
-    fun getBluetoothGatt(): BluetoothGatt? {
+    override fun getBluetoothGatt(): BluetoothGatt? {
         return bluetoothGatt
     }
 
@@ -89,13 +89,15 @@ class BleConnectionManagerImpl(
     }
 
     override fun writeCharacteristic(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
+        characteristic: BluetoothGattCharacteristic?,
         bytes: ByteArray,
     ) {
-        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
-            writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-        }
+        writeCharacteristic(
+            characteristic,
+            bytes,
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
+
     }
 
     override fun writeCharacteristicWithNoResponse(
@@ -109,15 +111,15 @@ class BleConnectionManagerImpl(
     }
 
     private fun writeCharacteristic(
-        gattCharacteristic: BluetoothGattCharacteristic,
+        gattCharacteristic: BluetoothGattCharacteristic?,
         bytes: ByteArray,
         writeType: Int,
     ) {
-        gattCharacteristic.writeType = writeType
+        gattCharacteristic?.writeType = writeType
         if (Build.VERSION.SDK_INT >= 33) {
-            bluetoothGatt?.writeCharacteristic(gattCharacteristic, bytes, writeType)
+            gattCharacteristic?.let { bluetoothGatt?.writeCharacteristic(it, bytes, writeType) }
         } else {
-            gattCharacteristic.value = bytes
+            gattCharacteristic?.value = bytes
             bluetoothGatt?.writeCharacteristic(gattCharacteristic)
         }
     }

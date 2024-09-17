@@ -42,7 +42,11 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        bleConnectionManager.writeCharacteristic(serviceUUID, characteristicUUID, bytes)
+        val service = bleConnectionManager.getBluetoothGatt()?.getService(serviceUUID)
+        val characteristic = service?.getCharacteristic(characteristicUUID)
+        if (characteristic != null) {
+            bleConnectionManager.writeCharacteristic(characteristic, bytes)
+        }
     }
 
     override fun writeCharacteristicWithNoResponse(
@@ -50,6 +54,10 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        bleConnectionManager.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, bytes)
+        bleConnectionManager.writeCharacteristicWithNoResponse(
+            serviceUUID,
+            characteristicUUID,
+            bytes
+        )
     }
 }
