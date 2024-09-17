@@ -3,8 +3,10 @@ package com.mnh.ble
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.content.Context
+import android.os.Build
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.napco.utils.DataState
 import com.napco.utils.model.DeviceDetails
@@ -21,7 +23,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import java.util.UUID
 import kotlin.test.Test
 
 
@@ -106,39 +107,25 @@ class BluetoothConnectionManagerTest {
 
     @Test
     fun `test writeCharacteristic success`(): Unit = runBlocking {
-        val status = BluetoothGatt.GATT_SUCCESS
-
         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
+        val characteristics = mock(BluetoothGattCharacteristic::class.java)
 
-        val mockDevice = mock(BluetoothDevice::class.java)
-
-        Mockito.`when`(mockBluetoothGatt.device).thenReturn(mockDevice)
-
-        Mockito.`when`(mockBluetoothGatt.device.name).thenReturn("abc")
-        Mockito.`when`(mockBluetoothGatt.device.address).thenReturn("address")
-        Mockito.`when`(mockBluetoothGatt.device.bondState).thenReturn(0)
-
-        val job = launch {
-
-            val result = bleConnectionManager.bleGattConnectionResult().take(1).toList()
-
-            println(result.toString())
-
-            val expected =
-                "[Success(data=DeviceDetails(deviceInfo=DeviceInfo(name=abc, address=address, generalInfo=0), services={}))]"
-
-            assertEquals(expected, result.toString())
-
-        }
-
-        val serviceID = UUID.randomUUID()
-        val characteristicsID = UUID.randomUUID()
         val byte = ByteArray(3)
 
-        bleConnectionManager.writeCharacteristic(serviceID, characteristicsID, byte)
+        bleConnectionManager.setBluetoothGatt(mockBluetoothGatt)
 
-        job.join()
+        bleConnectionManager.writeCharacteristic(characteristics, byte)
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            Mockito.verify(mockBluetoothGatt).writeCharacteristic(
+                characteristics,
+                byte,
+                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            )
+        } else {
+            Mockito.verify(mockBluetoothGatt).writeCharacteristic(characteristics)
+        }
+
     }
-
 
 }
