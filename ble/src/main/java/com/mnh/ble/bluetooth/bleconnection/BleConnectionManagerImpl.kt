@@ -33,14 +33,13 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class BleConnectionManagerImpl(
     private val context: Context,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
     private val bluetoothAdapter: BluetoothAdapter,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
     private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
+    private val gattServerResponse: MutableSharedFlow<ServerResponseState<List<ByteArray>>> = MutableSharedFlow(),
 ) : BleConnectionManager, BluetoothGattCallback() {
 
     private var bluetoothGatt: BluetoothGatt? = null
-
-    private val gattServerResponse = MutableSharedFlow<ServerResponseState<List<ByteArray>>>()
     private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
     private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
 
@@ -206,14 +205,7 @@ class BleConnectionManagerImpl(
         status: Int,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            scope.launch {
-                writeCharacteristicResponseBytes.add(characteristic.value)
-                gattServerResponse.emit(
-                    ServerResponseState.writeSuccess(
-                        writeCharacteristicResponseBytes
-                    )
-                )
-            }
+            writeCharacteristicResponseBytes.add(characteristic.value)
         }
     }
 
