@@ -167,9 +167,6 @@ class BleConnectionManagerImpl(
     }
 
     private suspend fun emitAttributes(peripheralGatt: BluetoothGatt) {
-
-        println("start emitting")
-
         val serviceCharacteristicsMap = extractServicesWithCharacteristics(peripheralGatt.services)
 
         val deviceInfo = DeviceInfo(
@@ -180,8 +177,6 @@ class BleConnectionManagerImpl(
         val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
         gattConnectionResult.emit(DataState.success(details))
-
-        println("end emitting")
 
     }
 
