@@ -9,6 +9,7 @@ import android.content.Context
 import android.os.Build
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.napco.utils.DataState
+import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.CoroutineScope
@@ -39,14 +40,18 @@ class BluetoothConnectionManagerTest {
     private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> =
         MutableSharedFlow(replay = 1)
 
+    private val gattServerResponse: MutableSharedFlow<ServerResponseState<List<ByteArray>>> =
+        MutableSharedFlow(replay = 1)
+
     @Before
     fun setUp() {
         bleConnectionManager =
             BleConnectionManagerImpl(
                 mockContext,
-                scope = mockScope,
                 mockBluetoothAdapter,
-                gattConnectionResult = gattConnectionResult
+                scope = mockScope,
+                gattConnectionResult = gattConnectionResult,
+                gattServerResponse = gattServerResponse
             )
     }
 
@@ -110,21 +115,42 @@ class BluetoothConnectionManagerTest {
         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
         val characteristics = mock(BluetoothGattCharacteristic::class.java)
 
-        val byte = ByteArray(3)
+        val bytes = ByteArray(3)
 
         bleConnectionManager.setBluetoothGatt(mockBluetoothGatt)
 
-        bleConnectionManager.writeCharacteristic(characteristics, byte)
+        bleConnectionManager.writeCharacteristic(characteristics, bytes)
 
         if (Build.VERSION.SDK_INT >= 33) {
             Mockito.verify(mockBluetoothGatt).writeCharacteristic(
                 characteristics,
-                byte,
+                bytes,
                 BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
             )
         } else {
             Mockito.verify(mockBluetoothGatt).writeCharacteristic(characteristics)
         }
+
+        val job = launch {
+            val result = bleConnectionManager.gattServerResponse().take(1)
+
+            println(result.toString())
+
+            val expected = "abc"
+
+            assertEquals(expected, result.toString())
+
+        }
+
+        job.join()
+
+        characteristics.value = bytes
+
+        bleConnectionManager.onCharacteristicWrite(
+            mockBluetoothGatt,
+            characteristics,
+            BluetoothGatt.GATT_SUCCESS
+        )
 
     }
 
