@@ -205,7 +205,14 @@ class BleConnectionManagerImpl(
         status: Int,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            writeCharacteristicResponseBytes.add(characteristic.value)
+            scope.launch {
+                writeCharacteristicResponseBytes.add(characteristic.value)
+                gattServerResponse.emit(
+                    ServerResponseState.writeSuccess(
+                        writeCharacteristicResponseBytes
+                    )
+                )
+            }
         }
     }
 
