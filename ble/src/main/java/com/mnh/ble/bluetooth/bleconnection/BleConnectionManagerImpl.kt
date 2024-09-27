@@ -25,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
@@ -37,11 +38,11 @@ class BleConnectionManagerImpl(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
     private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
     private val gattServerResponse: MutableSharedFlow<ServerResponseState<List<ByteArray>>> = MutableSharedFlow(),
+    private val writeCharacteristicResponseBytes: ArrayList<ByteArray> = ArrayList(),
 ) : BleConnectionManager, BluetoothGattCallback() {
 
     private var bluetoothGatt: BluetoothGatt? = null
     private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
-    private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
 
     fun setBluetoothGatt(gatt: BluetoothGatt) {
         this.bluetoothGatt = gatt
@@ -54,7 +55,7 @@ class BleConnectionManagerImpl(
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         gattConnectionResult.asSharedFlow()
 
-    override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> =
+    override fun gattServerResponse(): SharedFlow<ServerResponseState<List<ByteArray>>> =
         gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
@@ -208,9 +209,7 @@ class BleConnectionManagerImpl(
             scope.launch {
                 writeCharacteristicResponseBytes.add(characteristic.value)
                 gattServerResponse.emit(
-                    ServerResponseState.writeSuccess(
-                        writeCharacteristicResponseBytes
-                    )
+                    ServerResponseState.writeSuccess(writeCharacteristicResponseBytes)
                 )
             }
         }
