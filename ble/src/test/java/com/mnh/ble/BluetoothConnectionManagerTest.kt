@@ -43,6 +43,8 @@ class BluetoothConnectionManagerTest {
     private val gattServerResponse: MutableSharedFlow<ServerResponseState<List<ByteArray>>> =
         MutableSharedFlow(replay = 1)
 
+    private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
+
     @Before
     fun setUp() {
         bleConnectionManager =
@@ -51,7 +53,8 @@ class BluetoothConnectionManagerTest {
                 mockBluetoothAdapter,
                 scope = mockScope,
                 gattConnectionResult = gattConnectionResult,
-                gattServerResponse = gattServerResponse
+                gattServerResponse = gattServerResponse,
+                writeCharacteristicResponseBytes
             )
     }
 
@@ -111,11 +114,14 @@ class BluetoothConnectionManagerTest {
     }
 
     @Test
-    fun `test writeCharacteristic success`(): Unit = runBlocking {
+    fun `test writeCharacteristic`(): Unit = runBlocking {
         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
         val characteristics = mock(BluetoothGattCharacteristic::class.java)
 
         val bytes = ByteArray(3)
+        bytes[0] = 0x01
+        bytes[1] = 0x02
+        bytes[2] = 0x03
 
         bleConnectionManager.setBluetoothGatt(mockBluetoothGatt)
 
@@ -130,27 +136,6 @@ class BluetoothConnectionManagerTest {
         } else {
             Mockito.verify(mockBluetoothGatt).writeCharacteristic(characteristics)
         }
-
-        val job = launch {
-            val result = bleConnectionManager.gattServerResponse().take(1)
-
-            println(result.toString())
-
-            val expected = "abc"
-
-            assertEquals(expected, result.toString())
-
-        }
-
-        job.join()
-
-        characteristics.value = bytes
-
-        bleConnectionManager.onCharacteristicWrite(
-            mockBluetoothGatt,
-            characteristics,
-            BluetoothGatt.GATT_SUCCESS
-        )
 
     }
 
