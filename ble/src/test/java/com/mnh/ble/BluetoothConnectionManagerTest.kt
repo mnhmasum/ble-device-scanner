@@ -178,4 +178,45 @@ class BluetoothConnectionManagerTest {
 
     }
 
+    @Test
+    fun `test characteristic change response`(): Unit = runBlocking {
+        val mockBluetoothGatt = mock(BluetoothGatt::class.java)
+        val characteristics = mock(BluetoothGattCharacteristic::class.java)
+
+        val bytes = ByteArray(3)
+        bytes[0] = 0x01
+        bytes[1] = 0x02
+        bytes[2] = 0x03
+
+        val job = launch {
+            bleConnectionManager.gattServerResponse().take(1).collect {
+
+                when (it) {
+                    is ServerResponseState.Loading -> {}
+
+                    is ServerResponseState.NotifySuccess -> {
+                        assertEquals(bytes, it.data[0])
+                    }
+
+                    is ServerResponseState.ReadSuccess -> {}
+                    is ServerResponseState.WriteSuccess -> {}
+                }
+            }
+
+        }
+
+        characteristics.value = bytes
+        writeCharacteristicResponseBytes.add(bytes)
+
+        bleConnectionManager.onCharacteristicChanged(
+            mockBluetoothGatt,
+            characteristics,
+            bytes
+        )
+
+        job.join()
+        job.cancel()
+
+    }
+
 }
