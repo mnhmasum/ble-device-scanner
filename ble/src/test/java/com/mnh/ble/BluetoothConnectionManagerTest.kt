@@ -231,15 +231,13 @@ class BluetoothConnectionManagerTest {
 
         val job = launch {
             bleConnectionManager.gattServerResponse().take(1).collect {
-
                 when (it) {
                     is ServerResponseState.Loading -> {}
-
-                    is ServerResponseState.NotifySuccess -> {
-
+                    is ServerResponseState.NotifySuccess -> {}
+                    is ServerResponseState.ReadSuccess -> {
+                        assertEquals(bytes, it.data[0])
                     }
 
-                    is ServerResponseState.ReadSuccess -> { assertEquals(bytes, it.data[0]) }
                     is ServerResponseState.WriteSuccess -> {}
                 }
             }
