@@ -113,17 +113,23 @@ fun DeviceItem(
                 .weight(1f)
         ) {
             Text(
-                text = device.name ?: "Unknown", style = TextStyle(
-                    fontSize = 18.sp, fontWeight = FontWeight.SemiBold
+                text = device.name ?: "Unknown",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             )
             Text(
                 modifier = Modifier.padding(vertical = 2.dp),
                 text = device.address,
-                style = TextStyle(fontSize = 12.sp, color = Color.DarkGray)
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
+                )
             )
             Text(
-                modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
+                modifier = Modifier.padding(top = 8.dp),
+                text = "RSSI $rssi"
             )
         }
 
