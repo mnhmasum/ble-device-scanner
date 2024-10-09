@@ -3,13 +3,16 @@ package com.mnh.blescanner.devicelist
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,9 +69,14 @@ fun MainContentBody(
     deviceList: List<ScanResult>?,
     onClickConnect: (index: Int) -> Unit,
 ) {
-    Column(modifier = Modifier.padding(8.dp)) {
-        DeviceList(scanResults = deviceList, onClickConnect)
+    if (deviceList.isNullOrEmpty()) {
+        Loader()
+    } else {
+        Column(modifier = Modifier.padding(8.dp)) {
+            DeviceList(scanResults = deviceList, onClickConnect)
+        }
     }
+
 }
 
 @Composable
@@ -77,7 +85,6 @@ fun DeviceList(
     onClickConnect: (listIndex: Int) -> Unit,
 ) {
     val bleDeviceList = scanResults ?: emptyList()
-
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
@@ -142,6 +149,17 @@ fun DeviceItem(
         }
     }
 
+}
+
+@Composable
+fun Loader() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp), contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
 }
 
 @Preview(showBackground = true)
