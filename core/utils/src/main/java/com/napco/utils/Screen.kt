@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 object DeviceListScreen
 
 @Serializable
-data class DeviceDetailsScreen(val macAddress: String)
+data class DeviceDetailsScreen(val deviceName: String, val macAddress: String)
 
 @Serializable
 data class DeviceOperationScreen(

@@ -14,11 +14,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -44,10 +49,11 @@ import com.napco.utils.model.Service
 
 
 @Composable
-fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
+fun ServiceDetailsScreen(navController: NavController, deviceName: String, deviceAddress: String) {
     val isAlreadyConnected = rememberSaveable { mutableStateOf(false) }
 
     val detailsViewModel: DetailsViewModel = hiltViewModel()
+
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
         initialValue = DataState.Loading()
     )
@@ -69,7 +75,31 @@ fun ServiceDetailsScreen(navController: NavController, deviceAddress: String) {
         navController.navigateUp()
     }
 
-    ServiceDetails(navController, connectionResult)
+    Scaffold(topBar = {
+        MyTopBar(deviceName = deviceName, onNavigationIconClick = { navController.navigateUp() })
+    }) { paddingValues ->
+        Box(
+            modifier = Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
+            )
+        ) {
+            ServiceDetails(navController, connectionResult)
+        }
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
+    TopAppBar(title = { Text(deviceName) }, navigationIcon = {
+        IconButton(onClick = onNavigationIconClick) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+        }
+    })
 }
 
 @Composable
@@ -84,15 +114,15 @@ private fun ServiceDetails(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDetails) {
     val services = deviceDetails.services.toList()
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp), horizontalAlignment = Alignment.Start
+        modifier = Modifier.fillMaxSize()
     ) {
+
         items(services, key = { it.first.uuid }) { service ->
             ServiceItem(service, onNavigateCharacteristic = { characteristic ->
                 navController.navigate(
@@ -145,8 +175,7 @@ private fun CharacteristicItem(
         Column(modifier = Modifier.weight(3f)) {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList,
-                style = TextStyle(fontSize = 13.sp)
+                text = characteristic.acceptedPropertyList, style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
@@ -154,7 +183,7 @@ private fun CharacteristicItem(
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = null,
-                tint = Color.Gray // Set your desired icon color here
+                tint = Color.Gray
             )
 
         }

@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.mnh.bledevicescanner.core.theme.AppTheme
 import com.napco.utils.DeviceDetailsScreen
 
+@SuppressLint("MissingPermission")
 @Composable
 fun DeviceListScreen(navController: NavController) {
     val deviceListViewModel: DeviceListViewModel = hiltViewModel()
@@ -44,8 +45,9 @@ fun DeviceListScreen(navController: NavController) {
 
     val onClickConnect: (Int) -> Unit = remember(bleScannedDeviceList) {
         { selectedIndex ->
+            val deviceName: String = bleScannedDeviceList[selectedIndex].device?.name ?: ""
             val deviceAddress: String = bleScannedDeviceList[selectedIndex].device?.address ?: ""
-            navController.navigate(DeviceDetailsScreen(deviceAddress))
+            navController.navigate(DeviceDetailsScreen(deviceName, deviceAddress))
         }
     }
 
