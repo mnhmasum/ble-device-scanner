@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,10 +60,9 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     )
 
     LaunchedEffect(deviceAddress) {
-        if (!isAlreadyConnected.value) {
-            detailsViewModel.connect(deviceAddress)
-            isAlreadyConnected.value = true
-        }
+        detailsViewModel.connect(deviceAddress)
+        isAlreadyConnected.value = true
+
     }
 
     DisposableEffect(Unit) {
@@ -76,7 +76,7 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     }
 
     Scaffold(topBar = {
-        MyTopBar(deviceName = deviceName, onNavigationIconClick = { navController.navigateUp() })
+        TopBar(deviceName = deviceName, onNavigationIconClick = { navController.navigateUp() })
     }) { paddingValues ->
         Box(
             modifier = Modifier.padding(
@@ -86,7 +86,9 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
                 bottom = paddingValues.calculateBottomPadding()
             )
         ) {
-            ServiceDetails(navController, connectionResult)
+            ServiceDetails(navController, connectionResult, onClickReconnect = {
+                detailsViewModel.connect(deviceAddress)
+            })
         }
     }
 
@@ -94,7 +96,7 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
+fun TopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
     TopAppBar(title = { Text(deviceName) }, navigationIcon = {
         IconButton(onClick = onNavigationIconClick) {
             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -106,11 +108,12 @@ fun MyTopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
 private fun ServiceDetails(
     navController: NavController,
     connectionResult: DataState<DeviceDetails>,
+    onClickReconnect: () -> Unit,
 ) {
     when (connectionResult) {
         is DataState.Loading -> Loader()
         is DataState.Success -> DeviceDetailsContent(navController, connectionResult.data)
-        is DataState.Error -> DisconnectedMessage()
+        is DataState.Error -> DisconnectedMessage(onClickReconnect)
     }
 }
 
@@ -202,9 +205,21 @@ fun Loader() {
 }
 
 @Composable
-fun DisconnectedMessage() {
-    Text(
-        text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
-    )
+fun DisconnectedMessage(onClickReconnect: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+        )
+        IconButton(onClick = onClickReconnect) {
+            Icon(Icons.Default.Refresh, contentDescription = "Reconnect")
+        }
+
+    }
+
 }
 
