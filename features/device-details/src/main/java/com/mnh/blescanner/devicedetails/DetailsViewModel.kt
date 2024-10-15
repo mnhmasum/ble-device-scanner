@@ -23,6 +23,7 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
 
     fun connect(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            detailsUseCase.bleGattConnectionResult()
             detailsUseCase.connect(address)
         }
     }
