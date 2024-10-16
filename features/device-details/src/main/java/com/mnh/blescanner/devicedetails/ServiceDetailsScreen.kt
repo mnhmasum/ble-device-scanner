@@ -117,7 +117,6 @@ private fun ServiceDetails(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDetails) {
     val services = deviceDetails.services.toList()
