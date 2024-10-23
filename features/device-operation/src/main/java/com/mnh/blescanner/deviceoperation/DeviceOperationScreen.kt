@@ -1,7 +1,9 @@
 package com.mnh.blescanner.deviceoperation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,10 +11,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,25 +56,52 @@ fun DeviceOperationScreen(
         navController.navigateUp()
     }
 
-    Properties(
-        deviceOperationScreen,
-        serverResponse,
-        onClickRead = {
-            detailsViewModel.readCharacteristic(deviceOperationScreen)
-        },
-        onClickWrite = {
-            detailsViewModel.writeCharacteristic(deviceOperationScreen, it)
-        },
-        onClickWriteWithoutResponse = {
-            detailsViewModel.writeCharacteristicWithNoResponse(deviceOperationScreen, it)
-        },
-        onClickNotification = {
-            detailsViewModel.enableNotification(deviceOperationScreen)
-        },
-        onClickIndication = {
-            detailsViewModel.enableIndication(deviceOperationScreen)
-        })
+    Scaffold(topBar = {
+        TopBar(
+            deviceName = "Device Operation",
+            onNavigationIconClick = { navController.navigateUp() })
+    }) { paddingValues ->
+        DeviceOperationContent(
+            paddingValues = paddingValues,
+            deviceOperationScreen = deviceOperationScreen,
+            serverResponse = serverResponse,
+            detailsViewModel = detailsViewModel
+        )
+    }
 
+
+}
+
+@Composable
+private fun DeviceOperationContent(
+    paddingValues: PaddingValues,
+    deviceOperationScreen: DeviceOperationScreen,
+    serverResponse: ServerResponseState<List<ByteArray>>,
+    detailsViewModel: DeviceOperationViewModel,
+) {
+    val contentPadding = Modifier.padding(
+        start = 16.dp,
+        end = 16.dp,
+        top = paddingValues.calculateTopPadding(),
+        bottom = paddingValues.calculateBottomPadding()
+    )
+
+    Box(modifier = contentPadding) {
+        Properties(
+            deviceOperationScreen = deviceOperationScreen,
+            serverResponse = serverResponse,
+            onClickRead = { detailsViewModel.readCharacteristic(deviceOperationScreen) },
+            onClickWrite = { detailsViewModel.writeCharacteristic(deviceOperationScreen, it) },
+            onClickWriteWithoutResponse = {
+                detailsViewModel.writeCharacteristicWithNoResponse(
+                    deviceOperationScreen,
+                    it
+                )
+            },
+            onClickNotification = { detailsViewModel.enableNotification(deviceOperationScreen) },
+            onClickIndication = { detailsViewModel.enableIndication(deviceOperationScreen) }
+        )
+    }
 }
 
 @Composable
@@ -78,6 +114,7 @@ fun Properties(
     onClickNotification: () -> Unit,
     onClickIndication: () -> Unit,
 ) {
+
     Column(modifier = Modifier.padding(all = 16.dp)) {
 
         OperationTitle("PROPERTIES")
@@ -108,6 +145,17 @@ fun Properties(
 
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
+    TopAppBar(title = { Text(deviceName) }, navigationIcon = {
+        IconButton(onClick = onNavigationIconClick) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+        }
+    })
+}
+
 
 @Composable
 private fun WriteOperation(
