@@ -255,21 +255,23 @@ private fun ReadAndNotifyIndicationOperation(
     if (isNotifyAble || isSupportIndication || isReadable) {
         OperationTitle("READ/INDICATED VALUES")
 
+        val buttonPaddingEnd = Modifier.padding(end = 20.dp)
+
         Row {
             if (isNotifyAble) {
-                Button(onClick = onClickNotification, modifier = Modifier.padding(end = 20.dp)) {
+                Button(onClick = onClickNotification, modifier = buttonPaddingEnd) {
                     Text(text = "Notify")
                 }
             }
 
             if (isSupportIndication) {
-                Button(onClick = onClickIndication, modifier = Modifier.padding(end = 20.dp)) {
+                Button(onClick = onClickIndication, modifier = buttonPaddingEnd) {
                     Text(text = "Indication")
                 }
             }
 
             if (isReadable) {
-                Button(onClick = onClickRead, modifier = Modifier.padding(end = 20.dp)) {
+                Button(onClick = onClickRead, modifier = buttonPaddingEnd) {
                     Text(text = "Read")
                 }
             }
