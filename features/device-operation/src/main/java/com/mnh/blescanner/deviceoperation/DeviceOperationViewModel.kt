@@ -33,12 +33,6 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
         }
     }
 
-    fun disconnect() {
-        viewModelScope.launch(Dispatchers.IO) {
-            detailsUseCase.disconnect()
-        }
-    }
-
     private fun getUUIDs(
         serviceUUIDString: String,
         characteristicUUIDString: String,
