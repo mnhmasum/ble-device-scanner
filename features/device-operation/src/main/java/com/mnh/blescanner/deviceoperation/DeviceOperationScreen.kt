@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -57,8 +58,7 @@ fun DeviceOperationScreen(
     }
 
     Scaffold(topBar = {
-        TopBar(
-            deviceName = "Device Operation",
+        TopBar(deviceName = "Device Operation",
             onNavigationIconClick = { navController.navigateUp() })
     }) { paddingValues ->
         DeviceOperationContent(
@@ -87,20 +87,17 @@ private fun DeviceOperationContent(
     )
 
     Box(modifier = contentPadding) {
-        Properties(
-            deviceOperationScreen = deviceOperationScreen,
+        Properties(deviceOperationScreen = deviceOperationScreen,
             serverResponse = serverResponse,
             onClickRead = { detailsViewModel.readCharacteristic(deviceOperationScreen) },
             onClickWrite = { detailsViewModel.writeCharacteristic(deviceOperationScreen, it) },
             onClickWriteWithoutResponse = {
                 detailsViewModel.writeCharacteristicWithNoResponse(
-                    deviceOperationScreen,
-                    it
+                    deviceOperationScreen, it
                 )
             },
             onClickNotification = { detailsViewModel.enableNotification(deviceOperationScreen) },
-            onClickIndication = { detailsViewModel.enableIndication(deviceOperationScreen) }
-        )
+            onClickIndication = { detailsViewModel.enableIndication(deviceOperationScreen) })
     }
 }
 
@@ -134,10 +131,7 @@ fun Properties(
         )
 
         WriteOperation(
-            deviceOperationScreen,
-            serverResponse,
-            onClickWrite,
-            onClickWriteWithoutResponse
+            deviceOperationScreen, serverResponse, onClickWrite, onClickWriteWithoutResponse
         )
 
         OperationTitle("DESCRIPTORS")
@@ -181,13 +175,9 @@ private fun WriteOperation(
 
     OperationTitle("WRITE")
 
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-        },
-        placeholder = { Text("ex: D1 D2 D3") },
-        modifier = Modifier.fillMaxWidth()
+    OutlinedTextField(value = text, onValueChange = {
+        text = it
+    }, placeholder = { Text("ex: D1 D2 D3") }, modifier = Modifier.fillMaxWidth()
     )
 
     Spacer(modifier = Modifier.height(8.dp))
@@ -228,10 +218,8 @@ private fun WriteOperation(
 @Composable
 private fun OperationTitle(title: String) {
     BasicText(
-        text = title,
-        style = TextStyle(
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
+        text = title, style = TextStyle(
+            fontWeight = FontWeight.Bold, fontSize = 16.sp
         )
     )
     Divider(
@@ -297,13 +285,21 @@ fun ResponseList(gattServerResponse: ServerResponseState<List<ByteArray>>) {
     when (gattServerResponse) {
 
         is ServerResponseState.NotifySuccess -> {
-            gattServerResponse.data.forEach {
-                Text(text = Utility.bytesToHexString(it))
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(gattServerResponse.data.size,
+                    key = { index -> gattServerResponse.data[index].toString() }) { itemIndex ->
+                    Text(text = Utility.bytesToHexString(gattServerResponse.data[itemIndex]))
+                }
             }
         }
 
-        is ServerResponseState.ReadSuccess -> gattServerResponse.data.forEach {
-            Text(text = Utility.bytesToHexString(it))
+        is ServerResponseState.ReadSuccess -> {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(gattServerResponse.data.size,
+                    key = { index -> gattServerResponse.data[index][0] }) { itemIndex ->
+                    Text(text = Utility.bytesToHexString(gattServerResponse.data[itemIndex]))
+                }
+            }
         }
 
         else -> {}
