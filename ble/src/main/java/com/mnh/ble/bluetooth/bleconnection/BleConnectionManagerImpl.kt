@@ -35,14 +35,12 @@ import java.util.UUID
 class BleConnectionManagerImpl(
     private val context: Context,
     private val bluetoothAdapter: BluetoothAdapter,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
-    private val gattServerResponse: MutableSharedFlow<ServerResponseState<List<ByteArray>>> = MutableSharedFlow(),
-    private val writeCharacteristicResponseBytes: ArrayList<ByteArray> = ArrayList(),
+    private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow(),
 ) : BleConnectionManager, BluetoothGattCallback() {
 
     private var bluetoothGatt: BluetoothGatt? = null
-    private val readCharacteristicResponseBytes = ArrayList<ByteArray>()
 
     fun setBluetoothGatt(gatt: BluetoothGatt) {
         this.bluetoothGatt = gatt
@@ -55,12 +53,10 @@ class BleConnectionManagerImpl(
     override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         gattConnectionResult.asSharedFlow()
 
-    override fun gattServerResponse(): SharedFlow<ServerResponseState<List<ByteArray>>> =
+    override fun gattServerResponse(): SharedFlow<ServerResponseState<ByteArray>> =
         gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
-        readCharacteristicResponseBytes.clear()
-        writeCharacteristicResponseBytes.clear()
         bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
     }
 
@@ -207,9 +203,8 @@ class BleConnectionManagerImpl(
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
-                writeCharacteristicResponseBytes.add(characteristic.value)
                 gattServerResponse.emit(
-                    ServerResponseState.writeSuccess(writeCharacteristicResponseBytes)
+                    ServerResponseState.writeSuccess(characteristic.value)
                 )
             }
         }
@@ -266,12 +261,7 @@ class BleConnectionManagerImpl(
     ) {
         logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
-            readCharacteristicResponseBytes.add(newValue)
-            gattServerResponse.emit(
-                ServerResponseState.notifySuccess(
-                    readCharacteristicResponseBytes
-                )
-            )
+            gattServerResponse.emit(ServerResponseState.notifySuccess(newValue))
         }
     }
 
@@ -282,8 +272,7 @@ class BleConnectionManagerImpl(
         logD("Characteristic Read: ${characteristic.uuid}")
         logD("Characteristic Value: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
-            readCharacteristicResponseBytes.add(newValue)
-            gattServerResponse.emit(ServerResponseState.readSuccess(readCharacteristicResponseBytes))
+            gattServerResponse.emit(ServerResponseState.readSuccess(newValue))
         }
     }
 

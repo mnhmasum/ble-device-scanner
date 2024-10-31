@@ -12,7 +12,7 @@ interface BleConnectionManager {
     fun connect(address: String)
     fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>>
     fun getBluetoothGatt(): BluetoothGatt?
-    fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>>
+    fun gattServerResponse(): Flow<ServerResponseState<ByteArray>>
     fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
     fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID)
