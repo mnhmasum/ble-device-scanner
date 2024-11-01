@@ -45,7 +45,7 @@ class DeviceOperationUseCase @Inject constructor(private val deviceOperationRepo
             .flowOn(Dispatchers.IO)
             .map { it }
 
-    fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> =
-        deviceOperationRepository.gattServerResponse().flowOn(Dispatchers.IO).map { it }
+    fun gattServerResponse(): Flow<ServerResponseState<ByteArray>> =
+        deviceOperationRepository.gattServerResponse().flowOn(Dispatchers.IO)
 
 }

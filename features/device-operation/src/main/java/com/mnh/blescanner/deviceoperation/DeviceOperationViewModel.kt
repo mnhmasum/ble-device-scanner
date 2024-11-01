@@ -24,7 +24,7 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
         detailsUseCase.bleGattConnectionResult()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
 
-    val gattServerResponse: Flow<ServerResponseState<List<ByteArray>>> = detailsUseCase.gattServerResponse()
+    val gattServerResponse: Flow<ServerResponseState<ByteArray>> = detailsUseCase.gattServerResponse()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ServerResponseState.loading())
 
     fun connect(address: String) {

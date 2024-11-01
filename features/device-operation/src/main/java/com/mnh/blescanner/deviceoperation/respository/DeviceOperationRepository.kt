@@ -10,7 +10,7 @@ interface DeviceOperationRepository {
     fun connect(address: String)
     fun disconnect()
     fun getGattConnectionResult(): Flow<DataState<DeviceDetails>>
-    fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>>
+    fun     gattServerResponse(): Flow<ServerResponseState<ByteArray>>
     fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
     fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(service: UUID, characteristic: UUID)

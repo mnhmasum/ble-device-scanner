@@ -21,7 +21,7 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         return bleConnectionManager.bleGattConnectionResult()
     }
 
-    override fun gattServerResponse(): Flow<ServerResponseState<List<ByteArray>>> {
+    override fun gattServerResponse(): Flow<ServerResponseState<ByteArray>> {
         return bleConnectionManager.gattServerResponse()
     }
 
