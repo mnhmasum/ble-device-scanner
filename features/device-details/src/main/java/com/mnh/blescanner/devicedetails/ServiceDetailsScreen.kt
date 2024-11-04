@@ -78,14 +78,15 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     Scaffold(topBar = {
         TopBar(deviceName = deviceName, onNavigationIconClick = { navController.navigateUp() })
     }) { paddingValues ->
-        Box(
-            modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding()
-            )
-        ) {
+
+        val contentPadding = Modifier.padding(
+            start = 16.dp,
+            end = 16.dp,
+            top = paddingValues.calculateTopPadding(),
+            bottom = paddingValues.calculateBottomPadding()
+        )
+
+        Box(modifier = contentPadding) {
             ServiceDetails(navController, connectionResult, onClickReconnect = {
                 detailsViewModel.connect(deviceAddress)
             })
