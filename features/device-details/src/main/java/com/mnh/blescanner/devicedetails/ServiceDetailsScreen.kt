@@ -51,13 +51,13 @@ import com.napco.utils.model.Service
 
 @Composable
 fun ServiceDetailsScreen(navController: NavController, deviceName: String, deviceAddress: String) {
-    val isAlreadyConnected = rememberSaveable { mutableStateOf(false) }
-
     val detailsViewModel: DetailsViewModel = hiltViewModel()
 
     val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
         initialValue = DataState.Loading()
     )
+
+    val isAlreadyConnected = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(deviceAddress) {
         detailsViewModel.connect(deviceAddress)
