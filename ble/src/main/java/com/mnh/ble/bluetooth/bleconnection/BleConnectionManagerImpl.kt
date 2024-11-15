@@ -259,7 +259,7 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         newValue: ByteArray,
     ) {
-        logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
+        //logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             gattServerResponse.emit(ServerResponseState.notifySuccess(newValue))
         }
