@@ -15,7 +15,6 @@ import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
 import com.napco.utils.Utility.Companion.extractCharacteristicInfo
-import com.napco.utils.Utility.Companion.logD
 import com.napco.utils.Utility.Companion.logI
 import com.napco.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
@@ -259,7 +258,6 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         newValue: ByteArray,
     ) {
-        //logD("Characteristic Changed: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             gattServerResponse.emit(ServerResponseState.notifySuccess(newValue))
         }
@@ -269,8 +267,6 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         newValue: ByteArray,
     ) {
-        logD("Characteristic Read: ${characteristic.uuid}")
-        logD("Characteristic Value: ${Utility.bytesToHexString(newValue)}")
         scope.launch {
             gattServerResponse.emit(ServerResponseState.readSuccess(newValue))
         }
