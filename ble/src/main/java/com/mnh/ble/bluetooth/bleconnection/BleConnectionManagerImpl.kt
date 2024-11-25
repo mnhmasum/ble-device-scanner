@@ -169,6 +169,7 @@ class BleConnectionManagerImpl(
             address = peripheralGatt.device.address,
             generalInfo = "${peripheralGatt.device.bondState}"
         )
+
         val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
         gattConnectionResult.emit(DataState.success(details))
@@ -214,7 +215,7 @@ class BleConnectionManagerImpl(
         characteristic: BluetoothGattCharacteristic,
         newValue: ByteArray,
     ) {
-        handleCharacteristicChange(characteristic, newValue)
+        handleCharacteristicChange(characteristic)
     }
 
     @Deprecated(
@@ -223,11 +224,9 @@ class BleConnectionManagerImpl(
     )
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt?,
-        characteristic: BluetoothGattCharacteristic?,
+        characteristic: BluetoothGattCharacteristic,
     ) {
-        characteristic?.value?.let { newValue ->
-            handleCharacteristicChange(characteristic, newValue)
-        }
+        handleCharacteristicChange(characteristic)
     }
 
     override fun onCharacteristicRead(
@@ -237,38 +236,30 @@ class BleConnectionManagerImpl(
         status: Int,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            handleCharacteristicRead(characteristic, newValue)
+            handleCharacteristicRead(characteristic)
         }
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCharacteristicRead(
         gatt: BluetoothGatt?,
-        characteristic: BluetoothGattCharacteristic?,
+        characteristic: BluetoothGattCharacteristic,
         status: Int,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            characteristic?.value?.let { newValue ->
-                handleCharacteristicRead(characteristic, newValue)
-            }
+            handleCharacteristicRead(characteristic)
         }
     }
 
-    private fun handleCharacteristicChange(
-        characteristic: BluetoothGattCharacteristic,
-        newValue: ByteArray,
-    ) {
+    private fun handleCharacteristicChange(characteristic: BluetoothGattCharacteristic) {
         scope.launch {
-            gattServerResponse.emit(ServerResponseState.notifySuccess(newValue))
+            gattServerResponse.emit(ServerResponseState.notifySuccess(characteristic.value))
         }
     }
 
-    private fun handleCharacteristicRead(
-        characteristic: BluetoothGattCharacteristic,
-        newValue: ByteArray,
-    ) {
+    private fun handleCharacteristicRead(characteristic: BluetoothGattCharacteristic) {
         scope.launch {
-            gattServerResponse.emit(ServerResponseState.readSuccess(newValue))
+            gattServerResponse.emit(ServerResponseState.readSuccess(characteristic.value))
         }
     }
 
