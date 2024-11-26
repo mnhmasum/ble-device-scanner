@@ -124,19 +124,50 @@ class BleConnectionManagerImpl(
         characteristicUUID: UUID,
         value: ByteArray,
     ) {
-        bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
-            ?.let { characteristic ->
-                bluetoothGatt?.setCharacteristicNotification(characteristic, true)
-                characteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)
-                    ?.let { descriptor ->
-                        if (Build.VERSION.SDK_INT >= 33) {
-                            bluetoothGatt?.writeDescriptor(descriptor, value)
-                        } else {
-                            descriptor.value = value
-                            bluetoothGatt?.writeDescriptor(descriptor)
-                        }
-                    }
+        setupCharacteristicNotification(bluetoothGatt, serviceUUID, characteristicUUID, value)
+    }
+
+    private fun setupCharacteristicNotification(
+        bluetoothGatt: BluetoothGatt?,
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+        value: ByteArray,
+    ) {
+        val characteristic = getCharacteristic(bluetoothGatt, serviceUUID, characteristicUUID)
+        characteristic?.let {
+            enableNotification(bluetoothGatt, it)
+            writeDescriptor(bluetoothGatt, it, value)
+        }
+    }
+
+    private fun getCharacteristic(
+        bluetoothGatt: BluetoothGatt?,
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+    ): BluetoothGattCharacteristic? {
+        return bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
+    }
+
+    private fun enableNotification(
+        bluetoothGatt: BluetoothGatt?,
+        characteristic: BluetoothGattCharacteristic,
+    ) {
+        bluetoothGatt?.setCharacteristicNotification(characteristic, true)
+    }
+
+    private fun writeDescriptor(
+        bluetoothGatt: BluetoothGatt?,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray,
+    ) {
+        characteristic.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)?.let { descriptor ->
+            if (Build.VERSION.SDK_INT >= 33) {
+                bluetoothGatt?.writeDescriptor(descriptor, value)
+            } else {
+                descriptor.value = value
+                bluetoothGatt?.writeDescriptor(descriptor)
             }
+        }
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
@@ -203,9 +234,7 @@ class BleConnectionManagerImpl(
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
-                gattServerResponse.emit(
-                    ServerResponseState.writeSuccess(characteristic.value)
-                )
+                gattServerResponse.emit(ServerResponseState.writeSuccess(characteristic.value))
             }
         }
     }
