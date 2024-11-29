@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,17 +29,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.napco.utils.Constants
+import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
@@ -52,6 +57,10 @@ fun DeviceOperationScreen(
         initialValue = ServerResponseState.loading()
     )
 
+    val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
+        initialValue = DataState.Loading()
+    )
+
     BackHandler {
         navController.navigateUp()
     }
@@ -61,12 +70,27 @@ fun DeviceOperationScreen(
             deviceName = "Device Operation",
             onNavigationIconClick = { navController.navigateUp() })
     }) { paddingValues ->
-        DeviceOperationContent(
-            paddingValues = paddingValues,
-            deviceOperationScreen = deviceOperationScreen,
-            serverResponse = serverResponse,
-            detailsViewModel = detailsViewModel
-        )
+
+        when (connectionResult) {
+            is DataState.Error -> {
+                DisconnectedMessage(
+                    paddingValues = paddingValues,
+                    onClickRescan = {
+                        navController.navigateUp()
+                        navController.navigateUp()
+                    })
+            }
+
+            else -> {
+                DeviceOperationContent(
+                    paddingValues = paddingValues,
+                    deviceOperationScreen = deviceOperationScreen,
+                    serverResponse = serverResponse,
+                    detailsViewModel = detailsViewModel
+                )
+            }
+        }
+
     }
 
 }
@@ -307,3 +331,23 @@ private fun RowItem(title: String, value: String) {
     BasicText(text = value)
     Spacer(modifier = Modifier.height(16.dp))
 }
+
+@Composable
+fun DisconnectedMessage(paddingValues: PaddingValues, onClickRescan: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+        )
+        IconButton(onClick = onClickRescan) {
+            Icon(Icons.Default.Refresh, contentDescription = "Rescan")
+        }
+
+    }
+
+}
+
