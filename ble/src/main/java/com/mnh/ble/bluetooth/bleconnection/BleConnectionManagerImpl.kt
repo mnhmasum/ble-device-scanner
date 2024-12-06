@@ -56,6 +56,9 @@ class BleConnectionManagerImpl(
         gattServerResponse.asSharedFlow()
 
     override fun connect(address: String) {
+        scope.launch {
+            gattConnectionResult.emit(DataState.loading())
+        }
         bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
     }
 
