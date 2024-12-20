@@ -210,15 +210,18 @@ class BluetoothConnectionManagerTest {
     }
 
 
-    /*@Test
+    @Test
     fun `test characteristic read response`(): Unit = runBlocking {
         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
         val characteristics = mock(BluetoothGattCharacteristic::class.java)
 
-        val bytes = ByteArray(3)
-        bytes[0] = 0x01
-        bytes[1] = 0x02
-        bytes[2] = 0x03
+        val bytes = ByteArray(3).apply {
+            this[0] = 0x01
+            this[1] = 0x02
+            this[2] = 0x03
+        }
+
+        Mockito.`when`(characteristics.value).thenReturn(bytes)
 
         val job = launch {
             bleConnectionManager.gattServerResponse().take(1).collect {
@@ -245,6 +248,6 @@ class BluetoothConnectionManagerTest {
         job.join()
         job.cancel()
 
-    }*/
+    }
 
 }
