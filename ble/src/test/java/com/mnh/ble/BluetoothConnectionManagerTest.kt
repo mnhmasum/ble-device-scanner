@@ -43,8 +43,6 @@ class BluetoothConnectionManagerTest {
     private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> =
         MutableSharedFlow(replay = 1)
 
-    private val writeCharacteristicResponseBytes = ArrayList<ByteArray>()
-
     @Before
     fun setUp() {
         bleConnectionManager =
@@ -246,7 +244,5 @@ class BluetoothConnectionManagerTest {
 
         job.join()
         job.cancel()
-
     }
-
 }
