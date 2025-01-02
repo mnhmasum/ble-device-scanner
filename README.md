@@ -15,6 +15,7 @@ BLE Device Scanner is an Android app designed to find nearby Bluetooth Low Energ
 - MVVM (Model-View-ViewModel): A design pattern that separates the user interface logic from the business logic.
 - Hilt: A dependency injection library for Android that reduces the boilerplate code required for dependency injection.
 - Jetpack Compose: A modern toolkit for building native Android UI with declarative programming.
+- Mockito: Mocking Framework for Unit Test.
 
 ## Installation
 - Clone the repository:
