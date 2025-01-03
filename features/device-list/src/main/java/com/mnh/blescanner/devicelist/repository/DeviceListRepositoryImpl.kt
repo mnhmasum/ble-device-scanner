@@ -20,5 +20,4 @@ class DeviceListRepositoryImpl(private val bleSource: BleScanner) :
     override fun stopScanning() {
         bleSource.stopScanning()
     }
-
 }

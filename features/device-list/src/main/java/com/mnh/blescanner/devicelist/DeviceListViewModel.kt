@@ -30,5 +30,4 @@ class DeviceListViewModel @Inject constructor(private val bleUseCase: BleUseCase
             bleUseCase.stopScanning()
         }
     }
-
 }
