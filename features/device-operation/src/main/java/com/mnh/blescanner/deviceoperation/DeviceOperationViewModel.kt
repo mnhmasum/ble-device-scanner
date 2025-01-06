@@ -6,6 +6,8 @@ import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.ServerResponseState
+import com.napco.utils.Utility
+import com.napco.utils.Utility.Companion.hexStringToByteArray
 import com.napco.utils.model.DeviceDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +70,8 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
         val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
         val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         val hexString = string.replace("\\s".toRegex(), "")
-        val byteArray = hexStringToByteArray(hexString)
+        val byteArray = Utility.hexStringToByteArray(hexString)
+        println("${byteArray.size} >>>>>>>>>>")
         detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID, byteArray)
     }
 
@@ -78,17 +81,6 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
         val hexString = string.replace("\\s".toRegex(), "")
         val byteArray = hexStringToByteArray(hexString)
         detailsUseCase.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, byteArray)
-    }
-
-    private fun hexStringToByteArray(s: String): ByteArray {
-        val len = s.length
-        val data = ByteArray(len / 2)
-        var i = 0
-        while (i < len) {
-            data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
-            i += 2
-        }
-        return data
     }
 
 }
