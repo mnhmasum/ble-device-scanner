@@ -15,6 +15,7 @@ lifecycleService = "2.7.0"
 mockitoCore = "1.10.19"
 mockitoCoreVersion = "5.3.1"
 mockitoKotlin = "5.0.0"
+mockk = "1.13.7"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 roomCommon = "2.6.1"
@@ -62,6 +63,7 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

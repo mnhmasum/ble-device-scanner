@@ -67,6 +67,11 @@ dependencies {
     implementation (libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    testImplementation(libs.mockito.core) // Use the latest version
+    testImplementation(libs.mockito.kotlin) // Use the latest version
+    testImplementation(kotlin("test"))
+    testImplementation (libs.mockk)
+
     implementation(project(":core:utils"))
     implementation(project(":core:ui"))
     implementation(project(":ble"))
