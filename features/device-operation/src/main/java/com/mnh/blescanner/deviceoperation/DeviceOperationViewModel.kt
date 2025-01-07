@@ -6,15 +6,12 @@ import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.ServerResponseState
-import com.napco.utils.Utility
 import com.napco.utils.Utility.Companion.hexStringToByteArray
 import com.napco.utils.model.DeviceDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,21 +25,6 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
 
     val gattServerResponse: Flow<ServerResponseState<ByteArray>> = detailsUseCase.gattServerResponse()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ServerResponseState.loading())
-
-    fun connect(address: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            detailsUseCase.connect(address)
-        }
-    }
-
-    private fun getUUIDs(
-        serviceUUIDString: String,
-        characteristicUUIDString: String,
-    ): Pair<UUID, UUID> {
-        val serviceUUID = UUID.fromString(serviceUUIDString)
-        val characteristicUUID = UUID.fromString(characteristicUUIDString)
-        return serviceUUID to characteristicUUID
-    }
 
     private fun toUUID(serviceUUIDString: String): UUID {
         return UUID.fromString(serviceUUIDString)
@@ -70,8 +52,7 @@ class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: D
         val serviceUUID = toUUID(deviceDetailsScreen.serviceUUID)
         val characteristicUUID = toUUID(deviceDetailsScreen.characteristicUUID)
         val hexString = string.replace("\\s".toRegex(), "")
-        val byteArray = Utility.hexStringToByteArray(hexString)
-        println("${byteArray.size} >>>>>>>>>>")
+        val byteArray = hexStringToByteArray(hexString)
         detailsUseCase.writeCharacteristic(serviceUUID, characteristicUUID, byteArray)
     }
 
