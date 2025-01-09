@@ -95,7 +95,6 @@ class BleConnectionManagerImpl(
             bytes,
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         )
-
     }
 
     override fun writeCharacteristicWithNoResponse(
@@ -301,6 +300,4 @@ class BleConnectionManagerImpl(
             gattConnectionResult.emit(DataState.error("Disconnected", throwable))
         }
     }
-
-
 }
