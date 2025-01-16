@@ -25,7 +25,7 @@ class DeviceOperationViewModelTest {
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
             "Heart Rate",
-            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("a")
+            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
         )
 
         val writtenString = "d1 c1"
@@ -42,6 +42,22 @@ class DeviceOperationViewModelTest {
             UUID.fromString(deviceOperationScreen.serviceUUID),
             UUID.fromString(deviceOperationScreen.characteristicUUID),
             byteArray
+        )
+    }
+
+    fun `test device operation screen readCharacteristic`() {
+        val deviceOperationScreen = DeviceOperationScreen(
+            "AB:CD:ED:FG",
+            "240d5183-819a-4627-9ca9-1aa24df29f18",
+            "Heart Rate",
+            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
+        )
+
+        deviceOperationViewModel.readCharacteristic(deviceOperationScreen)
+
+        Mockito.verify(mockDeviceOperationUseCase).readCharacteristic(
+            UUID.fromString(deviceOperationScreen.serviceUUID),
+            UUID.fromString(deviceOperationScreen.characteristicUUID),
         )
     }
 
