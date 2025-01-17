@@ -45,6 +45,7 @@ class DeviceOperationViewModelTest {
         )
     }
 
+    @Test
     fun `test device operation screen readCharacteristic`() {
         val deviceOperationScreen = DeviceOperationScreen(
             "AB:CD:ED:FG",
