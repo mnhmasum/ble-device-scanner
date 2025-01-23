@@ -62,5 +62,21 @@ class DeviceOperationViewModelTest {
         )
     }
 
+    @Test
+    fun `test device operation screen enabledNotification is called successfully`() {
+        val deviceOperationScreen = DeviceOperationScreen(
+            "AB:CD:ED:FG",
+            "240d5183-819a-4627-9ca9-1aa24df29f18",
+            "Heart Rate",
+            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
+        )
+
+        deviceOperationViewModel.enableNotification(deviceOperationScreen)
+
+        Mockito.verify(mockDeviceOperationUseCase).enableNotification(
+            UUID.fromString(deviceOperationScreen.serviceUUID),
+            UUID.fromString(deviceOperationScreen.characteristicUUID),
+        )
+    }
 
 }
