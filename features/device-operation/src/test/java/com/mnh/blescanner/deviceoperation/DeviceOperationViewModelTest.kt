@@ -20,7 +20,7 @@ class DeviceOperationViewModelTest {
     }
 
     @Test
-    fun `test device operation screen writeCharacteristic`() {
+    fun `test device operation screen writeCharacteristic is called successfully`() {
         val deviceOperationScreen = DeviceOperationScreen(
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
@@ -46,7 +46,7 @@ class DeviceOperationViewModelTest {
     }
 
     @Test
-    fun `test device operation screen readCharacteristic`() {
+    fun `test device operation screen readCharacteristic is called successfully`() {
         val deviceOperationScreen = DeviceOperationScreen(
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
