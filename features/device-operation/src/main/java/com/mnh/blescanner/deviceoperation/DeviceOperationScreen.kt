@@ -53,11 +53,11 @@ fun DeviceOperationScreen(
     deviceOperationScreen: DeviceOperationScreen,
 ) {
     val detailsViewModel: DeviceOperationViewModel = hiltViewModel()
-    val serverResponse by detailsViewModel.gattServerResponse.collectAsStateWithLifecycle(
+    val serverResponse by detailsViewModel.serverResponseState.collectAsStateWithLifecycle(
         initialValue = ServerResponseState.loading()
     )
 
-    val connectionResult by detailsViewModel.bleConnectionResult.collectAsStateWithLifecycle(
+    val connectionResult by detailsViewModel.bleConnectionState.collectAsStateWithLifecycle(
         initialValue = DataState.Loading()
     )
 
