@@ -10,9 +10,9 @@ import java.util.UUID
 
 interface BleConnectionManager {
     fun connect(address: String)
-    fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>>
-    fun getBluetoothGatt(): BluetoothGatt?
-    fun gattServerResponse(): Flow<ServerResponseState<ByteArray>>
+    fun getConnectedDevice(): BluetoothGatt?
+    fun connectionState(): Flow<DataState<DeviceDetails>>
+    fun deviceResponse(): Flow<ServerResponseState<ByteArray>>
     fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
     fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID)

@@ -35,8 +35,8 @@ class BleConnectionManagerImpl(
     private val context: Context,
     private val bluetoothAdapter: BluetoothAdapter,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
-    private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow(),
+    private val connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow(),
+    private val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow(),
 ) : BleConnectionManager, BluetoothGattCallback() {
 
     private var bluetoothGatt: BluetoothGatt? = null
@@ -45,25 +45,25 @@ class BleConnectionManagerImpl(
         this.bluetoothGatt = gatt
     }
 
-    override fun getBluetoothGatt(): BluetoothGatt? {
+    override fun getConnectedDevice(): BluetoothGatt? {
         return bluetoothGatt
     }
 
-    override fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
-        gattConnectionResult.asSharedFlow()
+    override fun connectionState(): Flow<DataState<DeviceDetails>> =
+        connectionState.asSharedFlow()
 
-    override fun gattServerResponse(): SharedFlow<ServerResponseState<ByteArray>> =
-        gattServerResponse.asSharedFlow()
+    override fun deviceResponse(): SharedFlow<ServerResponseState<ByteArray>> =
+        serverResponse.asSharedFlow()
 
     override fun connect(address: String) {
         scope.launch {
-            gattConnectionResult.emit(DataState.loading())
+            connectionState.emit(DataState.loading())
         }
         bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
     }
 
     override fun disconnect() {
-        gattConnectionResult.drop(1)
+        connectionState.drop(1)
         bluetoothGatt?.disconnect()
         bluetoothGatt?.close()
     }
@@ -86,22 +86,11 @@ class BleConnectionManagerImpl(
         }
     }
 
-    override fun writeCharacteristic(
-        characteristic: BluetoothGattCharacteristic?,
-        bytes: ByteArray,
-    ) {
-        writeCharacteristic(
-            characteristic,
-            bytes,
-            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        )
+    override fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?, bytes: ByteArray) {
+        writeCharacteristic(characteristic, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
     }
 
-    override fun writeCharacteristicWithNoResponse(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        bytes: ByteArray,
-    ) {
+    override fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
         bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
             writeCharacteristic(it, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
         }
@@ -121,11 +110,7 @@ class BleConnectionManagerImpl(
         }
     }
 
-    private fun enableNotificationOrIndication(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        value: ByteArray,
-    ) {
+    private fun enableNotificationOrIndication(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
         setupCharacteristicNotification(bluetoothGatt, serviceUUID, characteristicUUID, value)
     }
 
@@ -150,10 +135,7 @@ class BleConnectionManagerImpl(
         return bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
     }
 
-    private fun enableNotification(
-        bluetoothGatt: BluetoothGatt?,
-        characteristic: BluetoothGattCharacteristic,
-    ) {
+    private fun enableNotification(bluetoothGatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic) {
         bluetoothGatt?.setCharacteristicNotification(characteristic, true)
     }
 
@@ -174,20 +156,19 @@ class BleConnectionManagerImpl(
 
     private fun handleCharacteristicChange(characteristic: BluetoothGattCharacteristic) {
         scope.launch {
-            gattServerResponse.emit(ServerResponseState.notifySuccess(characteristic.value))
+            serverResponse.emit(ServerResponseState.notifySuccess(characteristic.value))
         }
     }
 
     private fun handleCharacteristicRead(characteristic: BluetoothGattCharacteristic) {
         scope.launch {
-            gattServerResponse.emit(ServerResponseState.readSuccess(characteristic.value))
+            serverResponse.emit(ServerResponseState.readSuccess(characteristic.value))
         }
     }
 
-    private fun updateConnectionStatus() {
+    private fun updateConnectionStatus(dataState: DataState<DeviceDetails>) {
         scope.launch {
-            val throwable = Throwable("Error: Disconnected")
-            gattConnectionResult.emit(DataState.error("Disconnected", throwable))
+            connectionState.emit(dataState)
         }
     }
 
@@ -196,13 +177,12 @@ class BleConnectionManagerImpl(
 
         val deviceInfo = DeviceInfo(
             name = peripheralGatt.device.name,
-            address = peripheralGatt.device.address,
-            generalInfo = "${peripheralGatt.device.bondState}"
+            address = peripheralGatt.device.address
         )
 
         val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
 
-        gattConnectionResult.emit(DataState.success(details))
+        connectionState.emit(DataState.success(details))
 
     }
 
@@ -224,7 +204,7 @@ class BleConnectionManagerImpl(
             }
 
             BluetoothProfile.STATE_DISCONNECTED -> {
-                updateConnectionStatus()
+                updateConnectionStatus(DataState.error("Disconnected", Throwable("Error: Disconnected")))
                 logI("Device disconnected")
             }
         }
@@ -255,7 +235,7 @@ class BleConnectionManagerImpl(
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
-                gattServerResponse.emit(ServerResponseState.writeSuccess(characteristic.value))
+                serverResponse.emit(ServerResponseState.writeSuccess(characteristic.value))
             }
         }
     }
