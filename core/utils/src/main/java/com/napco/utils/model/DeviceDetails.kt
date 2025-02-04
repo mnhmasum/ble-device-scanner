@@ -21,7 +21,6 @@ data class Service(val name: String, val uuid: String)
 data class DeviceInfo(
     val name: String,
     val address: String,
-    val generalInfo: String,
 )
 
 @Serializable

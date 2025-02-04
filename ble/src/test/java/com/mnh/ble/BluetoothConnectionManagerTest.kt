@@ -50,8 +50,8 @@ class BluetoothConnectionManagerTest {
                 mockContext,
                 mockBluetoothAdapter,
                 scope = mockScope,
-                gattConnectionResult = gattConnectionResult,
-                gattServerResponse = gattServerResponse,
+                connectionState = gattConnectionResult,
+                serverResponse = gattServerResponse,
             )
     }
 
@@ -94,7 +94,7 @@ class BluetoothConnectionManagerTest {
 
         val job = launch {
 
-            val result = bleConnectionManager.bleGattConnectionResult().take(1).toList()
+            val result = bleConnectionManager.connectionState().take(1).toList()
 
             println(result.toString())
 
@@ -149,7 +149,7 @@ class BluetoothConnectionManagerTest {
         Mockito.`when`(characteristics.value).thenReturn(bytes)
 
         val job = launch {
-            bleConnectionManager.gattServerResponse().take(1).collect {
+            bleConnectionManager.deviceResponse().take(1).collect {
                 if(it is ServerResponseState.WriteSuccess) {
                     assertEquals(bytes, it.data)
                 }
@@ -183,7 +183,7 @@ class BluetoothConnectionManagerTest {
         Mockito.`when`(characteristics.value).thenReturn(bytes)
 
         val job = launch {
-            bleConnectionManager.gattServerResponse().take(1).collect {
+            bleConnectionManager.deviceResponse().take(1).collect {
                 if (it is ServerResponseState.NotifySuccess) {
                     assertEquals(bytes, it.data)
                 }
@@ -215,7 +215,7 @@ class BluetoothConnectionManagerTest {
         Mockito.`when`(characteristics.value).thenReturn(bytes)
 
         val job = launch {
-            bleConnectionManager.gattServerResponse().take(1).collect {
+            bleConnectionManager.deviceResponse().take(1).collect {
                 when (it) {
                     is ServerResponseState.Loading -> {}
                     is ServerResponseState.NotifySuccess -> {}
