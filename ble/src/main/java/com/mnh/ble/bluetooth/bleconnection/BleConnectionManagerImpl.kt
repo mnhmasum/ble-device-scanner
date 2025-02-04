@@ -172,25 +172,22 @@ class BleConnectionManagerImpl(
         }
     }
 
-    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-        when (newState) {
-            BluetoothProfile.STATE_CONNECTED -> {
-                setBluetoothGatt(gatt)
-                bluetoothGatt?.discoverServices()
-            }
-
-            BluetoothProfile.STATE_DISCONNECTED -> {
-                updateConnectionStatus()
-                logI("Device disconnected")
-            }
+    private fun handleCharacteristicChange(characteristic: BluetoothGattCharacteristic) {
+        scope.launch {
+            gattServerResponse.emit(ServerResponseState.notifySuccess(characteristic.value))
         }
     }
 
-    override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            scope.launch {
-                emitAttributes(gatt)
-            }
+    private fun handleCharacteristicRead(characteristic: BluetoothGattCharacteristic) {
+        scope.launch {
+            gattServerResponse.emit(ServerResponseState.readSuccess(characteristic.value))
+        }
+    }
+
+    private fun updateConnectionStatus() {
+        scope.launch {
+            val throwable = Throwable("Error: Disconnected")
+            gattConnectionResult.emit(DataState.error("Disconnected", throwable))
         }
     }
 
@@ -218,6 +215,28 @@ class BleConnectionManagerImpl(
             val newService = Service(serviceReadableTitleName, service.uuid.toString())
             newService to characteristics
         }
+
+    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+        when (newState) {
+            BluetoothProfile.STATE_CONNECTED -> {
+                setBluetoothGatt(gatt)
+                bluetoothGatt?.discoverServices()
+            }
+
+            BluetoothProfile.STATE_DISCONNECTED -> {
+                updateConnectionStatus()
+                logI("Device disconnected")
+            }
+        }
+    }
+
+    override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            scope.launch {
+                emitAttributes(gatt)
+            }
+        }
+    }
 
     override fun onDescriptorWrite(
         gatt: BluetoothGatt,
@@ -282,22 +301,4 @@ class BleConnectionManagerImpl(
         }
     }
 
-    private fun handleCharacteristicChange(characteristic: BluetoothGattCharacteristic) {
-        scope.launch {
-            gattServerResponse.emit(ServerResponseState.notifySuccess(characteristic.value))
-        }
-    }
-
-    private fun handleCharacteristicRead(characteristic: BluetoothGattCharacteristic) {
-        scope.launch {
-            gattServerResponse.emit(ServerResponseState.readSuccess(characteristic.value))
-        }
-    }
-
-    private fun updateConnectionStatus() {
-        scope.launch {
-            val throwable = Throwable("Error: Disconnected")
-            gattConnectionResult.emit(DataState.error("Disconnected", throwable))
-        }
-    }
 }
