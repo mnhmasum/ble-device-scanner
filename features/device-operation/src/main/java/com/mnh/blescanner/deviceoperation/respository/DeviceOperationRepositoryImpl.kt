@@ -18,11 +18,11 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
     }
 
     override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
-        return bleConnectionManager.bleGattConnectionResult()
+        return bleConnectionManager.connectionState()
     }
 
     override fun gattServerResponse(): Flow<ServerResponseState<ByteArray>> {
-        return bleConnectionManager.gattServerResponse()
+        return bleConnectionManager.deviceResponse()
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
@@ -42,7 +42,7 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        val service = bleConnectionManager.getBluetoothGatt()?.getService(serviceUUID)
+        val service = bleConnectionManager.getConnectedDevice()?.getService(serviceUUID)
         val characteristic = service?.getCharacteristic(characteristicUUID)
         if (characteristic != null) {
             bleConnectionManager.writeCharacteristic(characteristic, bytes)

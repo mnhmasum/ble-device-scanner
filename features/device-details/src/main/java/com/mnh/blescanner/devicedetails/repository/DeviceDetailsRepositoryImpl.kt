@@ -16,6 +16,6 @@ class DeviceDetailsRepositoryImpl(private val bleConnectionManager: BleConnectio
     }
 
     override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
-        return bleConnectionManager.bleGattConnectionResult()
+        return bleConnectionManager.connectionState()
     }
 }

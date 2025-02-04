@@ -57,7 +57,7 @@ fun DeviceOperationScreen(
         initialValue = ServerResponseState.loading()
     )
 
-    val connectionResult by detailsViewModel.bleConnectionState.collectAsStateWithLifecycle(
+    val connectionResult by detailsViewModel.connectionState.collectAsStateWithLifecycle(
         initialValue = DataState.Loading()
     )
 
