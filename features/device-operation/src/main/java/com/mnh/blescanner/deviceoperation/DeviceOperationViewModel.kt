@@ -19,9 +19,7 @@ import javax.inject.Inject
 class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: DeviceOperationUseCase) :
     ViewModel() {
 
-    val bleConnectionState: Flow<DataState<DeviceDetails>> =
-        detailsUseCase.bleGattConnectionResult()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
+    val connectionState: Flow<DataState<DeviceDetails>> = detailsUseCase.bleGattConnectionResult()
 
     val serverResponseState: Flow<ServerResponseState<ByteArray>> = detailsUseCase.gattServerResponse()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ServerResponseState.loading())
