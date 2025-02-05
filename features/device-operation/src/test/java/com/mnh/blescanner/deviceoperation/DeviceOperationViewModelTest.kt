@@ -1,5 +1,7 @@
 package com.mnh.blescanner.deviceoperation
 
+import android.bluetooth.BluetoothClass.Device
+import android.provider.ContactsContract.Data
 import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
@@ -19,7 +21,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import java.util.UUID
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class DeviceOperationViewModelTest {
     private var mockDeviceOperationUseCase: DeviceOperationUseCase = mock()
     private lateinit var deviceOperationViewModel: DeviceOperationViewModel
@@ -89,7 +91,26 @@ class DeviceOperationViewModelTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `bleConnectionResult should emit loading state`(): Unit = runTest {
+        val fakeDeviceOperationRepository = FakeDeviceOperationRepo()
+        val deviceOperationUseCase = DeviceOperationUseCase(fakeDeviceOperationRepository)
+
+        val viewModel = DeviceOperationViewModel(deviceOperationUseCase)
+
+        val expectedData: DataState<DeviceDetails> = DataState.loading()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.connectionState.collect {
+                if (it is DataState.Loading) {
+                    assertEquals(expectedData, it)
+                }
+            }
+        }
+
+        fakeDeviceOperationRepository.emit(expectedData)
+    }
+
     @Test
     fun `bleConnectionResult should emit success state`(): Unit = runTest {
         val generalInfo = DeviceInfo(name = "Your Device name", address = "Device mac address")
