@@ -20,6 +20,7 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import java.util.UUID
+import kotlin.jvm.Throws
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeviceOperationViewModelTest {
@@ -131,6 +132,25 @@ class DeviceOperationViewModelTest {
         }
 
         fakeDeviceOperationRepository.emit(DataState.success(expectedDevice))
+    }
+
+    @Test
+    fun `bleConnectionResult emit error state`(): Unit = runTest {
+        val fakeDeviceOperationRepository = FakeDeviceOperationRepo()
+        val deviceOperationUseCase = DeviceOperationUseCase(fakeDeviceOperationRepository)
+
+        val viewModel = DeviceOperationViewModel(deviceOperationUseCase)
+        val expectedThrowable = Throwable("Error: Disconnected")
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.connectionState.collect {
+                if (it is DataState.Error) {
+                    assertEquals(expectedThrowable, it.error)
+                    assertEquals("Disconnected", it.errorMessage)
+                }
+            }
+        }
+
+        fakeDeviceOperationRepository.emit(DataState.error("Disconnected", expectedThrowable))
     }
 
 }
