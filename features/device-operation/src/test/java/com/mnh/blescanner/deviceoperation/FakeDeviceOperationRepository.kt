@@ -9,11 +9,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import java.util.UUID
 
 class FakeDeviceOperationRepo : DeviceOperationRepository {
-    private val flow = MutableSharedFlow<DataState<DeviceDetails>>()
-    private val flow1 = MutableSharedFlow<ServerResponseState<ByteArray>>()
-    suspend fun emit(value: DataState<DeviceDetails>) = flow.emit(value)
-    suspend fun emit1(value: ServerResponseState<ByteArray>) = flow1.emit(value)
-    //override fun scores(): Flow<Int> = flow
+    private val connectionFlow = MutableSharedFlow<DataState<DeviceDetails>>()
+    private val serverResponseFlow = MutableSharedFlow<ServerResponseState<ByteArray>>()
+    suspend fun emit(value: DataState<DeviceDetails>) = connectionFlow.emit(value)
+    suspend fun emit(value: ServerResponseState<ByteArray>) = serverResponseFlow.emit(value)
 
     override fun connect(address: String) {
         TODO("Not yet implemented")
@@ -24,11 +23,11 @@ class FakeDeviceOperationRepo : DeviceOperationRepository {
     }
 
     override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
-        return flow
+        return connectionFlow
     }
 
     override fun gattServerResponse(): Flow<ServerResponseState<ByteArray>> {
-        return flow1
+        return serverResponseFlow
     }
 
     override fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID) {
