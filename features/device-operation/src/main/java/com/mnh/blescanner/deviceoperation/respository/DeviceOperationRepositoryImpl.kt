@@ -42,7 +42,7 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         characteristicUUID: UUID,
         bytes: ByteArray,
     ) {
-        val service = bleConnectionManager.getConnectedDevice()?.getService(serviceUUID)
+        val service = bleConnectionManager.getService(serviceUUID)
         val characteristic = service?.getCharacteristic(characteristicUUID)
         if (characteristic != null) {
             bleConnectionManager.writeCharacteristic(characteristic, bytes)

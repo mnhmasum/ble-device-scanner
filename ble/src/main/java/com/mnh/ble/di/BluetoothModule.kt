@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
+import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.mnh.ble.bluetooth.blescanner.BleScanner
@@ -52,11 +53,17 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideBleConnector(
+    fun provideBleGattClient(
         @ApplicationContext appContext: Context,
         bluetoothAdapter: BluetoothAdapter,
-    ): BleConnectionManager {
-        return BleConnectionManagerImpl(context = appContext, bluetoothAdapter = bluetoothAdapter)
+    ): BLEGattClient {
+        return BLEGattClient(context = appContext, bluetoothAdapter = bluetoothAdapter)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBleConnector(bleGattClient: BLEGattClient): BleConnectionManager {
+        return BleConnectionManagerImpl(bleGattClient)
     }
 
 }
