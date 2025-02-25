@@ -14,23 +14,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDetailsUseCase) :
-    ViewModel() {
-
-    val bleConnectionResult: Flow<DataState<DeviceDetails>> =
-        detailsUseCase.bleGattConnectionResult()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
+class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDetailsUseCase) : ViewModel() {
+    val bleConnectionResult: Flow<DataState<DeviceDetails>> = detailsUseCase.bleGattConnectionResult()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.loading())
 
     fun connect(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            detailsUseCase.bleGattConnectionResult()
             detailsUseCase.connect(address)
-        }
-    }
-
-    fun disconnect() {
-        viewModelScope.launch(Dispatchers.IO) {
-            detailsUseCase.disconnect()
         }
     }
 

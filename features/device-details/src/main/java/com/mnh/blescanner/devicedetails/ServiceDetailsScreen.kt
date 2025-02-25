@@ -26,7 +26,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,13 +61,6 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     LaunchedEffect(deviceAddress) {
         detailsViewModel.connect(deviceAddress)
         isAlreadyConnected.value = true
-
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            //detailsViewModel.disconnect()
-        }
     }
 
     BackHandler {
