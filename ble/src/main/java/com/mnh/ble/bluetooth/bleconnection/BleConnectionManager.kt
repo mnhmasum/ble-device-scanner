@@ -16,7 +16,7 @@ interface BleConnectionManager {
     fun enableNotification(serviceUUID: UUID, characteristicUUID: UUID)
     fun enableIndication(serviceUUID: UUID, characteristicUUID: UUID)
     fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID)
-    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?, bytes: ByteArray)
+    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, bytes: ByteArray)
     fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray, )
     fun disconnect()
 }

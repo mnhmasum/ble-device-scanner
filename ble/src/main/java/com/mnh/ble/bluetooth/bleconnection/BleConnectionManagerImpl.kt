@@ -54,27 +54,24 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
         bleGattClient.gatt?.readCharacteristic(characteristics)
     }
 
-    override fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?, bytes: ByteArray) {
+    override fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, bytes: ByteArray) {
         writeCharacteristic(characteristic, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
     }
 
     override fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
         val service = bleGattClient.gatt?.getService(serviceUUID)
-        val characteristics = service?.getCharacteristic(characteristicUUID)
+        val characteristics = service?.getCharacteristic(characteristicUUID) ?: return
         writeCharacteristic(characteristics, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
     }
 
-    private fun writeCharacteristic(
-        gattCharacteristic: BluetoothGattCharacteristic?,
-        bytes: ByteArray,
-        writeType: Int,
-    ) {
-        gattCharacteristic?.writeType = writeType
-        if (Build.VERSION.SDK_INT >= 33 && gattCharacteristic != null) {
-            bleGattClient.gatt?.writeCharacteristic(gattCharacteristic, bytes, writeType)
+    private fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, bytes: ByteArray, writeType: Int) {
+        characteristic.writeType = writeType
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            bleGattClient.gatt?.writeCharacteristic(characteristic, bytes, writeType)
         } else {
-            gattCharacteristic?.value = bytes
-            bleGattClient.gatt?.writeCharacteristic(gattCharacteristic)
+            characteristic.value = bytes
+            bleGattClient.gatt?.writeCharacteristic(characteristic)
         }
     }
 
@@ -110,14 +107,13 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
         characteristic: BluetoothGattCharacteristic?,
         value: ByteArray,
     ) {
-        characteristic?.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG)?.let { descriptor ->
-            if (Build.VERSION.SDK_INT >= 33) {
-                bluetoothGatt?.writeDescriptor(descriptor, value)
-            } else {
-                descriptor.value = value
-                bluetoothGatt?.writeDescriptor(descriptor)
-            }
+        val descriptor = characteristic?.getDescriptor(Constants.DESCRIPTOR_PRE_CLIENT_CONFIG) ?: return
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            bluetoothGatt?.writeDescriptor(descriptor, value)
+        } else {
+            descriptor.value = value
+            bluetoothGatt?.writeDescriptor(descriptor)
         }
     }
-
 }

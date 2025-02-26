@@ -37,27 +37,13 @@ class DeviceOperationRepositoryImpl(private val bleConnectionManager: BleConnect
         bleConnectionManager.readCharacteristic(service, characteristic)
     }
 
-    override fun writeCharacteristic(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        bytes: ByteArray,
-    ) {
+    override fun writeCharacteristic(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
         val service = bleConnectionManager.getService(serviceUUID)
-        val characteristic = service?.getCharacteristic(characteristicUUID)
-        if (characteristic != null) {
-            bleConnectionManager.writeCharacteristic(characteristic, bytes)
-        }
+        val characteristic = service?.getCharacteristic(characteristicUUID) ?: return
+        bleConnectionManager.writeCharacteristic(characteristic, bytes)
     }
 
-    override fun writeCharacteristicWithNoResponse(
-        serviceUUID: UUID,
-        characteristicUUID: UUID,
-        bytes: ByteArray,
-    ) {
-        bleConnectionManager.writeCharacteristicWithNoResponse(
-            serviceUUID,
-            characteristicUUID,
-            bytes
-        )
+    override fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
+        bleConnectionManager.writeCharacteristicWithNoResponse(serviceUUID, characteristicUUID, bytes)
     }
 }
