@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 class BLEGattClient(
     private val context: Context,
     private val bluetoothAdapter: BluetoothAdapter,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : BluetoothGattCallback() {
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
     val connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
     var gatt: BluetoothGatt? = null
