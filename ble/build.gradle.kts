@@ -51,6 +51,7 @@ dependencies {
     testImplementation(libs.mockito.core) // Use the latest version
 
     testImplementation(libs.mockito.kotlin) // Use the latest version
+    testImplementation (libs.kotlinx.coroutines.test)
 
     testImplementation(kotlin("test"))
     implementation(project(":core:utils"))
