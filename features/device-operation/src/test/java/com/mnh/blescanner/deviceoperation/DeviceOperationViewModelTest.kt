@@ -1,7 +1,5 @@
 package com.mnh.blescanner.deviceoperation
 
-import android.bluetooth.BluetoothClass.Device
-import android.provider.ContactsContract.Data
 import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
@@ -20,7 +18,6 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import java.util.UUID
-import kotlin.jvm.Throws
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeviceOperationViewModelTest {
