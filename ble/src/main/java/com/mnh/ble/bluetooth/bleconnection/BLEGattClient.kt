@@ -30,7 +30,7 @@ class BLEGattClient(
     private val bluetoothAdapter: BluetoothAdapter,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : BluetoothGattCallback() {
-    val connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
+    var connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
     var gatt: BluetoothGatt? = null
 

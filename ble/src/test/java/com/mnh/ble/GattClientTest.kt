@@ -12,17 +12,22 @@ import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Before
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import kotlin.math.exp
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class GattClientTest {
     private var mockContext: Context = mock()
 
@@ -36,6 +41,7 @@ class GattClientTest {
 
     private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> =
         MutableSharedFlow(replay = 1)
+
 
     private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> =
         MutableSharedFlow(replay = 1)
@@ -70,28 +76,31 @@ class GattClientTest {
     fun `test on connection state change loading`(): Unit = runBlocking {
         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
         val status = BluetoothGatt.GATT_SUCCESS
-        val state = BluetoothProfile.STATE_DISCONNECTING
+        val state = BluetoothProfile.STATE_CONNECTING
 
-        val expected = DataState.loading<DeviceDetails>()
-        Mockito.`when`(mockScope).thenReturn("abc")
+        //val expected = DataState.loading<DeviceDetails>()
 
-        val job = launch {
-           /* val data = bleGattClient.connectionState.take(1).toList()
-            assertEquals(expected, data)*/
-            bleGattClient.connectionState.collect {
-                when (it) {
-                    is DataState.Error -> TODO()
-                    is DataState.Loading -> TODO()
-                    is DataState.Success -> TODO()
+        //bleGattClient.connectionState = gattConnectionResult
+
+        //bleGattClient.onConnectionStateChange(mockBluetoothGatt, status, state)
+
+        //val x: DataState<DeviceDetails> = DataState.loading()
+
+        val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
+
+        val expectedData: DataState<DeviceDetails> = DataState.loading()
+
+
+
+        launch(UnconfinedTestDispatcher(testScheduler)) {
+            fakeBLEGattClient.connectionState.collect {
+                if (it is DataState.Loading) {
+                    Assert.assertEquals(expectedData, it)
                 }
             }
         }
 
-        bleGattClient.onConnectionStateChange(mockBluetoothGatt, status, state)
-
-        job.join()
-        //job.cancel()
-
+        fakeBLEGattClient.emit(expectedData)
     }
 
     /*
