@@ -85,6 +85,7 @@ class GattClientTest {
         }
 
         fakeBLEGattClient.emit(DataState.loading())
+
         assertTrue(isLoading)
     }
 
