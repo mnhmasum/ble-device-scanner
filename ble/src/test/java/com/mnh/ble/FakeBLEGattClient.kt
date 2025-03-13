@@ -32,6 +32,7 @@ class FakeBLEGattClient(
 ) : BluetoothGattCallback() {
     var connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
     suspend fun emit(value: DataState<DeviceDetails>) = connectionState.emit(value)
+
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
     var gatt: BluetoothGatt? = null
 

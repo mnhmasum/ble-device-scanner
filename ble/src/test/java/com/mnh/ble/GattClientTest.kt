@@ -10,22 +10,20 @@ import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import kotlin.math.exp
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GattClientTest {
@@ -73,34 +71,21 @@ class GattClientTest {
     }
 
     @Test
-    fun `test on connection state change loading`(): Unit = runBlocking {
-        val mockBluetoothGatt = mock(BluetoothGatt::class.java)
-        val status = BluetoothGatt.GATT_SUCCESS
-        val state = BluetoothProfile.STATE_CONNECTING
-
-        //val expected = DataState.loading<DeviceDetails>()
-
-        //bleGattClient.connectionState = gattConnectionResult
-
-        //bleGattClient.onConnectionStateChange(mockBluetoothGatt, status, state)
-
-        //val x: DataState<DeviceDetails> = DataState.loading()
-
+    fun `test on connection state change loading`(): Unit = runTest {
         val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
 
-        val expectedData: DataState<DeviceDetails> = DataState.loading()
+        var isLoading = false
 
-
-
-        launch(UnconfinedTestDispatcher(testScheduler)) {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             fakeBLEGattClient.connectionState.collect {
                 if (it is DataState.Loading) {
-                    Assert.assertEquals(expectedData, it)
+                    isLoading = true
                 }
             }
         }
 
-        fakeBLEGattClient.emit(expectedData)
+        fakeBLEGattClient.emit(DataState.loading())
+        assertTrue(isLoading)
     }
 
     /*
