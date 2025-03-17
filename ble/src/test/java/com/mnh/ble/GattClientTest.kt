@@ -33,7 +33,7 @@ class GattClientTest {
 
     private lateinit var bleGattClient: BLEGattClient
 
-    private lateinit var bleConnectionManager: BleConnectionManagerImpl
+    private lateinit var bleConnctionManager: BleConnectionManagerImpl
 
     private val mockScope = CoroutineScope(Dispatchers.Unconfined)
 
@@ -87,6 +87,25 @@ class GattClientTest {
         fakeBLEGattClient.emit(DataState.loading())
 
         assertTrue(isLoading)
+    }
+
+    @Test
+    fun `test on connection state change disconnected`(): Unit = runTest {
+        val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
+
+        var isDisconnected = false
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            fakeBLEGattClient.connectionState.collect {
+                if (it is DataState.Error) {
+                    isDisconnected = true
+                }
+            }
+        }
+
+        fakeBLEGattClient.emit(DataState.error("Disconnected", Throwable("Error: Disconnected")))
+
+        assertTrue(isDisconnected)
     }
 
     /*
