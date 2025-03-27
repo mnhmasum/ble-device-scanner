@@ -9,7 +9,11 @@ import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
+import com.napco.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.DeviceInfo
+import com.napco.utils.model.Service
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +37,7 @@ class GattClientTest {
 
     private lateinit var bleGattClient: BLEGattClient
 
-    private lateinit var bleConnctionManager: BleConnectionManagerImpl
+    private lateinit var bleConnectionManager: BleConnectionManagerImpl
 
     private val mockScope = CoroutineScope(Dispatchers.Unconfined)
 
@@ -108,39 +112,27 @@ class GattClientTest {
         assertTrue(isDisconnected)
     }
 
+
+    @Test
+    fun `test onServicesDiscovered success`(): Unit = runTest {
+        val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
+        val services: Map<Service, List<Characteristic>> = HashMap()
+        val deviceInfo = DeviceInfo("abc", "address")
+        val details = DeviceDetails(deviceInfo = deviceInfo, services = services)
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            fakeBLEGattClient.connectionState.collect {
+                if (it is DataState.Success) {
+                    assertEquals(details, it.data)
+                }
+            }
+        }
+
+        fakeBLEGattClient.emit(DataState.success(details))
+
+    }
+
     /*
-     @Test
-     fun `test onServicesDiscovered success`(): Unit = runBlocking {
-         val status = BluetoothGatt.GATT_SUCCESS
-
-         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
-
-         val mockDevice = mock(BluetoothDevice::class.java)
-
-         Mockito.`when`(mockBluetoothGatt.device).thenReturn(mockDevice)
-
-         Mockito.`when`(mockBluetoothGatt.device.name).thenReturn("abc")
-         Mockito.`when`(mockBluetoothGatt.device.address).thenReturn("address")
-         Mockito.`when`(mockBluetoothGatt.device.bondState).thenReturn(0)
-
-         val job = launch {
-
-             val result = bleConnectionManager.connectionState().take(1).toList()
-
-             println(result.toString())
-
-             val expected =
-                 "[Success(data=DeviceDetails(deviceInfo=DeviceInfo(name=abc, address=address, generalInfo=0), services={}))]"
-
-             assertEquals(expected, result.toString())
-
-         }
-
-         bleConnectionManager.onServicesDiscovered(mockBluetoothGatt, status)
-
-         job.join()
-     }
-
      @Test
      fun `test writeCharacteristic`(): Unit = runBlocking {
          val mockBluetoothGatt = mock(BluetoothGatt::class.java)
