@@ -117,18 +117,18 @@ class GattClientTest {
     fun `test onServicesDiscovered success`(): Unit = runTest {
         val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
         val services: Map<Service, List<Characteristic>> = HashMap()
-        val deviceInfo = DeviceInfo("abc", "address")
-        val details = DeviceDetails(deviceInfo = deviceInfo, services = services)
+        val device = DeviceInfo("abc", "address")
+        val expectedResult = DeviceDetails(deviceInfo = device, services = services)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             fakeBLEGattClient.connectionState.collect {
                 if (it is DataState.Success) {
-                    assertEquals(details, it.data)
+                    assertEquals(expectedResult, it.data)
                 }
             }
         }
 
-        fakeBLEGattClient.emit(DataState.success(details))
+        fakeBLEGattClient.emit(DataState.success(expectedResult))
 
     }
 
