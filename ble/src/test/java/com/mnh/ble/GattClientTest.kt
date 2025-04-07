@@ -6,9 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
-import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.napco.utils.DataState
-import com.napco.utils.ServerResponseState
 import com.napco.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
 import com.napco.utils.model.DeviceInfo
@@ -18,7 +16,6 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -37,16 +34,7 @@ class GattClientTest {
 
     private lateinit var bleGattClient: BLEGattClient
 
-    private lateinit var bleConnectionManager: BleConnectionManagerImpl
-
     private val mockScope = CoroutineScope(Dispatchers.Unconfined)
-
-    private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> =
-        MutableSharedFlow(replay = 1)
-
-
-    private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> =
-        MutableSharedFlow(replay = 1)
 
     @Before
     fun setUp() {
