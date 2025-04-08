@@ -31,9 +31,12 @@ class FakeBLEGattClient(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : BluetoothGattCallback() {
     var connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
-    suspend fun emit(value: DataState<DeviceDetails>) = connectionState.emit(value)
 
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
+
+    suspend fun emit(value: DataState<DeviceDetails>) = connectionState.emit(value)
+    suspend fun emit(value: ServerResponseState<ByteArray>) = serverResponse.emit(value)
+
     var gatt: BluetoothGatt? = null
 
     fun connect(address: String) {

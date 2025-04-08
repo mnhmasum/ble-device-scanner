@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.napco.utils.DataState
+import com.napco.utils.ServerResponseState
 import com.napco.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
 import com.napco.utils.model.DeviceInfo
@@ -120,33 +121,29 @@ class GattClientTest {
 
     }
 
-    /*
+
      @Test
-     fun `test writeCharacteristic`(): Unit = runBlocking {
-         val mockBluetoothGatt = mock(BluetoothGatt::class.java)
-         val characteristics = mock(BluetoothGattCharacteristic::class.java)
+     fun `test on characteristic read`(): Unit = runTest {
+         val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
 
          val bytes = ByteArray(3)
          bytes[0] = 0x01
          bytes[1] = 0x02
          bytes[2] = 0x03
 
-         bleConnectionManager.setBluetoothGatt(mockBluetoothGatt)
-
-         bleConnectionManager.writeCharacteristic(characteristics, bytes)
-
-         if (Build.VERSION.SDK_INT >= 33) {
-             Mockito.verify(mockBluetoothGatt).writeCharacteristic(
-                 characteristics,
-                 bytes,
-                 BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-             )
-         } else {
-             Mockito.verify(mockBluetoothGatt).writeCharacteristic(characteristics)
+         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+             fakeBLEGattClient.serverResponse.collect {
+                 if (it is ServerResponseState.ReadSuccess) {
+                     assertEquals(bytes, it.data)
+                 }
+             }
          }
+
+         fakeBLEGattClient.emit(ServerResponseState.readSuccess(bytes))
 
      }
 
+    /*
      @Test
      fun `test writeCharacteristic success response`(): Unit = runBlocking {
          val mockBluetoothGatt = mock(BluetoothGatt::class.java)
