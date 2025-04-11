@@ -121,7 +121,6 @@ class GattClientTest {
 
     }
 
-
      @Test
      fun `test on characteristic read`(): Unit = runTest {
          val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
@@ -142,6 +141,27 @@ class GattClientTest {
          fakeBLEGattClient.emit(ServerResponseState.readSuccess(bytes))
 
      }
+
+    @Test
+    fun `test on characteristic notifiy`(): Unit = runTest {
+        val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
+
+        val bytes = ByteArray(3)
+        bytes[0] = 0x01
+        bytes[1] = 0x02
+        bytes[2] = 0x03
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            fakeBLEGattClient.serverResponse.collect {
+                if (it is ServerResponseState.NotifySuccess) {
+                    assertEquals(bytes, it.data)
+                }
+            }
+        }
+
+        fakeBLEGattClient.emit(ServerResponseState.notifySuccess(bytes))
+
+    }
 
     /*
      @Test
