@@ -28,7 +28,7 @@ import org.mockito.Mockito.mock
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GattClientTest {
+class BLEGattClientTest {
     private var mockContext: Context = mock()
 
     private var mockBluetoothAdapter: BluetoothAdapter = mock()
