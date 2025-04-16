@@ -163,5 +163,26 @@ class BLEGattClientTest {
 
     }
 
+    @Test
+    fun `test on characteristic write success`(): Unit = runTest {
+        val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
+
+        val bytes = ByteArray(3)
+        bytes[0] = 0x01
+        bytes[1] = 0x02
+        bytes[2] = 0x03
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            fakeBLEGattClient.serverResponse.collect {
+                if (it is ServerResponseState.WriteSuccess) {
+                    assertEquals(bytes, it.data)
+                }
+            }
+        }
+
+        fakeBLEGattClient.emit(ServerResponseState.writeSuccess(bytes))
+
+    }
+
 
 }
