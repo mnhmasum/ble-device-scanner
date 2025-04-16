@@ -14,7 +14,7 @@ import org.junit.Before
 import org.mockito.Mockito.mock
 
 
-class BluetoothConnectionManagerTest {
+class BLEConnectionManagerTest {
     private var mockContext: Context = mock()
 
     private var mockBluetoothAdapter: BluetoothAdapter = mock()
