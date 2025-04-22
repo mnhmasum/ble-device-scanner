@@ -152,9 +152,9 @@ class BLEGattClientTest {
         bytes[2] = 0x03
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            fakeBLEGattClient.serverResponse.collect {
-                if (it is ServerResponseState.NotifySuccess) {
-                    assertEquals(bytes, it.data)
+            fakeBLEGattClient.serverResponse.collect { result ->
+                if (result is ServerResponseState.NotifySuccess) {
+                    assertEquals(bytes, result.data)
                 }
             }
         }
@@ -173,9 +173,9 @@ class BLEGattClientTest {
         bytes[2] = 0x03
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            fakeBLEGattClient.serverResponse.collect {
-                if (it is ServerResponseState.WriteSuccess) {
-                    assertEquals(bytes, it.data)
+            fakeBLEGattClient.serverResponse.collect { result ->
+                if (result is ServerResponseState.WriteSuccess) {
+                    assertEquals(bytes, result.data)
                 }
             }
         }
