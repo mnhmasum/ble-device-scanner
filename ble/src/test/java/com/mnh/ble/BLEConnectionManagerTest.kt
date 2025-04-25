@@ -11,7 +11,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.junit.Before
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import kotlin.test.Test
 
 
 class BLEConnectionManagerTest {
@@ -36,18 +38,13 @@ class BLEConnectionManagerTest {
         bleConnectionManager = BleConnectionManagerImpl(bleGattClient)
     }
 
-   /* @Test
+    @Test
     fun testConnectCallConnectGattWithBLEDevice() {
-        val bluetoothLEDevice = mock(BluetoothDevice::class.java)
-
-        Mockito.`when`(mockBluetoothAdapter.getRemoteDevice(anyString()))
-            .thenReturn(bluetoothLEDevice)
-
-        bleConnectionManager.connect(anyString())
-
-        Mockito.verify(bluetoothLEDevice).connectGatt(any(), Mockito.eq(false), any())
+        bleConnectionManager.connect("")
+        Mockito.verify(bleGattClient).connect("")
     }
 
+    /*
     @Test
     fun testOnConnectionStateChangeConnectionSuccess() {
         val status = BluetoothGatt.GATT_SUCCESS
