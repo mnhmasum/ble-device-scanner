@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -72,12 +73,8 @@ dependencies {
     implementation(libs.androidx.navigation)
 
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     implementation (libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.serialization.json)
-}
-
-kapt {
-    correctErrorTypes = true
 }

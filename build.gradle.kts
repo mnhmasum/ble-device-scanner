@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
     alias (libs.plugins.daggerHiltAndroid) apply false
     alias(libs.plugins.androidLibrary) apply false
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
 }
 
 buildscript {
