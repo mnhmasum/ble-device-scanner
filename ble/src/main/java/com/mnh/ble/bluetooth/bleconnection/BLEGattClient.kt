@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
+import android.util.Log
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
@@ -35,7 +36,11 @@ class BLEGattClient(
     var gatt: BluetoothGatt? = null
 
     fun connect(address: String) {
-        bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
+        scope.launch {
+            connectionState.emit(DataState.loading())
+        }.also {
+            bluetoothAdapter.getRemoteDevice(address).connectGatt(context, false, this)
+        }
     }
 
     fun disconnect() {
@@ -51,6 +56,7 @@ class BLEGattClient(
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         when (newState) {
             BluetoothProfile.STATE_CONNECTING -> {
+                Log.i("BLE_GattClient", "onConnectionStateChange: ")
                 scope.launch {
                     connectionState.emit(DataState.loading())
                 }
@@ -63,7 +69,12 @@ class BLEGattClient(
 
             BluetoothProfile.STATE_DISCONNECTED -> {
                 scope.launch {
-                    connectionState.emit(DataState.error("Disconnected", Throwable("Error: Disconnected")))
+                    connectionState.emit(
+                        DataState.error(
+                            "Disconnected",
+                            Throwable("Error: Disconnected")
+                        )
+                    )
                 }
                 logI("Device disconnected")
             }
@@ -75,7 +86,8 @@ class BLEGattClient(
             scope.launch {
                 val serviceCharacteristicsMap = extractServicesWithCharacteristics(gatt.services)
                 val deviceInfo = DeviceInfo(gatt.device.name, gatt.device.address)
-                val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
+                val details =
+                    DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
                 connectionState.emit(DataState.success(details))
             }
         }
