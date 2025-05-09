@@ -205,7 +205,7 @@ fun DisconnectedMessage(onClickReconnect: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+            text = "Reconnect", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
         )
         IconButton(onClick = onClickReconnect) {
             Icon(Icons.Default.Refresh, contentDescription = "Reconnect")
