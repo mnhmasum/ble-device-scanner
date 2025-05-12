@@ -69,12 +69,7 @@ class BLEGattClient(
 
             BluetoothProfile.STATE_DISCONNECTED -> {
                 scope.launch {
-                    connectionState.emit(
-                        DataState.error(
-                            "Disconnected",
-                            Throwable("Error: Disconnected")
-                        )
-                    )
+                    connectionState.emit(DataState.error("Disconnected", Throwable("Error: Disconnected")))
                 }
                 logI("Device disconnected")
             }
