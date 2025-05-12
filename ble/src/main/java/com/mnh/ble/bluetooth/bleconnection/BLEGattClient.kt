@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
-import android.util.Log
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
@@ -55,13 +54,6 @@ class BLEGattClient(
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         when (newState) {
-            BluetoothProfile.STATE_CONNECTING -> {
-                Log.i("BLE_GattClient", "onConnectionStateChange: ")
-                scope.launch {
-                    connectionState.emit(DataState.loading())
-                }
-            }
-
             BluetoothProfile.STATE_CONNECTED -> {
                 setBluetoothGatt(gatt)
                 gatt.discoverServices()
