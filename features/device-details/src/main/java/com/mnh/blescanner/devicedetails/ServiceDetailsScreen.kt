@@ -61,14 +61,21 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     LaunchedEffect(deviceAddress) {
         detailsViewModel.connect(deviceAddress)
         isAlreadyConnected.value = true
+
     }
 
     BackHandler {
+        detailsViewModel.disconnect()
         navController.navigateUp()
     }
 
     Scaffold(topBar = {
-        TopBar(deviceName = deviceName, onNavigationIconClick = { navController.navigateUp() })
+        TopBar(
+            deviceName = deviceName,
+            onNavigationIconClick = {
+                detailsViewModel.disconnect()
+                navController.navigateUp()
+            })
     }) { paddingValues ->
 
         val contentPadding = Modifier.padding(

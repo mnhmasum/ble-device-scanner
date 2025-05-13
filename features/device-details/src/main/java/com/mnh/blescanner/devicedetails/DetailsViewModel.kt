@@ -24,4 +24,10 @@ class DetailsViewModel @Inject constructor(private val detailsUseCase: DeviceDet
         }
     }
 
+    fun disconnect() {
+        viewModelScope.launch(Dispatchers.IO) {
+            detailsUseCase.disconnect()
+        }
+    }
+
 }
