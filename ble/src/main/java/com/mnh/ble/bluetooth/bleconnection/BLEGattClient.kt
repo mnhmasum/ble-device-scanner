@@ -45,7 +45,6 @@ class BLEGattClient(
     fun disconnect() {
         connectionState.drop(1)
         gatt?.disconnect()
-        gatt?.close()
     }
 
     private fun setBluetoothGatt(gatt: BluetoothGatt) {
@@ -63,6 +62,7 @@ class BLEGattClient(
                 scope.launch {
                     connectionState.emit(DataState.error("Disconnected", Throwable("Error: Disconnected")))
                 }
+                gatt.close()
                 logI("Device disconnected")
             }
         }
