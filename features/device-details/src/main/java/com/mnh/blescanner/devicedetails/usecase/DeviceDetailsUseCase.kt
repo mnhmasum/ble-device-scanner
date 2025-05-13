@@ -14,10 +14,6 @@ class DeviceDetailsUseCase @Inject constructor(private val deviceDetailsReposito
         return deviceDetailsRepository.connect(device)
     }
 
-    fun disconnect() {
-        deviceDetailsRepository.disconnect()
-    }
-
     fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
         deviceDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
