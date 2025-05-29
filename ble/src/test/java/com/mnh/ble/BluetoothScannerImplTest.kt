@@ -24,8 +24,7 @@ class BluetoothScannerImplTest {
 
     @Before
     fun setUp() {
-        bleScannerImpl =
-            BleScannerImpl(bluetoothLeScanner = bluetoothLeScanner, settings = scanSettingsMock)
+        bleScannerImpl = BleScannerImpl(bluetoothLeScanner = bluetoothLeScanner, settings = scanSettingsMock)
     }
 
     @Test

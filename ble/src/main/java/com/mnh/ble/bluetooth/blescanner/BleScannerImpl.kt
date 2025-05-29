@@ -15,7 +15,6 @@ class BleScannerImpl(
     private val bluetoothLeScanner: BluetoothLeScanner,
     private val deviceList: MutableMap<String, ScanResult> = mutableMapOf(),
     private val channel: Channel<List<ScanResult>> = Channel(Channel.BUFFERED),
-    private val close: (Throwable) -> Unit = { throwable -> channel.close(throwable) },
     private val settings: ScanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build(),
 ) : BleScanner,
     ScanCallback() {
@@ -30,7 +29,6 @@ class BleScannerImpl(
     }
 
     override fun onScanFailed(errorCode: Int) {
-        //close(IllegalStateException("BLE Scan failed with error code: $errorCode"))
     }
 
     private fun trySend(results: List<ScanResult>) {
