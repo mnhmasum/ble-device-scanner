@@ -5,6 +5,7 @@ import android.bluetooth.le.ScanResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +14,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +38,7 @@ import androidx.navigation.NavController
 import com.mnh.bledevicescanner.core.theme.AppTheme
 import com.napco.utils.DeviceDetailsScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")
 @Composable
 fun DeviceListScreen(navController: NavController) {
@@ -61,21 +66,33 @@ fun DeviceListScreen(navController: NavController) {
         }
     }
 
-    MainContentBody(deviceList = bleScannedDeviceList, onClickConnect = {
-        onClickConnect(it)
-    })
+    Scaffold(topBar = {
+        TopAppBar(title = { Text("BLE Device Scanner") })
+    }) { paddingValues ->
+
+        MainContentBody(paddingValues, deviceList = bleScannedDeviceList, onClickConnect = {
+            onClickConnect(it)
+        })
+    }
+
+
 }
 
 @Composable
 fun MainContentBody(
+    contentPadding: PaddingValues,
     deviceList: List<ScanResult>?,
     onClickConnect: (index: Int) -> Unit,
 ) {
     if (deviceList.isNullOrEmpty()) {
         Loader()
     } else {
-        Column(modifier = Modifier.padding(8.dp)) {
-            DeviceList(scanResults = deviceList, onClickConnect)
+        Column {
+            DeviceList(
+                contentPadding,
+                scanResults = deviceList,
+                onClickConnect
+            )
         }
     }
 
@@ -83,16 +100,16 @@ fun MainContentBody(
 
 @Composable
 fun DeviceList(
+    contentPadding: PaddingValues,
     scanResults: List<ScanResult>?,
     onClickConnect: (listIndex: Int) -> Unit,
 ) {
     val bleDeviceList = scanResults ?: emptyList()
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(bleDeviceList.size,
-            key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
-            DeviceItem(itemIndex,
-                bleDeviceList[itemIndex],
-                onClickConnect = { onClickConnect(itemIndex) })
+    LazyColumn(contentPadding = contentPadding) {
+        items(
+            bleDeviceList.size, key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
+            DeviceItem(
+                itemIndex, bleDeviceList[itemIndex], onClickConnect = { onClickConnect(itemIndex) })
         }
     }
 }
@@ -113,8 +130,7 @@ fun DeviceItem(
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(8.dp)
-            ),
-        verticalAlignment = Alignment.CenterVertically
+            ), verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
@@ -122,30 +138,22 @@ fun DeviceItem(
                 .weight(1f)
         ) {
             Text(
-                text = device.name ?: "Unknown",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
+                text = device.name ?: "Unknown", style = TextStyle(
+                    fontSize = 18.sp, fontWeight = FontWeight.SemiBold
                 )
             )
             Text(
-                modifier = Modifier.padding(vertical = 2.dp),
-                text = device.address,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = Color.DarkGray
+                modifier = Modifier.padding(vertical = 2.dp), text = device.address, style = TextStyle(
+                    fontSize = 12.sp, color = Color.DarkGray
                 )
             )
             Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = "RSSI $rssi"
+                modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
             )
         }
 
         Button(
-            onClick = { onClickConnect(index) },
-            shape = RoundedCornerShape(16),
-            modifier = Modifier.padding(end = 8.dp)
+            onClick = { onClickConnect(index) }, shape = RoundedCornerShape(16), modifier = Modifier.padding(end = 8.dp)
         ) {
             Text("Connect")
         }
@@ -168,6 +176,6 @@ fun Loader() {
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBody(deviceList = emptyList(), onClickConnect = { })
+        MainContentBody(PaddingValues(16.dp), deviceList = emptyList(), onClickConnect = { })
     }
 }
