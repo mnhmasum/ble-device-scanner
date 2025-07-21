@@ -129,7 +129,7 @@ fun DeviceItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .background(
-                color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(8.dp)
+                color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp)
             ), verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
