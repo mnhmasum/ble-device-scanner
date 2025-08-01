@@ -50,8 +50,8 @@ fun DeviceListScreen(navController: NavController) {
 
     val onClickConnect: (Int) -> Unit = remember(bleScannedDeviceList) {
         { selectedIndex ->
-            val deviceName: String = bleScannedDeviceList[selectedIndex].device?.name ?: ""
-            val deviceAddress: String = bleScannedDeviceList[selectedIndex].device?.address ?: ""
+            val deviceName: String = bleScannedDeviceList[selectedIndex].device?.name ?: "Unknown"
+            val deviceAddress: String = bleScannedDeviceList[selectedIndex].device?.address.orEmpty()
             navController.navigate(DeviceDetailsScreen(deviceName, deviceAddress))
         }
     }
