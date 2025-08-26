@@ -20,6 +20,7 @@ BLE Device Scanner is an Android app designed to find nearby Bluetooth Low Energ
 ## Installation
 - Clone the repository:
 - git clone https://github.com/yourusername/BLEDeviceScanner.git
+- Use JDK 17
 
 ## Usage
 * Launch the app on your Android device.
