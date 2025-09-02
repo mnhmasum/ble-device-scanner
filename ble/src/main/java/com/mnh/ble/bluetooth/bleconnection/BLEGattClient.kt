@@ -85,9 +85,6 @@ class BLEGattClient(
         descriptor: BluetoothGattDescriptor,
         status: Int,
     ) {
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            // When descriptor is written successfully
-        }
     }
 
     override fun onCharacteristicWrite(
