@@ -2,7 +2,7 @@ package com.mnh.blescanner.devicedetails.repository
 
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
 import com.napco.utils.DataState
-import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 
 class DeviceDetailsRepositoryImpl(private val bleConnectionManager: BleConnectionManager) :
@@ -15,7 +15,7 @@ class DeviceDetailsRepositoryImpl(private val bleConnectionManager: BleConnectio
         bleConnectionManager.disconnect()
     }
 
-    override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
+    override fun getGattConnectionResult(): Flow<DataState<BleDevice>> {
         return bleConnectionManager.connectionState()
     }
 }

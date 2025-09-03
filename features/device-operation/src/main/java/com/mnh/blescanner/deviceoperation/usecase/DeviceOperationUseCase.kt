@@ -3,7 +3,7 @@ package com.mnh.blescanner.deviceoperation.usecase
 import com.mnh.blescanner.deviceoperation.respository.DeviceOperationRepository
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
-import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.BleDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -40,7 +40,7 @@ class DeviceOperationUseCase @Inject constructor(private val deviceOperationRepo
         deviceOperationRepository.disconnect()
     }
 
-    fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
+    fun bleGattConnectionResult(): Flow<DataState<BleDevice>> =
         deviceOperationRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
             .map { it }

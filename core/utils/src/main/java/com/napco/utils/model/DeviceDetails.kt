@@ -18,13 +18,8 @@ data class Characteristic(
 data class Service(val name: String, val uuid: String)
 
 @Serializable
-data class DeviceInfo(
+data class BleDevice(
     val name: String,
-    val address: String,
-)
-
-@Serializable
-data class DeviceDetails(
-    val deviceInfo: DeviceInfo,
+    val macAddress: String,
     val services: Map<Service, List<Characteristic>>,
 )

@@ -14,9 +14,8 @@ import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
 import com.napco.utils.Utility.Companion.extractCharacteristicInfo
 import com.napco.utils.Utility.Companion.logI
+import com.napco.utils.model.BleDevice
 import com.napco.utils.model.Characteristic
-import com.napco.utils.model.DeviceDetails
-import com.napco.utils.model.DeviceInfo
 import com.napco.utils.model.Service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,7 @@ class BLEGattClient(
     private val bluetoothAdapter: BluetoothAdapter,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : BluetoothGattCallback() {
-    var connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
+    var connectionState: MutableSharedFlow<DataState<BleDevice>> = MutableSharedFlow()
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
     var gatt: BluetoothGatt? = null
 
@@ -71,11 +70,13 @@ class BLEGattClient(
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
-                val serviceCharacteristicsMap = extractServicesWithCharacteristics(gatt.services)
-                val deviceInfo = DeviceInfo(gatt.device.name, gatt.device.address)
-                val details =
-                    DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
-                connectionState.emit(DataState.success(details))
+                val bleServicesWithCharacteristics = extractServicesWithCharacteristics(gatt.services)
+                val bleDevice = BleDevice(
+                    name = gatt.device.name,
+                    macAddress = gatt.device.address,
+                    services = bleServicesWithCharacteristics
+                )
+                connectionState.emit(DataState.success(bleDevice))
             }
         }
     }
@@ -149,7 +150,7 @@ class BLEGattClient(
     }
 
     private fun extractServicesWithCharacteristics(serviceList: List<BluetoothGattService>): Map<Service, List<Characteristic>> =
-        serviceList.associate { service ->
+        serviceList.associate { service: BluetoothGattService ->
             val characteristics = service.characteristics.map { bleCharacteristic ->
                 extractCharacteristicInfo(bleCharacteristic)
             }

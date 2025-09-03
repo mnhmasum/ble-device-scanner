@@ -2,7 +2,7 @@ package com.mnh.blescanner.devicedetails.usecase
 
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
 import com.napco.utils.DataState
-import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.BleDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -18,7 +18,7 @@ class DeviceDetailsUseCase @Inject constructor(private val deviceDetailsReposito
         deviceDetailsRepository.disconnect()
     }
 
-    fun bleGattConnectionResult(): Flow<DataState<DeviceDetails>> =
+    fun bleGattConnectionResult(): Flow<DataState<BleDevice>> =
         deviceDetailsRepository.getGattConnectionResult()
             .flowOn(Dispatchers.IO)
             .map { it }

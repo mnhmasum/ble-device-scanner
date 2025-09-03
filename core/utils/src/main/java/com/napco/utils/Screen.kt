@@ -10,7 +10,7 @@ data class DeviceDetailsScreen(val deviceName: String, val macAddress: String)
 
 @Serializable
 data class DeviceOperationScreen(
-    val deviceAddress: String,
+    val deviceMacAddress: String,
     val serviceUUID: String,
     val characteristicName: String,
     val characteristicUUID: String,

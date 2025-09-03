@@ -7,7 +7,7 @@ import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility.Companion.hexStringToByteArray
-import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.BleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class DeviceOperationViewModel @Inject constructor(private val detailsUseCase: DeviceOperationUseCase) :
     ViewModel() {
 
-    val connectionState: Flow<DataState<DeviceDetails>> = detailsUseCase.bleGattConnectionResult()
+    val connectionState: Flow<DataState<BleDevice>> = detailsUseCase.bleGattConnectionResult()
 
     val serverResponseState: Flow<ServerResponseState<ByteArray>> = detailsUseCase.gattServerResponse()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ServerResponseState.loading())

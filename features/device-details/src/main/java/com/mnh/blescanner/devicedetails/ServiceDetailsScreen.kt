@@ -43,8 +43,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.napco.utils.DataState
 import com.napco.utils.DeviceOperationScreen
+import com.napco.utils.model.BleDevice
 import com.napco.utils.model.Characteristic
-import com.napco.utils.model.DeviceDetails
 import com.napco.utils.model.Service
 
 
@@ -107,7 +107,7 @@ fun TopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
 @Composable
 private fun ServiceDetails(
     navController: NavController,
-    connectionResult: DataState<DeviceDetails>,
+    connectionResult: DataState<BleDevice>,
     onClickReconnect: () -> Unit,
 ) {
     when (connectionResult) {
@@ -118,8 +118,8 @@ private fun ServiceDetails(
 }
 
 @Composable
-fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDetails) {
-    val services = deviceDetails.services.toList()
+fun DeviceDetailsContent(navController: NavController, bleDevice: BleDevice) {
+    val services = bleDevice.services.toList()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -129,7 +129,7 @@ fun DeviceDetailsContent(navController: NavController, deviceDetails: DeviceDeta
             ServiceItem(service, onNavigateCharacteristic = { characteristic ->
                 navController.navigate(
                     DeviceOperationScreen(
-                        deviceAddress = deviceDetails.deviceInfo.address,
+                        deviceMacAddress = bleDevice.macAddress,
                         serviceUUID = service.first.uuid,
                         characteristicName = characteristic.name,
                         characteristicUUID = characteristic.uuid,
@@ -221,4 +221,3 @@ fun DisconnectedMessage(onClickReconnect: () -> Unit) {
     }
 
 }
-

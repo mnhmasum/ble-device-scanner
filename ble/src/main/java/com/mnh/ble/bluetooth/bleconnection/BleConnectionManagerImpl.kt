@@ -9,7 +9,7 @@ import android.os.Build
 import com.napco.utils.Constants
 import com.napco.utils.DataState
 import com.napco.utils.ServerResponseState
-import com.napco.utils.model.DeviceDetails
+import com.napco.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -22,7 +22,7 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
         return bleGattClient.gatt?.getService(serviceUUID)
     }
 
-    override fun connectionState(): Flow<DataState<DeviceDetails>> =
+    override fun connectionState(): Flow<DataState<BleDevice>> =
         bleGattClient.connectionState.asSharedFlow()
 
     override fun deviceResponse(): SharedFlow<ServerResponseState<ByteArray>> =

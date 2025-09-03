@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.napco.utils.Constants
 import com.napco.utils.DataState
+import com.napco.utils.DataState.Loading
 import com.napco.utils.DeviceOperationScreen
 import com.napco.utils.ServerResponseState
 import com.napco.utils.Utility
@@ -58,7 +59,7 @@ fun DeviceOperationScreen(
     )
 
     val connectionResult by detailsViewModel.connectionState.collectAsStateWithLifecycle(
-        initialValue = DataState.Loading()
+        initialValue = Loading()
     )
 
     BackHandler {
@@ -141,7 +142,7 @@ fun Properties(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        RowItem("Device Address", deviceOperationScreen.deviceAddress)
+        RowItem("Device Address", deviceOperationScreen.deviceMacAddress)
 
         RowItem("Characteristic Name", deviceOperationScreen.characteristicName)
 
