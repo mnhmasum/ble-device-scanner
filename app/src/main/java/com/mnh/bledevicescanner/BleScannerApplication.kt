@@ -1,4 +1,4 @@
-package com.mnh.bledevicescanner;
+package com.mnh.bledevicescanner
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

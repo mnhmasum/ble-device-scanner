@@ -12,10 +12,6 @@ import java.util.UUID
 import javax.inject.Inject
 
 class DeviceOperationUseCase @Inject constructor(private val deviceOperationRepository: DeviceOperationRepository) {
-    fun connect(device: String) {
-        return deviceOperationRepository.connect(device)
-    }
-
     fun enableNotification(service: UUID, chara: UUID) {
         deviceOperationRepository.enableNotification(service, chara)
     }
@@ -34,10 +30,6 @@ class DeviceOperationUseCase @Inject constructor(private val deviceOperationRepo
 
     fun writeCharacteristicWithNoResponse(service: UUID, chara: UUID, bytes: ByteArray) {
         deviceOperationRepository.writeCharacteristicWithNoResponse(service, chara, bytes)
-    }
-
-    fun disconnect() {
-        deviceOperationRepository.disconnect()
     }
 
     fun bleGattConnectionResult(): Flow<DataState<BleDevice>> =
