@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,7 +52,8 @@ fun DeviceListScreen(navController: NavController) {
     val onClickConnect: (Int) -> Unit = remember(bleScannedDeviceList) {
         { selectedIndex ->
             val deviceName: String = bleScannedDeviceList[selectedIndex].device?.name ?: "Unknown"
-            val deviceAddress: String = bleScannedDeviceList[selectedIndex].device?.address.orEmpty()
+            val deviceAddress: String =
+                bleScannedDeviceList[selectedIndex].device?.address.orEmpty()
             navController.navigate(DeviceDetailsScreen(deviceName, deviceAddress))
         }
     }
@@ -89,9 +91,7 @@ fun MainContentBody(
     } else {
         Column {
             DeviceList(
-                contentPadding,
-                scanResults = deviceList,
-                onClickConnect
+                contentPadding, scanResults = deviceList, onClickConnect
             )
         }
     }
@@ -107,7 +107,8 @@ fun DeviceList(
     val bleDeviceList = scanResults ?: emptyList()
     LazyColumn(contentPadding = contentPadding) {
         items(
-            bleDeviceList.size, key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
+            bleDeviceList.size,
+            key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
             DeviceItem(
                 itemIndex, bleDeviceList[itemIndex], onClickConnect = { onClickConnect(itemIndex) })
         }
@@ -143,7 +144,9 @@ fun DeviceItem(
                 )
             )
             Text(
-                modifier = Modifier.padding(vertical = 2.dp), text = device.address, style = TextStyle(
+                modifier = Modifier.padding(vertical = 2.dp),
+                text = device.address,
+                style = TextStyle(
                     fontSize = 12.sp, color = Color.DarkGray
                 )
             )
@@ -151,14 +154,21 @@ fun DeviceItem(
                 modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
             )
         }
-
         Button(
-            onClick = { onClickConnect(index) }, shape = RoundedCornerShape(16), modifier = Modifier.padding(end = 8.dp)
+            onClick = { onClickConnect(index) },
+            shape = RoundedCornerShape(16),
+            modifier = Modifier.padding(end = 8.dp)
         ) {
             Text("Connect")
         }
     }
-
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .background(Color.LightGray)
+            .height(0.5.dp)
+    )
 }
 
 @Composable
