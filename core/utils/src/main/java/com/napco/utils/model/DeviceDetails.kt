@@ -1,10 +1,8 @@
 package com.napco.utils.model
 
 import com.napco.utils.Utility
-import kotlinx.serialization.Serializable
 import java.util.UUID
 
-@Serializable
 data class Characteristic(
     val uuid: String = "",
     val properties: List<String>,
@@ -13,11 +11,8 @@ data class Characteristic(
     val name: String
         get() = Utility.getCharacteristicPurpose(UUID.fromString(uuid))
 }
-
-@Serializable
 data class Service(val name: String, val uuid: String)
 
-@Serializable
 data class BleDevice(
     val name: String,
     val macAddress: String,
