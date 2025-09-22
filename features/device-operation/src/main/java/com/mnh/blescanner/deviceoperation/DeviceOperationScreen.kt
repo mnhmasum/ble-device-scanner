@@ -137,15 +137,10 @@ fun Properties(
 ) {
 
     Column(modifier = Modifier.padding(all = 16.dp)) {
-
         OperationTitle("PROPERTIES")
-
         Spacer(modifier = Modifier.height(16.dp))
-
         RowItem("Device Address", deviceOperationScreen.deviceMacAddress)
-
         RowItem("Characteristic Name", deviceOperationScreen.characteristicName)
-
         ReadAndNotifyIndicationOperation(
             deviceOperationScreen,
             serverResponse,
@@ -153,11 +148,9 @@ fun Properties(
             onClickNotification,
             onClickIndication
         )
-
         WriteOperation(
             deviceOperationScreen, serverResponse, onClickWrite, onClickWriteWithoutResponse
         )
-
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
 
@@ -182,7 +175,6 @@ private fun WriteOperation(
     onClickWrite: (String) -> Unit,
     onClickWriteWithoutResponse: (String) -> Unit,
 ) {
-
     var text by remember { mutableStateOf(TextFieldValue("")) }
 
     val isWritable = deviceOperationScreen.properties.any {
@@ -198,24 +190,18 @@ private fun WriteOperation(
     }
 
     OperationTitle("WRITE")
-
     OutlinedTextField(value = text, onValueChange = {
         text = it
     }, placeholder = { Text("ex: D1 D2 D3") }, modifier = Modifier.fillMaxWidth()
     )
-
     Spacer(modifier = Modifier.height(8.dp))
-
     Row {
         if (isWritable) {
             Button(onClick = { onClickWrite(text.text) }) {
                 Text(text = "WRITE")
             }
-
             Spacer(modifier = Modifier.width(16.dp))
         }
-
-
         if (isWritableNoResponse) {
             Button(onClick = { onClickWriteWithoutResponse(text.text) }) {
                 Text(text = "WRITE WITHOUT RESPONSE")
@@ -224,11 +210,9 @@ private fun WriteOperation(
     }
 
     Spacer(modifier = Modifier.height(20.dp))
-
     if (!isWritable) {
         return
     }
-
     when (gattServerResponse) {
         is ServerResponseState.WriteSuccess -> {
             Text(text = Utility.bytesToHexString(gattServerResponse.data))
@@ -236,7 +220,6 @@ private fun WriteOperation(
 
         else -> {}
     }
-
 }
 
 @Composable

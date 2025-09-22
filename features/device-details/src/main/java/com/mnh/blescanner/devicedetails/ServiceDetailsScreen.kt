@@ -61,7 +61,6 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
     LaunchedEffect(deviceAddress) {
         detailsViewModel.connect(deviceAddress)
         isAlreadyConnected.value = true
-
     }
 
     BackHandler {
@@ -77,7 +76,6 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
                 navController.navigateUp()
             })
     }) { paddingValues ->
-
         val contentPadding = Modifier.padding(
             start = 16.dp,
             end = 16.dp,
@@ -124,7 +122,6 @@ fun DeviceDetailsContent(navController: NavController, bleDevice: BleDevice) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-
         items(services, key = { it.first.uuid }) { service ->
             ServiceItem(service, onNavigateCharacteristic = { characteristic ->
                 navController.navigate(
@@ -217,7 +214,5 @@ fun DisconnectedMessage(onClickReconnect: () -> Unit) {
         IconButton(onClick = onClickReconnect) {
             Icon(Icons.Default.Refresh, contentDescription = "Reconnect")
         }
-
     }
-
 }
