@@ -76,8 +76,6 @@ fun DeviceListScreen(navController: NavController) {
             onClickConnect(it)
         })
     }
-
-
 }
 
 @Composable
@@ -95,7 +93,6 @@ fun MainContentBody(
             )
         }
     }
-
 }
 
 @Composable
@@ -122,16 +119,14 @@ fun DeviceItem(
     scanResult: ScanResult,
     onClickConnect: (index: Int) -> Unit,
 ) {
-    val device = scanResult.device
-    val rssi = scanResult.rssi
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .background(
                 color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp)
-            ), verticalAlignment = Alignment.CenterVertically
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
@@ -139,19 +134,23 @@ fun DeviceItem(
                 .weight(1f)
         ) {
             Text(
-                text = device.name ?: "Unknown", style = TextStyle(
-                    fontSize = 18.sp, fontWeight = FontWeight.SemiBold
+                text = scanResult.device.name ?: "Unknown",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             )
             Text(
                 modifier = Modifier.padding(vertical = 2.dp),
-                text = device.address,
+                text = scanResult.device.address,
                 style = TextStyle(
-                    fontSize = 12.sp, color = Color.DarkGray
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
                 )
             )
             Text(
-                modifier = Modifier.padding(top = 8.dp), text = "RSSI $rssi"
+                modifier = Modifier.padding(top = 8.dp),
+                text = "RSSI ${scanResult.rssi}"
             )
         }
         Button(
