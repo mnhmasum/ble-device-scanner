@@ -56,11 +56,8 @@ fun ServiceDetailsScreen(navController: NavController, deviceName: String, devic
         initialValue = DataState.Loading()
     )
 
-    val isAlreadyConnected = rememberSaveable { mutableStateOf(false) }
-
     LaunchedEffect(deviceAddress) {
         detailsViewModel.connect(deviceAddress)
-        isAlreadyConnected.value = true
     }
 
     BackHandler {
