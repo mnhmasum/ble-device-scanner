@@ -43,9 +43,9 @@ import com.napco.utils.DeviceDetailsScreen
 @SuppressLint("MissingPermission")
 @Composable
 fun DeviceListScreen(navController: NavController) {
-    val deviceListViewModel: DeviceListViewModel = hiltViewModel()
+    val deviceDiscoveryViewModel: DeviceDiscoveryViewModel = hiltViewModel()
 
-    val bleScannedDeviceList by deviceListViewModel.scannedDeviceList.collectAsStateWithLifecycle(
+    val bleScannedDeviceList by deviceDiscoveryViewModel.scannedDeviceList.collectAsStateWithLifecycle(
         emptyList()
     )
 
@@ -59,12 +59,12 @@ fun DeviceListScreen(navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        deviceListViewModel.startScanning()
+        deviceDiscoveryViewModel.startScanning()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            deviceListViewModel.stopScanning()
+            deviceDiscoveryViewModel.stopScanning()
         }
     }
 
