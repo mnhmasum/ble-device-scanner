@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
-import com.mnh.blescanner.devicelist.DeviceListScreen
+import com.mnh.blescanner.devicediscovery.DeviceListScreen
 import com.mnh.blescanner.deviceoperation.DeviceOperationScreen
 import com.napco.utils.DeviceDetailsScreen
 import com.napco.utils.DeviceListScreen

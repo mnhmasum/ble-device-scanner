@@ -1,9 +1,9 @@
-package com.mnh.blescanner.devicelist.repository
+package com.mnh.blescanner.devicediscovery.repository
 
 import android.bluetooth.le.ScanResult
 import kotlinx.coroutines.flow.Flow
 
-interface DeviceListRepository {
+interface DeviceDiscoveryRepository {
     fun getScannedDeviceList(): Flow<List<ScanResult>>
     fun startScanning()
     fun stopScanning()

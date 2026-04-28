@@ -1,18 +1,18 @@
-package com.mnh.blescanner.devicelist.usecase
+package com.mnh.blescanner.devicediscovery.usecase
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
-import com.mnh.blescanner.devicelist.repository.DeviceListRepository
+import com.mnh.blescanner.devicediscovery.repository.DeviceDiscoveryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class BleUseCase @Inject constructor(private val deviceListRepository: DeviceListRepository) {
+class ObserveDiscoveredDevicesUseCase @Inject constructor(private val deviceDiscoveryRepository: DeviceDiscoveryRepository) {
     @SuppressLint("MissingPermission")
     fun getBleDeviceList(): Flow<List<ScanResult>> {
-        return deviceListRepository.getScannedDeviceList()
+        return deviceDiscoveryRepository.getScannedDeviceList()
             .distinctUntilChanged { oldItem, newItem ->
                 oldItem == newItem
             }
@@ -20,11 +20,11 @@ class BleUseCase @Inject constructor(private val deviceListRepository: DeviceLis
     }
 
     suspend fun startScanning() {
-        deviceListRepository.startScanning()
+        deviceDiscoveryRepository.startScanning()
     }
 
     fun stopScanning() {
-        deviceListRepository.stopScanning()
+        deviceDiscoveryRepository.stopScanning()
     }
 
 }

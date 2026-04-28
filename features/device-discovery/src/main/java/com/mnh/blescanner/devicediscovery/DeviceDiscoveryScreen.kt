@@ -1,4 +1,4 @@
-package com.mnh.blescanner.devicelist
+package com.mnh.blescanner.devicediscovery
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
