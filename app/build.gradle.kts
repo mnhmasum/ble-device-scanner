@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    //id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.kotlin.serialization)
     id("com.google.devtools.ksp")
@@ -96,8 +95,3 @@ dependencies {
     implementation(project(":features:device-operation"))
 
 }
-
-/*
-kapt {
-    correctErrorTypes = true
-}*/

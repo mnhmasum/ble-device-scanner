@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.daggerHiltAndroid)
     alias(libs.plugins.kotlin.serialization)
-    id("kotlin-kapt")
+    //id("kotlin-kapt")
     id("com.google.devtools.ksp")
 }
 
