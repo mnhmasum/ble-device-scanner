@@ -74,4 +74,5 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "daggerHiltAndroid" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-kapt = { id = "kotlin-kapt", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version = "1.9.0-1.0.13" }
 
