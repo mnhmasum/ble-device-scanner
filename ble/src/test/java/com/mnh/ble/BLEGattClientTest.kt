@@ -6,12 +6,12 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
-import com.napco.utils.DataState
-import com.napco.utils.ServerResponseState
-import com.napco.utils.model.Characteristic
+import com.mnh.utils.DataState
+import com.mnh.utils.ServerResponseState
+import com.mnh.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
 import com.napco.utils.model.DeviceInfo
-import com.napco.utils.model.Service
+import com.mnh.utils.model.Service
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope

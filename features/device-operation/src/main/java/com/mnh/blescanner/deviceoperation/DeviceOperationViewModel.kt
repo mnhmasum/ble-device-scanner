@@ -3,11 +3,11 @@ package com.mnh.blescanner.deviceoperation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
-import com.napco.utils.DataState
-import com.napco.utils.DeviceOperationScreen
-import com.napco.utils.ServerResponseState
-import com.napco.utils.Utility.Companion.hexStringToByteArray
-import com.napco.utils.model.BleDevice
+import com.mnh.utils.DataState
+import com.mnh.utils.DeviceOperationScreen
+import com.mnh.utils.ServerResponseState
+import com.mnh.utils.Utility.Companion.hexStringToByteArray
+import com.mnh.utils.model.BleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted

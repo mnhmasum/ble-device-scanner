@@ -1,8 +1,9 @@
-package com.napco.utils
+package com.mnh.utils
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
-import com.napco.utils.model.Characteristic
+import com.mnh.utils.model.Characteristic
+import java.lang.StringBuilder
 import java.util.Formatter
 import java.util.UUID
 
@@ -11,7 +12,7 @@ class Utility {
 
     companion object {
         fun bytesToHexString(bytes: ByteArray): String {
-            val sb = java.lang.StringBuilder(bytes.size * 2)
+            val sb = StringBuilder(bytes.size * 2)
             val formatter = Formatter(sb)
             for (b in bytes) formatter.format("%02x ", b)
             return sb.toString()

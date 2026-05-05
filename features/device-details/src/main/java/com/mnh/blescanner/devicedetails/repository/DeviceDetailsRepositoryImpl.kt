@@ -1,8 +1,8 @@
 package com.mnh.blescanner.devicedetails.repository
 
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManager
-import com.napco.utils.DataState
-import com.napco.utils.model.BleDevice
+import com.mnh.utils.DataState
+import com.mnh.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 
 class DeviceDetailsRepositoryImpl(private val bleConnectionManager: BleConnectionManager) :

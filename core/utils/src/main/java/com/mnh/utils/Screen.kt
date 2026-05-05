@@ -1,4 +1,4 @@
-package com.napco.utils
+package com.mnh.utils
 
 import kotlinx.serialization.Serializable
 

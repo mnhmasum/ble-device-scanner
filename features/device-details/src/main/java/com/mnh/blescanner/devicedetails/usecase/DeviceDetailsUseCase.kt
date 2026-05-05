@@ -1,8 +1,8 @@
 package com.mnh.blescanner.devicedetails.usecase
 
 import com.mnh.blescanner.devicedetails.repository.DeviceDetailsRepository
-import com.napco.utils.DataState
-import com.napco.utils.model.BleDevice
+import com.mnh.utils.DataState
+import com.mnh.utils.model.BleDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn

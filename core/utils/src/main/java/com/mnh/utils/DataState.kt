@@ -1,4 +1,4 @@
-package com.napco.utils
+package com.mnh.utils
 
 sealed class DataState<T> {
 

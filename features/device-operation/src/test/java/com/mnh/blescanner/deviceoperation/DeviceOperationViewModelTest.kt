@@ -1,13 +1,13 @@
 package com.mnh.blescanner.deviceoperation
 
 import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
-import com.napco.utils.DataState
-import com.napco.utils.DeviceOperationScreen
-import com.napco.utils.Utility.Companion.hexStringToByteArray
-import com.napco.utils.model.Characteristic
+import com.mnh.utils.DataState
+import com.mnh.utils.DeviceOperationScreen
+import com.mnh.utils.Utility.Companion.hexStringToByteArray
+import com.mnh.utils.model.Characteristic
 import com.napco.utils.model.DeviceDetails
 import com.napco.utils.model.DeviceInfo
-import com.napco.utils.model.Service
+import com.mnh.utils.model.Service
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mnh.bledevicescanner.core.theme.AppTheme
-import com.napco.utils.DeviceDetailsScreen
+import com.mnh.utils.DeviceDetailsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")

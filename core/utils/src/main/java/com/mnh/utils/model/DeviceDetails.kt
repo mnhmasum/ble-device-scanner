@@ -1,6 +1,6 @@
-package com.napco.utils.model
+package com.mnh.utils.model
 
-import com.napco.utils.Utility
+import com.mnh.utils.Utility
 import java.util.UUID
 
 data class Characteristic(
@@ -9,7 +9,7 @@ data class Characteristic(
     val acceptedPropertyList: String = properties.joinToString(", "),
 ) {
     val name: String
-        get() = Utility.getCharacteristicPurpose(UUID.fromString(uuid))
+        get() = Utility.Companion.getCharacteristicPurpose(UUID.fromString(uuid))
 }
 data class Service(val name: String, val uuid: String)
 

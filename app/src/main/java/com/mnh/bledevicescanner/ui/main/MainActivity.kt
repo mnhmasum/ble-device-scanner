@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.mnh.bledevicescanner.core.theme.AppTheme
 import com.mnh.bledevicescanner.ui.navigation.Navigation
-import com.napco.utils.PermissionManager.Companion.permissionManager
+import com.mnh.utils.PermissionManager.Companion.permissionManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

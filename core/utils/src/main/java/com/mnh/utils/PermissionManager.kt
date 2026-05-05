@@ -1,4 +1,4 @@
-package com.napco.utils
+package com.mnh.utils
 
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
