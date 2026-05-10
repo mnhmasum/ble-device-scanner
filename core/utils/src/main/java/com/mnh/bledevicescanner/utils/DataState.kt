@@ -1,4 +1,4 @@
-package com.mnh.utils
+package com.mnh.bledevicescanner.utils
 
 sealed class DataState<T> {
 

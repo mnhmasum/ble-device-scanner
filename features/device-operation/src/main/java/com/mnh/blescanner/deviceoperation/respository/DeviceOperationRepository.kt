@@ -1,8 +1,8 @@
 package com.mnh.blescanner.deviceoperation.respository
 
-import com.mnh.utils.DataState
-import com.mnh.utils.ServerResponseState
-import com.mnh.utils.model.BleDevice
+import com.mnh.bledevicescanner.utils.DataState
+import com.mnh.bledevicescanner.utils.ServerResponseState
+import com.mnh.bledevicescanner.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 

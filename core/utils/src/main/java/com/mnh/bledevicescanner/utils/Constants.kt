@@ -1,4 +1,4 @@
-package com.mnh.utils
+package com.mnh.bledevicescanner.utils
 
 import java.util.UUID
 

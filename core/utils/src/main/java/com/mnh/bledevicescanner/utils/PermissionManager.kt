@@ -1,4 +1,4 @@
-package com.mnh.utils
+package com.mnh.bledevicescanner.utils
 
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity

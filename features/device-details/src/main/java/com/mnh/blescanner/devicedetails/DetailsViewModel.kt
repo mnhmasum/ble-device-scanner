@@ -3,8 +3,8 @@ package com.mnh.blescanner.devicedetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnh.blescanner.devicedetails.usecase.DeviceDetailsUseCase
-import com.mnh.utils.DataState
-import com.mnh.utils.model.BleDevice
+import com.mnh.bledevicescanner.utils.DataState
+import com.mnh.bledevicescanner.utils.model.BleDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

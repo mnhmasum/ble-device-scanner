@@ -39,11 +39,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mnh.utils.DataState
-import com.mnh.utils.DeviceOperationScreen
-import com.mnh.utils.model.BleDevice
-import com.mnh.utils.model.Characteristic
-import com.mnh.utils.model.Service
+import com.mnh.bledevicescanner.utils.DataState
+import com.mnh.bledevicescanner.utils.DeviceOperationScreen
+import com.mnh.bledevicescanner.utils.model.BleDevice
+import com.mnh.bledevicescanner.utils.model.Characteristic
+import com.mnh.bledevicescanner.utils.model.Service
 
 
 @Composable

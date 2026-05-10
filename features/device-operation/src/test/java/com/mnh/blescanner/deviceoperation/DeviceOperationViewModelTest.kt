@@ -1,13 +1,12 @@
 package com.mnh.blescanner.deviceoperation
 
 import com.mnh.blescanner.deviceoperation.usecase.DeviceOperationUseCase
-import com.mnh.utils.DataState
-import com.mnh.utils.DeviceOperationScreen
-import com.mnh.utils.Utility.Companion.hexStringToByteArray
-import com.mnh.utils.model.Characteristic
-import com.napco.utils.model.DeviceDetails
-import com.napco.utils.model.DeviceInfo
-import com.mnh.utils.model.Service
+import com.mnh.bledevicescanner.utils.DataState
+import com.mnh.bledevicescanner.utils.DataState.*
+import com.mnh.bledevicescanner.utils.DeviceOperationScreen
+import com.mnh.bledevicescanner.utils.Utility.Companion.hexStringToByteArray
+import com.mnh.bledevicescanner.utils.model.Characteristic
+import com.mnh.bledevicescanner.utils.model.Service
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -100,7 +99,7 @@ class DeviceOperationViewModelTest {
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.connectionState.collect {
-                if (it is DataState.Loading) {
+                if (it is Loading) {
                     assertEquals(expectedData, it)
                 }
             }
@@ -122,7 +121,7 @@ class DeviceOperationViewModelTest {
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.connectionState.collect {
-                if (it is DataState.Success) {
+                if (it is Success) {
                     assertEquals(expectedDevice, it.data)
                 }
             }
@@ -140,7 +139,7 @@ class DeviceOperationViewModelTest {
         val expectedThrowable = Throwable("Error: Disconnected")
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.connectionState.collect {
-                if (it is DataState.Error) {
+                if (it is Error) {
                     assertEquals(expectedThrowable, it.error)
                     assertEquals("Disconnected", it.errorMessage)
                 }

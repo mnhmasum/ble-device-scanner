@@ -11,9 +11,9 @@ import androidx.navigation.toRoute
 import com.mnh.blescanner.devicedetails.ServiceDetailsScreen
 import com.mnh.blescanner.devicediscovery.DeviceListScreen
 import com.mnh.blescanner.deviceoperation.DeviceOperationScreen
-import com.mnh.utils.DeviceDetailsScreen
-import com.mnh.utils.DeviceListScreen
-import com.mnh.utils.DeviceOperationScreen
+import com.mnh.bledevicescanner.utils.DeviceDetailsScreen
+import com.mnh.bledevicescanner.utils.DeviceListScreen
+import com.mnh.bledevicescanner.utils.DeviceOperationScreen
 
 @Composable
 fun Navigation() {

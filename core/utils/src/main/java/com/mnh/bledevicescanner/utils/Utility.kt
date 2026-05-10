@@ -1,8 +1,8 @@
-package com.mnh.utils
+package com.mnh.bledevicescanner.utils
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
-import com.mnh.utils.model.Characteristic
+import com.mnh.bledevicescanner.utils.model.Characteristic
 import java.lang.StringBuilder
 import java.util.Formatter
 import java.util.UUID

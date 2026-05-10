@@ -2,8 +2,8 @@ package com.mnh.ble
 
 import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
-import com.mnh.utils.DataState
-import com.mnh.utils.ServerResponseState
+import com.mnh.bledevicescanner.utils.DataState
+import com.mnh.bledevicescanner.utils.ServerResponseState
 import com.napco.utils.model.DeviceDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.junit.Before
