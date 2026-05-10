@@ -5,6 +5,7 @@ import com.mnh.bledevicescanner.utils.DataState
 import com.mnh.bledevicescanner.utils.DataState.*
 import com.mnh.bledevicescanner.utils.DeviceOperationScreen
 import com.mnh.bledevicescanner.utils.Utility.Companion.hexStringToByteArray
+import com.mnh.bledevicescanner.utils.model.BleDevice
 import com.mnh.bledevicescanner.utils.model.Characteristic
 import com.mnh.bledevicescanner.utils.model.Service
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +35,8 @@ class DeviceOperationViewModelTest {
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
             "Heart Rate",
-            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
+            "240d5183-819a-4627-9ca9-1aa24df29f18",
+            listOf("Readable", "Writable")
         )
 
         val writtenString = "d1 c1"
@@ -60,7 +62,8 @@ class DeviceOperationViewModelTest {
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
             "Heart Rate",
-            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
+            "240d5183-819a-4627-9ca9-1aa24df29f18",
+            listOf("Readable", "Writable")
         )
 
         deviceOperationViewModel.readCharacteristic(deviceOperationScreen)
@@ -77,7 +80,8 @@ class DeviceOperationViewModelTest {
             "AB:CD:ED:FG",
             "240d5183-819a-4627-9ca9-1aa24df29f18",
             "Heart Rate",
-            "240d5183-819a-4627-9ca9-1aa24df29f18", listOf("Readable", "Writable")
+            "240d5183-819a-4627-9ca9-1aa24df29f18",
+            listOf("Readable", "Writable")
         )
 
         deviceOperationViewModel.enableNotification(deviceOperationScreen)
@@ -95,7 +99,7 @@ class DeviceOperationViewModelTest {
 
         val viewModel = DeviceOperationViewModel(deviceOperationUseCase)
 
-        val expectedData: DataState<DeviceDetails> = DataState.loading()
+        val expectedData: DataState<BleDevice> = DataState.loading()
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.connectionState.collect {
@@ -110,9 +114,11 @@ class DeviceOperationViewModelTest {
 
     @Test
     fun `bleConnectionResult should emit success state`(): Unit = runTest {
-        val generalInfo = DeviceInfo(name = "Your Device name", address = "Device mac address")
-        val services: HashMap<Service, List<Characteristic>> = HashMap()
-        val expectedDevice = DeviceDetails(generalInfo, services)
+        val expectedDevice = BleDevice(
+            name = "Your Device name",
+            macAddress = "Device mac address",
+            services = HashMap()
+        )
 
         val fakeDeviceOperationRepository = FakeDeviceOperationRepo()
         val deviceOperationUseCase = DeviceOperationUseCase(fakeDeviceOperationRepository)

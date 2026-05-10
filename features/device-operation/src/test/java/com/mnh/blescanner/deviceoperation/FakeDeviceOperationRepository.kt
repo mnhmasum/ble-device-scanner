@@ -3,15 +3,15 @@ package com.mnh.blescanner.deviceoperation
 import com.mnh.blescanner.deviceoperation.respository.DeviceOperationRepository
 import com.mnh.bledevicescanner.utils.DataState
 import com.mnh.bledevicescanner.utils.ServerResponseState
-import com.mnh.utils.model.DeviceDetails
+import com.mnh.bledevicescanner.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.util.UUID
 
 class FakeDeviceOperationRepo : DeviceOperationRepository {
-    private val connectionFlow = MutableSharedFlow<DataState<DeviceDetails>>()
+    private val connectionFlow = MutableSharedFlow<DataState<BleDevice>>()
     private val serverResponseFlow = MutableSharedFlow<ServerResponseState<ByteArray>>()
-    suspend fun emit(value: DataState<DeviceDetails>) = connectionFlow.emit(value)
+    suspend fun emit(value: DataState<BleDevice>) = connectionFlow.emit(value)
     suspend fun emit(value: ServerResponseState<ByteArray>) = serverResponseFlow.emit(value)
 
     override fun connect(address: String) {
@@ -22,7 +22,7 @@ class FakeDeviceOperationRepo : DeviceOperationRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getGattConnectionResult(): Flow<DataState<DeviceDetails>> {
+    override fun getGattConnectionResult(): Flow<DataState<BleDevice>> {
         return connectionFlow
     }
 
