@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.napco.utils"
+    namespace = "com.mnh.blescanner.utils"
     compileSdk = 34
 
     defaultConfig {
