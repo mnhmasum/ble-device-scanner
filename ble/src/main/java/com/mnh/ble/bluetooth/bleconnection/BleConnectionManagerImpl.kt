@@ -6,10 +6,10 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.os.Build
-import com.mnh.bledevicescanner.utils.Constants
-import com.mnh.bledevicescanner.utils.DataState
-import com.mnh.bledevicescanner.utils.ServerResponseState
-import com.mnh.bledevicescanner.utils.model.BleDevice
+import com.mnh.blescanner.utils.Constants
+import com.mnh.blescanner.utils.DataState
+import com.mnh.blescanner.utils.ServerResponseState
+import com.mnh.blescanner.utils.model.BleDevice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

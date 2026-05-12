@@ -1,6 +1,6 @@
-package com.mnh.bledevicescanner.utils.model
+package com.mnh.blescanner.utils.model
 
-import com.mnh.bledevicescanner.utils.Utility
+import com.mnh.blescanner.utils.Utility
 import java.util.UUID
 
 data class Characteristic(

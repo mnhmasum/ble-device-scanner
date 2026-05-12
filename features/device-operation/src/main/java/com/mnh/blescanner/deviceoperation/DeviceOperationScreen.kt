@@ -41,12 +41,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mnh.bledevicescanner.utils.Constants
-import com.mnh.bledevicescanner.utils.DataState
-import com.mnh.bledevicescanner.utils.DataState.Loading
-import com.mnh.bledevicescanner.utils.DeviceOperationScreen
-import com.mnh.bledevicescanner.utils.ServerResponseState
-import com.mnh.bledevicescanner.utils.Utility
+import com.mnh.blescanner.utils.Constants
+import com.mnh.blescanner.utils.DataState
+import com.mnh.blescanner.utils.DataState.Loading
+import com.mnh.blescanner.utils.DeviceOperationScreen
+import com.mnh.blescanner.utils.ServerResponseState
+import com.mnh.blescanner.utils.Utility
 
 @Composable
 fun DeviceOperationScreen(
