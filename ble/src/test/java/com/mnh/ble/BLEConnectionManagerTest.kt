@@ -4,7 +4,7 @@ import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.mnh.ble.bluetooth.bleconnection.BleConnectionManagerImpl
 import com.mnh.blescanner.utils.DataState
 import com.mnh.blescanner.utils.ServerResponseState
-import com.napco.utils.model.DeviceDetails
+import com.mnh.blescanner.utils.model.BleDevice
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.junit.Before
 import org.mockito.Mockito
@@ -17,7 +17,7 @@ class BLEConnectionManagerTest {
 
     private lateinit var bleConnectionManager: BleConnectionManagerImpl
 
-    private val gattConnectionResult: MutableSharedFlow<DataState<DeviceDetails>> =
+    private val gattConnectionResult: MutableSharedFlow<DataState<BleDevice>> =
         MutableSharedFlow(replay = 1)
 
     private val gattServerResponse: MutableSharedFlow<ServerResponseState<ByteArray>> =
