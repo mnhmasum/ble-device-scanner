@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lightnotebook.core.ui"
+    namespace = "com.mnh.blescanner.core.ui"
     compileSdk = 34
 
     defaultConfig {
