@@ -13,13 +13,11 @@ composeBom = "2023.10.01"
 hilt-android = "2.50"
 lifecycle-viewmodel-compose = "2.4.0"
 lifecycleService = "2.7.0"
-mockitoCore = "1.10.19"
 mockitoCoreVersion = "5.3.1"
 mockitoKotlin = "5.0.0"
 mockk = "1.13.7"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
-roomCommon = "2.6.1"
 material = "1.11.0"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
@@ -53,7 +51,6 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
-androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -73,6 +70,4 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "daggerHiltAndroid" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlin-kapt = { id = "kotlin-kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "1.9.0-1.0.13" }
-
