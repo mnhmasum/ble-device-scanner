@@ -47,7 +47,7 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideBleScannerDataSourceImp(bluetoothLeScanner: BluetoothLeScanner): BleScanner {
+    fun provideBleScanner(bluetoothLeScanner: BluetoothLeScanner): BleScanner {
         return BleScannerImpl(bluetoothLeScanner)
     }
 
@@ -62,7 +62,7 @@ class BluetoothModule {
 
     @Provides
     @Singleton
-    fun provideBleConnector(bleGattClient: BLEGattClient): BleConnectionManager {
+    fun provideBleConnectionManager(bleGattClient: BLEGattClient): BleConnectionManager {
         return BleConnectionManagerImpl(bleGattClient)
     }
 
