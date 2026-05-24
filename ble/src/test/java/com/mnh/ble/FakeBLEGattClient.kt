@@ -14,9 +14,8 @@ import com.mnh.blescanner.utils.ServerResponseState
 import com.mnh.blescanner.utils.Utility
 import com.mnh.blescanner.utils.Utility.Companion.extractCharacteristicInfo
 import com.mnh.blescanner.utils.Utility.Companion.logI
+import com.mnh.blescanner.utils.model.BleDevice
 import com.mnh.blescanner.utils.model.Characteristic
-import com.napco.utils.model.DeviceDetails
-import com.napco.utils.model.DeviceInfo
 import com.mnh.blescanner.utils.model.Service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +29,11 @@ class FakeBLEGattClient(
     private val bluetoothAdapter: BluetoothAdapter,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : BluetoothGattCallback() {
-    var connectionState: MutableSharedFlow<DataState<DeviceDetails>> = MutableSharedFlow()
+    var connectionState: MutableSharedFlow<DataState<BleDevice>> = MutableSharedFlow()
 
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
 
-    suspend fun emit(value: DataState<DeviceDetails>) = connectionState.emit(value)
+    suspend fun emit(value: DataState<BleDevice>) = connectionState.emit(value)
     suspend fun emit(value: ServerResponseState<ByteArray>) = serverResponse.emit(value)
 
     var gatt: BluetoothGatt? = null
@@ -79,9 +78,9 @@ class FakeBLEGattClient(
         if (status == BluetoothGatt.GATT_SUCCESS) {
             scope.launch {
                 val serviceCharacteristicsMap = extractServicesWithCharacteristics(gatt.services)
-                val deviceInfo = DeviceInfo(gatt.device.name, gatt.device.address)
-                val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
-                connectionState.emit(DataState.success(details))
+                val deviceInfo = BleDevice(gatt.device.name, gatt.device.address, serviceCharacteristicsMap)
+                //val details = DeviceDetails(deviceInfo = deviceInfo, services = serviceCharacteristicsMap)
+                connectionState.emit(DataState.success(deviceInfo))
             }
         }
     }

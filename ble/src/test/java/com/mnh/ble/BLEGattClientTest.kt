@@ -8,9 +8,8 @@ import android.content.Context
 import com.mnh.ble.bluetooth.bleconnection.BLEGattClient
 import com.mnh.blescanner.utils.DataState
 import com.mnh.blescanner.utils.ServerResponseState
+import com.mnh.blescanner.utils.model.BleDevice
 import com.mnh.blescanner.utils.model.Characteristic
-import com.napco.utils.model.DeviceDetails
-import com.napco.utils.model.DeviceInfo
 import com.mnh.blescanner.utils.model.Service
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -106,18 +105,18 @@ class BLEGattClientTest {
     fun `test onServicesDiscovered success`(): Unit = runTest {
         val fakeBLEGattClient = FakeBLEGattClient(mockContext, mockBluetoothAdapter, mockScope)
         val services: Map<Service, List<Characteristic>> = HashMap()
-        val device = DeviceInfo("abc", "address")
-        val expectedResult = DeviceDetails(deviceInfo = device, services = services)
+        val device = BleDevice("abc", "address", services)
+        //val expectedResult = DeviceDetails(deviceInfo = device, services = services)
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             fakeBLEGattClient.connectionState.collect {
                 if (it is DataState.Success) {
-                    assertEquals(expectedResult, it.data)
+                    assertEquals(device, it.data)
                 }
             }
         }
 
-        fakeBLEGattClient.emit(DataState.success(expectedResult))
+        fakeBLEGattClient.emit(DataState.success(device))
 
     }
 
