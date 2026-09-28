@@ -30,9 +30,12 @@ BLE Device Scanner is an Android app designed to find nearby Bluetooth Low Energ
 
 ## Screenshots
 
-|                   Device Discovery                    | Service Details |                      Device Operation (Write)                      | Device Operation (Notification) |
-|:-----------------------------------------------------:| :---: |:------------------------------------------------------------------:| :---: |
-| ![Device Discovery](screenshots/Image_discovery.jpeg) | ![Service Details](screenshots/Image_details.jpeg) | ![Device Operation Write](screenshots/Image_device_operation.jpeg) | ![Device Operation Notification](screenshots/Image_operation.jpeg) |
+<p align="center">
+  <img src="screenshots/Image_discovery.jpeg" width="220" alt="Device Discovery" />
+  <img src="screenshots/Image_details.jpeg" width="220" alt="Service Details" />
+  <img src="screenshots/Image_device_operation.jpeg" width="220" alt="Device Operation Write" />
+  <img src="screenshots/Image_operation.jpeg" width="220" alt="Device Operation Notification" />
+</p>
 
 ### Contributing
 Contributions are welcome! Please fork this repository and submit pull requests with your changes.
