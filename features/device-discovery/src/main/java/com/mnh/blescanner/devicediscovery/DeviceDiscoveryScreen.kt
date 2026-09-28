@@ -72,9 +72,12 @@ fun DeviceListScreen(navController: NavController) {
         TopAppBar(title = { Text("BLE Device Scanner") })
     }) { paddingValues ->
 
-        MainContentBody(paddingValues, deviceList = bleScannedDeviceList, onClickConnect = {
-            onClickConnect(it)
-        })
+        MainContentBody(
+            contentPadding = paddingValues,
+            deviceList = bleScannedDeviceList,
+            onClickConnect = {
+                onClickConnect(it)
+            })
     }
 }
 
@@ -89,7 +92,9 @@ fun MainContentBody(
     } else {
         Column {
             DeviceList(
-                contentPadding, scanResults = deviceList, onClickConnect
+                contentPadding = contentPadding,
+                scanResults = deviceList,
+                onClickConnect = onClickConnect
             )
         }
     }
@@ -107,7 +112,8 @@ fun DeviceList(
             bleDeviceList.size,
             key = { index -> bleDeviceList[index].device?.address ?: index }) { itemIndex ->
             DeviceItem(
-                itemIndex, bleDeviceList[itemIndex], onClickConnect = { onClickConnect(itemIndex) })
+                itemIndex, bleDeviceList[itemIndex],
+                onClickConnect = { onClickConnect(itemIndex) })
         }
     }
 }
@@ -124,7 +130,8 @@ fun DeviceItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .background(
-                color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp)
+                color = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(8.dp)
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -175,7 +182,8 @@ fun Loader() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), contentAlignment = Alignment.Center
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
@@ -185,6 +193,9 @@ fun Loader() {
 @Composable
 fun MainPreview() {
     AppTheme {
-        MainContentBody(PaddingValues(16.dp), deviceList = emptyList(), onClickConnect = { })
+        MainContentBody(
+            contentPadding = PaddingValues(16.dp),
+            deviceList = emptyList(),
+            onClickConnect = { })
     }
 }

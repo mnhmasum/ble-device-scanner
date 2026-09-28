@@ -169,7 +169,8 @@ private fun CharacteristicItem(
         Column(modifier = Modifier.weight(3f)) {
             Text(text = characteristic.name)
             Text(
-                text = characteristic.acceptedPropertyList, style = TextStyle(fontSize = 13.sp)
+                text = characteristic.acceptedPropertyList,
+                style = TextStyle(fontSize = 13.sp)
             )
         }
         if (characteristic.properties.isNotEmpty()) {
@@ -204,10 +205,15 @@ fun DisconnectedMessage(onClickReconnect: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Reconnect", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+            text = "Reconnect",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
         )
         IconButton(onClick = onClickReconnect) {
-            Icon(Icons.Default.Refresh, contentDescription = "Reconnect")
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Reconnect"
+            )
         }
     }
 }

@@ -68,15 +68,13 @@ fun DeviceOperationScreen(
 
     Scaffold(topBar = {
         TopBar(
-            deviceName = "Device Operation",
-            onNavigationIconClick = { navController.navigateUp() })
+            deviceName = "Device Operation", onNavigationIconClick = { navController.navigateUp() })
     }) { paddingValues ->
 
         when (connectionResult) {
             is DataState.Error -> {
                 DisconnectedMessage(
-                    paddingValues = paddingValues,
-                    onClickRescan = {
+                    paddingValues = paddingValues, onClickRescan = {
                         navController.navigateUp()
                         navController.navigateUp()
                     })
@@ -111,7 +109,8 @@ private fun DeviceOperationContent(
     )
 
     Box(modifier = contentPadding) {
-        Properties(deviceOperationScreen = deviceOperationScreen,
+        Properties(
+            deviceOperationScreen = deviceOperationScreen,
             serverResponse = serverResponse,
             onClickRead = { detailsViewModel.readCharacteristic(deviceOperationScreen) },
             onClickWrite = { detailsViewModel.writeCharacteristic(deviceOperationScreen, it) },
@@ -142,14 +141,17 @@ fun Properties(
         RowItem("Device Address", deviceOperationScreen.deviceMacAddress)
         RowItem("Characteristic Name", deviceOperationScreen.characteristicName)
         ReadAndNotifyIndicationOperation(
-            deviceOperationScreen,
-            serverResponse,
-            onClickRead,
-            onClickNotification,
-            onClickIndication
+            deviceOperationScreen = deviceOperationScreen,
+            gattServerResponse = serverResponse,
+            onClickRead = onClickRead,
+            onClickNotification = onClickNotification,
+            onClickIndication = onClickIndication,
         )
         WriteOperation(
-            deviceOperationScreen, serverResponse, onClickWrite, onClickWriteWithoutResponse
+            deviceOperationScreen = deviceOperationScreen,
+            gattServerResponse = serverResponse,
+            onClickWrite = onClickWrite,
+            onClickWriteWithoutResponse = onClickWriteWithoutResponse,
         )
         OperationTitle("DESCRIPTORS")
         BasicText(text = "Not implemented yet")
@@ -162,7 +164,10 @@ fun Properties(
 fun TopBar(deviceName: String, onNavigationIconClick: () -> Unit) {
     TopAppBar(title = { Text(deviceName) }, navigationIcon = {
         IconButton(onClick = onNavigationIconClick) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back"
+            )
         }
     })
 }
@@ -190,9 +195,13 @@ private fun WriteOperation(
     }
 
     OperationTitle("WRITE")
-    OutlinedTextField(value = text, onValueChange = {
-        text = it
-    }, placeholder = { Text("ex: D1 D2 D3") }, modifier = Modifier.fillMaxWidth()
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+        },
+        placeholder = { Text("ex: D1 D2 D3") },
+        modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(8.dp))
     Row {
@@ -225,12 +234,16 @@ private fun WriteOperation(
 @Composable
 private fun OperationTitle(title: String) {
     BasicText(
-        text = title, style = TextStyle(
-            fontWeight = FontWeight.Bold, fontSize = 16.sp
+        text = title,
+        style = TextStyle(
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
         )
     )
     Divider(
-        color = Color.Gray, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp)
+        color = Color.Gray,
+        thickness = 0.5.dp,
+        modifier = Modifier.padding(vertical = 4.dp),
     )
 }
 
@@ -325,10 +338,15 @@ fun DisconnectedMessage(paddingValues: PaddingValues, onClickRescan: () -> Unit)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Disconnected", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+            text = "Disconnected",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
         )
         IconButton(onClick = onClickRescan) {
-            Icon(Icons.Default.Refresh, contentDescription = "Rescan")
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Rescan",
+            )
         }
 
     }
