@@ -24,14 +24,14 @@ class BleScannerImpl(
     override fun onScanResult(callbackType: Int, result: ScanResult?) {
         if (result != null) {
             deviceList[result.device.address] = result
-            trySend(deviceList.values.toList())
+            sendResult(deviceList.values.toList())
         }
     }
 
     override fun onScanFailed(errorCode: Int) {
     }
 
-    private fun trySend(results: List<ScanResult>) {
+    private fun sendResult(results: List<ScanResult>) {
         channel.trySend(results).isSuccess
     }
 
