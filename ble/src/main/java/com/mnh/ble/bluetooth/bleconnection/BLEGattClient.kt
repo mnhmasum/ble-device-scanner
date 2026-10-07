@@ -31,7 +31,7 @@ class BLEGattClient(
 ) : BluetoothGattCallback() {
     var connectionState: MutableSharedFlow<DataState<BleDevice>> = MutableSharedFlow()
     val serverResponse: MutableSharedFlow<ServerResponseState<ByteArray>> = MutableSharedFlow()
-    var gatt: BluetoothGatt? = null
+    var bluetoothGatt: BluetoothGatt? = null
 
     fun connect(address: String) {
         scope.launch {
@@ -43,11 +43,11 @@ class BLEGattClient(
 
     fun disconnect() {
         connectionState.drop(1)
-        gatt?.disconnect()
+        bluetoothGatt?.disconnect()
     }
 
     private fun setBluetoothGatt(gatt: BluetoothGatt) {
-        this.gatt = gatt
+        this.bluetoothGatt = gatt
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {

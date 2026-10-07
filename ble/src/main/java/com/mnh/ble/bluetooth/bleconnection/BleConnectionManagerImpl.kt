@@ -19,7 +19,7 @@ import java.util.UUID
 class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleConnectionManager {
 
     override fun getService(serviceUUID: UUID): BluetoothGattService? {
-        return bleGattClient.gatt?.getService(serviceUUID)
+        return bleGattClient.bluetoothGatt?.getService(serviceUUID)
     }
 
     override fun connectionState(): Flow<DataState<BleDevice>> =
@@ -49,9 +49,9 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
     }
 
     override fun readCharacteristic(serviceUUID: UUID, characteristicUUID: UUID) {
-        val service = bleGattClient.gatt?.getService(serviceUUID)
+        val service = bleGattClient.bluetoothGatt?.getService(serviceUUID)
         val characteristics = service?.getCharacteristic(characteristicUUID)
-        bleGattClient.gatt?.readCharacteristic(characteristics)
+        bleGattClient.bluetoothGatt?.readCharacteristic(characteristics)
     }
 
     override fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, bytes: ByteArray) {
@@ -59,7 +59,7 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
     }
 
     override fun writeCharacteristicWithNoResponse(serviceUUID: UUID, characteristicUUID: UUID, bytes: ByteArray) {
-        val service = bleGattClient.gatt?.getService(serviceUUID)
+        val service = bleGattClient.bluetoothGatt?.getService(serviceUUID)
         val characteristics = service?.getCharacteristic(characteristicUUID) ?: return
         writeCharacteristic(characteristics, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
     }
@@ -68,15 +68,15 @@ class BleConnectionManagerImpl(private val bleGattClient: BLEGattClient) : BleCo
         characteristic.writeType = writeType
 
         if (Build.VERSION.SDK_INT >= 33) {
-            bleGattClient.gatt?.writeCharacteristic(characteristic, bytes, writeType)
+            bleGattClient.bluetoothGatt?.writeCharacteristic(characteristic, bytes, writeType)
         } else {
             characteristic.value = bytes
-            bleGattClient.gatt?.writeCharacteristic(characteristic)
+            bleGattClient.bluetoothGatt?.writeCharacteristic(characteristic)
         }
     }
 
     private fun enableNotificationOrIndication(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
-        setupCharacteristicNotification(bleGattClient.gatt, serviceUUID, characteristicUUID, value)
+        setupCharacteristicNotification(bleGattClient.bluetoothGatt, serviceUUID, characteristicUUID, value)
     }
 
     private fun setupCharacteristicNotification(
